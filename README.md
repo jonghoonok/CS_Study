@@ -4,4 +4,4 @@
 
 기본적으로 서울대 컴공 커리큘럼에서 전필 위주로 따라가며 공부함 
 
-![컴공](./IMG_7439.png)
+![컴공](https://github.com/jonghoonok/CS_Study/blob/main/IMG_7439.PNG?raw=true)
