@@ -9,13 +9,12 @@
 - 그림으로 배우는 네트워크 원리
 - Computer networking - Top down approach 
   - [이화여대 강의자료](http://www.kocw.net/home/cview.do?mty=p&kemId=1046412)
-  - 
 
 
 
 [TOC]
 
-## 1. 네트워크 개요
+## **1. 네트워크 개요**
 
 
 
@@ -56,7 +55,7 @@ LAN과 WAN
   - HTTP(웹상에서 뭘 주고받는가?), TCP(어떻게 전송하는가?), IP(어디로 전송하는가?), 이더넷 등이 있음
   - 프로토콜의 집합이 **네트워크 아키텍처**
     - 프로토콜 스택이라고도 함
-    - TCP/IP, OSI 7계층 등이 있음
+    - **TCP/IP**, OSI, Appletalk 등이 있음
 
 
 
@@ -97,25 +96,36 @@ LAN과 WAN
 
 인터넷은 어떻게 구성되는가?
 
-- 전 세계의 다양한 네트워크가 연결된 것: Autonomous System
+- TCP/IP 프로토콜을 기반으로 전 세계의 **다양한 네트워크**(좁게는 AS)를 연결한 것: 
 
-  - ISP(Internet Service Provider)는 AS의 한 예
+  - **Autonomous System** 자율 시스템
 
+    - 독립적인 네트워크로 한 조직에 의해 관리됨
+- AS 내의 라우터들은 단일한 **라우팅 프로토콜**을 사용함
+    
+- ISP(Internet Service Provider)
+  
+    - 집이나 사업장에 유료료 인터넷을 제공하는 공급자
+    - 각 ISP는 고유한 ASN(AS Number)를 갖고 있음: ASN은 BGP라우팅에서 사용됨
+      - Border Gateway Protocol: AS간을 연결하는 Exterior Router Protocol의 한 예
+  
   - 인터넷 상의 모든 ISP는 **Tier1**를 경유하여 연결됨
-
-    - Tier 1: a network that **can reach every other network** on the Internet **without purchasing** [IP transit](https://en.wikipedia.org/wiki/Internet_transit) or **paying** for peering.
-
+  
+    - Tier 1: a network that **can reach every other network** on the Internet **without purchasing** [IP transit](https://en.wikipedia.org/wiki/Internet_transit) or **paying** for peering(대륙-국가 간 인터넷 트래픽 교환)
+  
       ![tier1](https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Internet_Connectivity_Distribution_%26_Core.svg/825px-Internet_Connectivity_Distribution_%26_Core.svg.png)
+      
+    - Tier2는 1과 3을 연결해주며, Tier3이 개인이 흔히 사용하는 인터넷을 제공하는 ISP
 
 
 
 인터넷은 어떻게 동작하는가? [MDN](https://developer.mozilla.org/ko/docs/Learn/Common_questions/How_does_the_Internet_work)
 
-1. 서버 쪽 호스트가 DNS 서버에게 IP를 이름으로 바꿔달라는 요청을 보냄
+1. 서버 쪽 호스트가 **DNS 서버**에게 IP를 이름으로 바꿔달라는 요청을 보냄
    - **호스트**란 네트워크에 연결된 "컴퓨터"를 말함
      - 네트워크에 연결된 장치를 **노드**라 하고 IP주소가 할당된 노드를 호스트라 함
-   - **DNS**(Domain Name System)란?
-     - IP가 아니라 이름으로 연결하기 위한 서버
+   - Domain Name System
+     - IP가 아니라 **이름으로 연결하기 위한 서버**
      - DNS서버에 질의하는 기능은 "DNS 리졸버"라고 하며 OS에 내장되어 있음
        - 질의한 서버에 호스트명이 없으면 루트에서부터 **재귀질의**함
        - 질의한 정보는 한동안 서버와 리졸버의 캐시에 저장
@@ -134,12 +144,14 @@ LAN과 WAN
 
 #### 1.2.1. Web
 
+
+
 웹이란?
 
 - 인터넷상에서 **문서들**을 **연결**하여(HyperText) 정보 검색을 빠르게 할 수 있게 한 것
   - 웹사이트는 복수의 웹페이지(HTML 파일)로 구성됨
   - 문서의 레이아웃 및 디자인은 스타일 시트로 정의되며 **CSS**언어로 기술됨
-- 구체적으로는 클라이언트-서버 간 **HTTP 프로토콜**을 사용하여 HTML을 주고받는 시스템
+- 구체적으로는 클라이언트-서버 간 **HTTP 프로토콜을 사용하여 HTML을 주고받는 시스템**
   - HTTP 프로토콜: 하이퍼텍스트를 빠르게 교환하기 위한 프로토콜
     - HTTP 파일전송은 **Request**와 **Response**를 주고받으며 이루어짐
     - Request
@@ -155,7 +167,7 @@ LAN과 WAN
         - [Response Code](https://developer.mozilla.org/ko/docs/Web/HTTP/Status)
         - 설명문은 상태 코드의 의미를 간단히 보여줌
       - entity 바디에는 브라우저에 돌려보낼 데이터 포함: 주로 HTML
-  - 특징: **비연결성, 무상태**
+  - HTTP 특징: **비연결성, 무상태**
     - 비연결성: 리소스를 아끼기 위해 비연결성을 띔
       - 잦은 연결/해제는 오버헤드를 초래함
     - 무상태: 비연결성으로 인해 클라이언트를 식별할 수 없는 것
@@ -190,14 +202,16 @@ LAN과 WAN
 
 - **웹 기반 컨텐츠**(웹페이지)를 검색 및 열람하기 위한 어플리케이션
   - 서버에서 **컴포넌트 파일**(코드 파일 + 자원)을 가져옴
-  - 코드 파일: HTML, CSS, JS
+  - 코드 파일: HTML, CSS, JavaScript
   - 자원: 웹사이트를 만드는 모든 다른 것들 - 이미지, 음악, PDF 등
 - 구성: UI - 브라우저 엔진 - 렌더링 엔진, 통신, JS해석기, 임시파일저장소
-  - ![ㅇ](https://d2.naver.com/content/images/2015/06/helloworld-59361-1.png)
+
+  ![ㅇ](https://d2.naver.com/content/images/2015/06/helloworld-59361-1.png)
 - 렌더링 동작 과정
   - html가져옴 - **DOM트리 작성** - CSSOM트리 작성 - 2개 결합해 렌더트리 생성
     - DOM트리는 HTML태그들의 계층관계를 나타낸 것
-    - 문서객체모델(DOM)에 따르면 모든 HTML 태그는 객체로, JS를 통해 접근하여 페이지를 조작할 때 객체를 사용함
+    - 문서객체모델(DOM)에서 모든 HTML 태그는 객체로 취급
+    - JS를 통해 페이지를 조작할 때 객체를 사용함
   - 객체들에게 위치,크기 지정(레이아웃) - CSS속성 적용 - 화면 업데이트
   - 도중에 JS를 발견하면 JS엔진 실행했다가 다시 DOM 생성함
 
@@ -236,17 +250,22 @@ REST API란?
     - 웹에 존재하는 모든 자원에 **URI**를 부여하고, **HTTP method**를 통해 해당 자원에 대한 CRUD operation을 적용한 결과를 JSON으로 표현
       - URI(Uniform Resource Identifier): 하나의 자원을 가리키는 문자열
       - URL이라고도 하는데 URI가 정식 표현이다
-  - 특징
-    - uniform: URI에 대한 조작은 HTTP method로 통일
-    - statelss: 클라이언트의 context를 서버에 유지하지 않고 메시지로만 요청 처리
-    - cacheable: HTTP가 가진 캐싱 기능을 적용
-    - self-descriptiveness: REST API메시지만 보고도 이해 가능
-    - client-server architecture
-    - 계층형 구조: 클라이언트는 REST API만 호출하며 REST서버는 다중 계층으로 구성
+  - [특징](https://gmlwjd9405.github.io/2018/09/21/rest-and-restful.html)
+    - Uniform Interface: URI에 대한 조작은 HTTP method로 통일
+    - Stateless: 클라이언트의 context를 서버에 유지하지 않고 메시지로만 요청 처리
+    - Cacheable: [HTTP가 가진 **캐싱 기능**](https://developer.mozilla.org/ko/docs/Web/HTTP/Caching)을 적용
+    - Self-descriptiveness: REST API메시지만 보고도 이해 가능
+    - Client-Server Architecture
+    - Layered System: 클라이언트는 REST API만 호출하며 REST서버는 다중 계층으로 구성
 - API란?
   - Application Programming Interface
   - 응용프로그램에서 사용할 수 있도록 운영체제나 프로그래밍 언어가 제공하는 기능을 제어할 수 있게 만든 인터페이스
-- 이해하기 쉽고, 모든 플랫폼 사용 가능하며(서버와 클라이언트가 같은 방식을 사용해서 요청해야) 별도의 인프라 구축 필요 없으나 메서드가 제한적이라는 단점 있음
+- 장점
+  - 이해하기 쉬움(self-descriptiveness)
+  - 모든 플랫폼 사용 가능함(서버와 클라이언트가 같은 방식을 사용해서 요청해야)
+  - 별도의 인프라 구축 필요 없음
+- 단점
+  - 메서드가 제한적임(HTTP)
 
 
 
@@ -277,19 +296,21 @@ REST API란?
 
 
 
-## 2. OSI 7계층
+## **2. OSI 7계층**
 
 > Open Systems Interconnection Reference Model
 >
-> 최근에는 사용되지 않으며 실무에선 대부분 TCP/IP 아키텍쳐가 이용되므로 대충 읽자
+> 국제 표준화기구에서 개발한 것으로 **네트워크 아키텍처의 개념을 계층별로 정의하는 모델**임
 
 
 
-Application Presentation Session Transport Network Datalink Physical
+계층이란?
 
-각 계층은 하위 계층의 기능을 이용하여 상위 계층에 기능을 제공
-
-계층을 지날 때마다 헤더가 붙음
+- 상하 관계를 이루는 하나 이상의 엔티티가 기능을 구현하는 단위
+  - 각 계층은 **하위 계층의 기능을 이용하여 상위 계층에 기능을 제공**
+- 계층별로 헤더가 붙음
+- 계층 목록
+  - Application, Presentation, Session, Transport, Network, Datalink, Physical
 
 
 
@@ -363,7 +384,7 @@ Application Presentation Session Transport Network Datalink Physical
 
 
 
-## 3. TCP/IP
+## **3. TCP/IP**
 
 > TCP와 IP를 중심으로 하는 프로토콜의 집합으로 가장 많이 이용되는 네트워크 아키텍처
 
@@ -426,6 +447,7 @@ IP 주소
   - 호스트의(인터페이스) 식별 정보
     - 각 인터페이스별로 IP주소 지정 가능(안할수도 있음)
   - IPv4의 경우 32비트로 **도트형 10진표기**로 나타냄
+    - `255.192.10.1` 같이 10진수로 표시하는 것
 - IP주소의 구성
   - **유니캐스트**의 경우 네트워크부와 호스트부 2가지로 구성됨
     - 유니캐스트: 단 한 곳으로 데이터를 전송
@@ -478,7 +500,7 @@ MAC 주소
 1. 호스트 간 이동은 인터넷층(IP)에서 다 해결이 되나 **한 장치 내 여러 프로그램이 통신**할 경우 IP로는 한계가 있었음
 2. IP는 **best effort**: 데이터 보내는 데에는 최선을 다하나 안 되면 말고ㅎ
 3. 이를 보완하기 위해 **ICMP**가 나왔지만 오류 보고만 하지 대응은 못함
-4. 1을 해결하기 위해 **포트 번호**가 등장했고 2/3을 해결하기 위해 **전송 계층** 도입
+4. 1을 해결하기 위해 **포트 번호**가 등장했고 2, 3을 해결하기 위해 **전송 계층** 도입
 
 
 
@@ -544,11 +566,17 @@ User Datagram Protocol
   - 한마디로 많이보내면 혼잡해지니까 속도를 조절하는 것
   - 해결방법
     - AIMD: 윈도우 크기를 선형적으로 증가시키고 혼잡을 감지하면 절반으로 줄임
+      
       - 공평함: 여러 호스트가 한 네트워크 공유시 평형상태로 수렴하게 됨
-    - Slow Start: 패킷을 하나씩 보내고 **임계치에 도달할 때까지 윈도우 사이즈 2배씩 증가**시키나 혼잡 감지시 사이즈를 1로 하고 지수적으로 증가시킨 후 혼잡이 발생했던 window size의 절반에 ㅇ 선형증가
+      - 반복되면 톱니모양처럼 보인다고 하여 AIMD Sawtooth라고 함
+      
+      ![aimd](https://mlga3gjkilfa.i.optimole.com/7hU5Bn8-edeag6dx/w:351/h:154/q:90/https://www.keyboardbanger.com/wp-content/uploads/2015/08/tcp-congestion-control-sawtooth-AIMD.png)
+    - Slow Start: 패킷을 하나씩 보내고 **임계치에 도달할 때까지 윈도우 사이즈 2배씩 증가**시키나 혼잡 감지시 사이즈를 1로 하고 지수적으로 증가시킨 후 혼잡이 발생했던 window size의 절반에 이르면 선형증가
       - Congestion Avoidance: 임계치를 넘으면 선형적으로 증가
       - Fast Retransmit: 중복된 패킷을 3개 받으면(Triple duplicated ACK) 혼잡이 일어나 손실됐다고 간주, **즉시 재전송**
-      - Fast Recovery: 혼잡 이후 윈도우 사이즈를 1이 아닌 절반으로 내리고 선형증가시킴
+      - Fast Recovery: 혼잡 이후 윈도우 사이즈를(1이 아닌) 절반으로 하고 선형증가시킴
+      
+      ![slow](https://www.researchgate.net/profile/Romain_Delpoux/publication/267783414/figure/fig5/AS:669531638861835@1536640190532/Slow-start-fast-retransmit-and-fast-recovery-illustration.pbm)
 
 
 
@@ -566,7 +594,8 @@ IP: 패킷 교환 네트워크에서 정보를 주고받는 데 사용하는 **�
 - 특징
   - 비신뢰성/비연결형
   - 에러제어, 흐름제어 없음: 에러 검출은 하지만 보낸 내용을 보장하지 않음
-- MTU(Maximun Transfer Unit)때문에 IP패킷을 잘라서(단편화) 보냄
+- **MTU(Maximun Transfer Unit)** 때문에 IP패킷을 잘라서(단편화) 보냄
+  - 패킷의 MTU는 1500 byte: 이더넷 프레임은 최대 1518 byte가 됨
 - IPv6
   - IPv4가 가진 주소 고갈, 보안성, 이동성 지원 등을 해결하기 위해 등장
   - 보안성: 패킷 출처 인증, 데이터 무결서 및 비밀 보장 기능
@@ -582,6 +611,7 @@ ICMP: Internet Control Message Protocol
   - 진단: **ping command** 등으로 IP의 엔드투엔드 통신이 가능한지 체크
     - ICMP 헤더에 "에코 요청 메시지"를 기술하여 보낸 데이터를 그대로 돌려받음
     - 데이터를 수신하면 통신 가능함을 확인
+    - **게임에서의 핑**은 클라이언트가 보낸 정보가 "다른 사용자들이 보낸 정보와 함께" 서버에서 처리되고 돌아오는데 걸리는 시간으로 ms 단위로 표기됨
 
 
 
@@ -632,9 +662,9 @@ ARP: Address Resolution Protocol
       - PC의 라우팅 테이블에는 직접 접속 경로 정보와 디폴트경로만(**기본 게이트웨이**) 등록
 - 라우팅 순서
   1. 라우터가 호스트로부터 IP 패킷을 수신
-  2. 테이블에서 Next Hop을 탐색
+  2. **테이블에서 Next Hop을 탐색**
   3. 수신한 IP패킷의 이더넷 헤더에는 현재 라우터의 MAC주소가 목적지로 되어 있음
-  4. ARP를 실행하여 **Next Hop의 MAC주소**를 얻고 이더넷 헤더 + FCS 교체
+  4. ARP를 실행하여 **Next Hop의 MAC주소를 얻고 이더넷 헤더 + FCS 교체**
   5. IP헤더의 TTL(Time To Live, 패킷의 수명)에서 1을 빼준 후 송신
      - 라우팅 시에 IP주소는 변하지 않음: NAT로 변환하면 달라짐
   6. 수신한 라우터는 다시 라우팅 테이블을 통해 라우팅 실시
@@ -673,8 +703,8 @@ ARP: Address Resolution Protocol
 - 이더넷 프레임
   - 이더넷 헤더 + 데이터 + FCS
     - 헤더 내에는 목적지/출발지 MAC 주소와 **타입 코드**가 포함
-      - 타입 코드: 이더넷으로 운반할 대상의 데이터
-      - IPv4는 0x0800, ARP는 0x0806
+      - 타입 코드: 이더넷으로 운반할 대상의 데이터 패킷의 타입을 명시함
+      - IPv4패킷은 0x0800, ARP 패킷은 0x0806
     - 데이터는 최대 1500byte (Maximun Transmission Unit)
       - 이를 넘는 데이터는 전송 계층에서 분할해 줌
       - IP헤더, TCP헤더 20바이트 씩을 제외하고 1460바이트가 넘는 메시지
@@ -711,13 +741,11 @@ ARP: Address Resolution Protocol
   - 충돌을 방지하기 위해 **CSMA/CA** 이용: 충돌 회피
     1. 전파가 이용중인지 확인
     2. 이용중이 아니더라도 랜덤 시간 대기 후(동시에 미사용 판단 가능성) 다시 확인하고 송신
-  - 위의 대기 시간이 기본적으로 존재하기 때문에 실효속도(throughput)은 규격상 전송속도의 절반 정도가 됨
+  - 위의 대기 시간이 기본적으로 존재하기 때문에 실효속도(throughput)는 규격상 전송속도의 절반 정도가 됨
 - 보안
   - 도청이 편리한 구조: 보안 대책 필수
   - 일반적으로 WPA2 보안 규격이(IEEE802.11i) 이용됨
     - WPA2는 AES 암호와 IEEE802.1X 인증을 이용함
-
-
 
 
 
@@ -758,7 +786,7 @@ ARP: Address Resolution Protocol
 
 
 
-## 4. 네트워크 보안
+## **4. 네트워크 보안**
 
 > 공격으로부터 네트워크를 보호하기 위해 취약한 부분을 
 
@@ -824,7 +852,7 @@ ARP: Address Resolution Protocol
   - 제3자가 송신자에게 의도적으로 잘못된 공개키를 전송한 후 암호문을 가로채 기밀을 얻을 수 있음
   - 디지털 서명을 이용하여 공개키의 진위 여부 판단
     - PKI(Public Key Infrastructure):신뢰할 수 있는 제3자 기관 CA(Certification Authority)에서 **디지털 인증서**를 발행
-    - 디지털 인증서: 의뢰사의 공개키 + CA의 비밀키로 만든 디지털 서명
+    - 디지털 인증서: 의뢰사의 공개키 및 디지털 서명(서명은 CA의 비밀키로 작성)
 - 주요 알고리즘: RSA, 타원 곡선 암호
 
 
@@ -841,24 +869,24 @@ SSL(Secure Socket Layer): 하이브리드 암호
   - HTTPS 통신 흐름
     1. 서버 소유 기업이 공개키와 비밀키를 제작
     2. CA가 공개키에 대해 디지털 인증서를 만들고 이를 다시 비밀키로 암호화해 전달
-    3. 클라이언트가 서버에 요청을 보내면 암호화된 인증서를 수신
-    4. 브라우저는 CA의 공개키를 이용해 이를 복호화하여 서버의 공개키 획득
-    5. 브라우저는 대칭키를 생성하고 서버의 공개키로 이를 암호화
+    3. 클라이언트가 서버에 요청을 보내면 **암호화된 인증서를 수신**
+    4. 브라우저는 CA의 공개키를 이용해 이를 복호화하여 **서버의 공개키 획득**
+    5. 브라우저는 **대칭키를 생성하고 서버의 공개키로 이를 암호화**
     6. 서버는 비밀키를 이용하여 브라우저의 대칭키를 입수
-    7. 이후 대칭키를 이용하여 통신
+    7. 이후 **대칭키를 이용하여 통신**
 
 
 
 VPN(Virtual Private Network)
 
-- 인터넷을 가상으로 사설네트워크처럼 다루는 기술
+- 인터넷을 가상으로 **사설네트워크처럼 다루는 기술**
 - WAN 구축 비용을 아끼기 위해 인터넷을 사설 네트워크처럼 이용하는 방식
   - 터널링: 거점 LAN 라우터 사이를 가상으로 연결
   - 터널을 경유하는 데이터는 암호화
 
 
 
-## 5. 클라우드
+## **5. 클라우드**
 
 클라우드란?
 
