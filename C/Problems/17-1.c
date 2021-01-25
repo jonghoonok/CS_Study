@@ -2,7 +2,7 @@
 
 void MaxAndMin(int* array, int** mnPtr, int** mxPtr)
 {
-    //int* max, min;  // 이러면 min은 포인터가 아니라 int 타입 변수가 됨
+    //int* max, min;  // 선언주의: 이러면 min은 포인터가 아니라 int 타입 변수가 됨
     int *max, *min;
     max = min = &array[0];
 
