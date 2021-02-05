@@ -9,6 +9,8 @@
 - SNUON [강의](http://etl.snu.ac.kr/local/ubonline/course_view.php?id=188304&returnurl=L2xvY2FsL3Vib25saW5lL2luZGV4LnBocD9zZWFyY2h0eXBlPTEma2V5d29yZD0lRUElQjUlQUMlRUMlQTElQjAmcGFnZT0z)
   - Computer Systems: A Programmer's Perspective 
   - Computer Organization and Design
+- 그래서 컴퓨터는 어떻게 동작하나요?
+- CODE
 
 
 

@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-int snail(int cnt, int rot, int n, int arr[][n])
+int snail(int cnt, int rot, int n, int* arr)    // 배열 길이가 문제가 됨: 동적할당 필요
 {
     int i=rot, j=rot;
     int len = n - (1 + 2 * rot);
