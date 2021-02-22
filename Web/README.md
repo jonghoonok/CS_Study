@@ -621,6 +621,166 @@
 
 #### 웹 기본
 
+
+
+웹이란?
+
+- 인터넷상에서 **문서들**을 **연결**하여(HyperText) 정보 검색을 빠르게 할 수 있게 한 것
+  - 웹사이트는 복수의 웹페이지(HTML 파일)로 구성됨
+  - 문서의 레이아웃 및 디자인은 스타일 시트로 정의되며 **CSS**언어로 기술됨
+- 구체적으로는 클라이언트-서버 간 **HTTP 프로토콜을 사용하여 HTML을 주고받는 시스템**
+  - HTTP 프로토콜: 하이퍼텍스트를 빠르게 교환하기 위한 프로토콜
+    - HTTP 파일전송은 **Request**와 **Response**를 주고받으며 이루어짐
+    - Request
+      - 요청라인 + 메시지 헤더 + (공백) + entity 바디
+      - 리퀘스트 라인: **HTTP method** + URL + version
+        - HTTP method: GET, POST, PUT, PATCH, DELETE 등
+        - version은 그냥 HTTP의 버전을 나타냄
+      - 메시지 헤더는 웹브라우저 종류/버전, 대응하는 데이터 타입 등을 기술
+      - entity 바디는 **POST에서 데이터를 담아 보낼 때** 사용
+    - Response
+      - 상태라인(status) + 메시지 헤더 + (공백) + entity 바디
+      - 리스폰스 라인: 버전 + 상태 코드 + 설명문
+        - [Response Code](https://developer.mozilla.org/ko/docs/Web/HTTP/Status)
+        - 설명문은 상태 코드의 의미를 간단히 보여줌
+      - entity 바디에는 브라우저에 돌려보낼 데이터 포함: 주로 HTML
+  - HTTP 특징: **비연결성, 무상태**
+    - 비연결성: 리소스를 아끼기 위해 비연결성을 띔
+      - 잦은 연결/해제는 오버헤드를 초래함
+    - 무상태: 비연결성으로 인해 클라이언트를 식별할 수 없는 것
+      - **쿠키/세션/토큰**을 이용하여 기억함
+
+
+
+쿠키, 캐시, 세션, 토큰
+
+- 쿠키와 캐시의 [차이](https://zorba91.tistory.com/163)
+  - 쿠키는 **사용자 인증**을 위해 사용됨
+    - 키-값의 데이터 파일, **웹서버에서 PC로 **보내주는 파일 저장
+    - 웹사이트 접속시 발생, 유출돼도 큰 일 없을 정보들(로그인 정보, 열람 이력)
+    - 만료기간이 있어 자동 삭제됨
+  - 캐시는 **웹페이지를 빠르게 렌더링**하기 위해 사용됨
+    - 웹페이지요소(Response), 그림파일 등
+    - 수동 삭제 필요, 캐시가 너무 많이 쌓이면 브라우저 속도 저하됨
+- 세션
+  - 사이트와 브라우저 사이의 상태를 유지시킴. 
+    - 연결 그 자체를 세션이라 하기도 하고 통신을 마칠 때까지의 기간을 뜻하기도 함
+  - 클라이언트는 세션 아이디(클라이언트 식별자)를 **쿠키**를 이용해 저장
+  - **세션 자체는 서버에 저장**
+    - 서버의 메모리를 차지하고 과부하의 원인이 됨
+- 토큰
+  - 쿠키와 세션의 문제점을 보완한 **본인 확인 수단**
+  - 보호할 데이터를 토큰으로 치환하여 원본 대신 토큰을 이용함
+  - **추후 보강**
+
+
+
+웹 브라우저란?
+
+- **웹 기반 컨텐츠**(웹페이지)를 검색 및 열람하기 위한 어플리케이션
+
+  - 서버에서 **컴포넌트 파일**(코드 파일 + 자원)을 가져옴
+  - 코드 파일: HTML, CSS, JavaScript
+  - 자원: 웹사이트를 만드는 모든 다른 것들 - 이미지, 음악, PDF 등
+
+- 구성: UI - 브라우저 엔진 - 렌더링 엔진, 통신, JS해석기, 임시파일저장소
+
+  ![ㅇ](https://d2.naver.com/content/images/2015/06/helloworld-59361-1.png)
+
+- 렌더링 동작 과정
+
+  - html가져옴 - **DOM트리 작성** - CSSOM트리 작성 - 2개 결합해 렌더트리 생성
+    - DOM트리는 HTML태그들의 계층관계를 나타낸 것
+    - 문서객체모델(DOM)에서 모든 HTML 태그는 객체로 취급
+    - JS를 통해 페이지를 조작할 때 객체를 사용함
+  - 객체들에게 위치,크기 지정(레이아웃) - CSS속성 적용 - 화면 업데이트
+  - 도중에 JS를 발견하면 JS엔진 실행했다가 다시 DOM 생성함
+
+
+
+SSR, CSR, SPA, MPA
+
+- 웹 브라우저가 문서를 어떻게 가져올 것인가? [그림 설명](https://medium.com/%EC%95%84%EB%AA%BD%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4/csr-ssr-spa-mpa-ede7b55c5f6f)
+- SSR(Server Side Rendering)
+  - 서버에서 view페이지를 렌더링해서 가져오고 브라우저는 이를 보여주기만 함
+  - 매번 새로 렌더링하니 **느리고 서버에 부담**
+  - CSR보다 **SEO가 뛰어나다**는 장점이 있음
+- CSR(Client Side Rendering)
+  - 서버에서 html, js등을 다운받은 후 클라이언트가(브라우저에서) 렌더링
+- SPA(Single Page Application)
+  - 서버에서 **처음 1회만 페이지를 받아오고** 이후에는 **동적으로 DOM을 구성하여** 렌더링 되는 화면이 바뀌게 함
+    - SPA는 어플리케이션이고 CSR은 렌더링 방식으로 SPA구현을 위해 CSR이 사용됨
+  - 사용자 경험(UX) 향상을 위해 도입
+    - 좋아요 버튼을 누를 때마다 페이지 새로고침이 되지 않도록
+  - SPA를 만드는 데 최적화된 라이브러리로 React.js, Next.js 등이 있음
+- MPA(Multi Page Application)
+  - 서버로부터 완전한 페이지를 받아오고 수정/조회시 다른 완전한 페이지로 이동
+  - 동적이지 않은 페이지를 상황에 맞게 클라이언트에 뿌려줌
+- SEO(Search Engine Optimization)
+  - 검색엔진에 잘 노출될 수 있도록 **웹사이트를 각 엔진이 잘 읽을 수 있게끔** 최적화
+  - 첫번째 페이지는 SSR로, 이후에는 CSR을 이용하면 속도와 SEO를 다 잡을 수 있음
+
+
+
+REST API란?
+
+- REST란?
+  - REpresentational State Transfer: 웹의 장점을 활용하며 범용성을 보장한 아키텍처
+  - 구성
+    - 자원(URI), 행위(HTTP method), 표현(JSON, XML, txt)
+    - 웹에 존재하는 모든 자원에 **URI**를 부여하고, **HTTP method**를 통해 해당 자원에 대한 CRUD operation을 적용한 결과를 JSON으로 표현
+      - URI(Uniform Resource Identifier): 하나의 자원을 가리키는 문자열
+      - URL이라고도 하는데 URI가 정식 표현이다
+  - [특징](https://gmlwjd9405.github.io/2018/09/21/rest-and-restful.html)
+    - Uniform Interface: URI에 대한 조작은 HTTP method로 통일
+    - Stateless: 클라이언트의 context를 서버에 유지하지 않고 메시지로만 요청 처리
+    - Cacheable: [HTTP가 가진 **캐싱 기능**](https://developer.mozilla.org/ko/docs/Web/HTTP/Caching)을 적용
+    - Self-descriptiveness: REST API메시지만 보고도 이해 가능
+    - Client-Server Architecture
+    - Layered System: 클라이언트는 REST API만 호출하며 REST서버는 다중 계층으로 구성
+- API란?
+  - Application Programming Interface
+  - 응용프로그램에서 사용할 수 있도록 운영체제나 프로그래밍 언어가 제공하는 기능을 제어할 수 있게 만든 인터페이스
+- 장점
+  - 이해하기 쉬움(self-descriptiveness)
+  - 모든 플랫폼 사용 가능함(서버와 클라이언트가 같은 방식을 사용해서 요청해야)
+  - 별도의 인프라 구축 필요 없음
+- 단점
+  - 메서드가 제한적임(HTTP)
+
+
+
+웹 서버 vs WAS(Web Application Server)
+
+- [추후 보강](https://gyoogle.dev/blog/web-knowledge/Web%20Server%EC%99%80%20WAS%EC%9D%98%20%EC%B0%A8%EC%9D%B4.html)
+- 웹 서버
+  - 기능: HTTP 기반으로 클라이언트의 요청을 서비스
+    - **정적 컨텐츠 제공**: WAS를 거치지 않고 제공
+    - 동적 컨텐츠 제공을 위한 요청 전달: WAS에 요청하여 응답을 클라이언트에 전송
+  - 어플리케이션 종류: **Apache**, Nginx, IIS 등
+- WAS
+  - 기능: 서버단에서 필요한 기능(DB 조회 및 다양한 로직 처리)을 수행하고 **동적인 컨텐츠를 제공**
+    - 웹 서버에 지나치게 부하가 가해지는 것을 막기 위해 도입
+    - 웹 서버를 앞단에 두고(클라이언트 쪽) WAS들을 웹 서버에 플러그인 형태로 설정하는 것이 가능
+  - 종류: Tomcat, JBoss 등
+
+
+
+호스팅
+
+- 대형 **서버의 기능을 빌려쓰는** 것
+- 종류: 웹 호스팅, 서버 호스팅, 클라우드 호스팅
+  - 웹호스팅: 하나의 서버 장비를 여러 명이 공유하여 사용
+  - 서버호스팅: 한명의 고객이 하나의 서버장비를 임대
+    - 고정적으로 트래픽 양이 많은 사이트에 적합
+  - 클라우드호스팅: **가상서버를 임대**하고 **이용한만큼 지불**
+
+
+
+
+
+
+
 - HTTP
   - HyperText Transfer Protocol: 웹브라우저와 웹서버가 통신할 때 사용하는 규칙
     - 기본적으로 **텍스트**를 주고받기 때문에 보안문제가 있음: **HTTPS** 도입

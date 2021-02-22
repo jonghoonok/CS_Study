@@ -6,7 +6,8 @@
 
 참고서적
 
-- 운영체제와 정보기술의 원리 [강의](http://www.kocw.net/home/search/kemView.do?kemId=1046323)
+- 운영체제와 정보기술의 원리
+  -  [이화여대 강의](http://www.kocw.net/home/search/kemView.do?kemId=1046323) : "운영체제" - 반효경
 - Operating Systems: Three Easy Pieces
 
 
