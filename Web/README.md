@@ -32,6 +32,8 @@
 >
 > HyperText Markup Language
 
+
+
 - 시맨틱 태그
   - 콘텐츠의 의미를 명확히 설명하는 태그
   - 마크업 언어는 텍스트에 역할을 부여하는 것
@@ -66,11 +68,11 @@
 
 #### 반응형 웹
 
-> 1. **반응**하여 구성 요소가 변하는 기술
+> **반응**하여 구성 요소가 변하는 기술
 >
-> 2. 기기별로 웹사이트의 구조가 최적화되어 보여지는 기능: 최근엔 모바일 퍼스트도 등장
+> 기기별로 웹사이트의 구조가 최적화되어 보여지는 기능: 최근엔 모바일 퍼스트도 등장
 
-- 브라우저의 가로 넓이에 따른 크기 변경
+- 브라우저의 가로 넓이에 따른 크기 변경: 반응형 웹 디자인
   - 넓이에 따라 CSS를 추가로 코딩해야 하기 때문에 비용이 증가하는 문제가 있음
   - .container > .row > col-*
 - Vue에서 data가 바뀌면 DOM이 알아서 다시 렌더링 되게 하는 기술
@@ -182,6 +184,10 @@ CSS의 형식
 
 
 
+
+
+
+
 ### 2.2. 텍스트 표현
 
 > 웹 문서의 가장 많은 부분을 차지하는 텍스트
@@ -232,7 +238,7 @@ CSS의 형식
     - justify: 양쪽에 맞춤
     - match-parent: 부모 요소에 따라 정렬
 - line-height
-  - 문단 내의 줄 간격을 조절함
+  - **문단 내의 줄 간격**을 조절함
   - 텍스트를 세로 정렬할 때도 유용하게 사용할 수 있음
     - 영역의 높이를 나타내는 height와 line-height를 동일하게 지정하면 세로로 가운데 정렬됨
 - text-decoration
@@ -251,9 +257,19 @@ CSS의 형식
 
 #### 2.2.2. 목록
 
-불릿 모양 지정
+불릿 스타일
 
-
+- list-style-type
+  - 불릿 모양(ul) 또는 번호 스타일(ol) 지정 가능
+  - disc, circle, square, decimal, lower-roman 등
+- list-style-image
+  - 불릿을 원하는 이미지로 변경 가능
+- list-style-position
+  - 불릿 들여쓰기 조정
+  - inside(안으로 들여쓰기), outside(기본값)
+- list-style
+  - 위 3개를 한 번에 표현 가능
+  - `list-style: lower-alpha inside;`
 
 
 
@@ -263,45 +279,206 @@ CSS의 형식
 
 
 
+테이블 제목
+
+- caption-side
+  - `<caption> `태그를 이용해 표시되는 표 제목의 위치 조정
+  - top(기본값), bottom
+
+
+
+테두리
+
+- border
+  - 크기, 모양, 색 3가지로 구성됨
+  - `border: 1px solid black;`
+- border-spacing
+  - 테두리를 표 전체에 적용하고 각 요소에 다시 적용하면 셀 사이의 여백이 생김: spacing 조절
+  - 수평거리, 수직거리
+  - `border-spacing: 1px 1px;`
+- border-collapse
+  - seperate(기본값, 여백 유지), collapse(테이블과 셀의 테두리를 합침)
+  - 이 속성은 **table 태그에 적용**하면 됨
+  - *collapse가 안 되는 경우에는 어떻게 함ㄴ 되지?*
+
+
+
+##### 테이블 CSS 문제 해결
+
+테이블의 헤더를 고정하는 방법
+
+
+
+table-layout:fixed
+
+
+
+nowrap
+
+
+
 ### 2.3. 박스 모델
 
-Box Model
+> 박스 형태인 요소를 이용하여 배치
+>
+> 컨텐츠를 담을 박스를 지정하고 스타일, 위치, 정렬을 지정함
 
-- 컨텐츠를 담을 박스를 지정하고 스타일, 위치, 정렬을 지정함
-- content: 글, 이미지, 비디오 등 요소의 내용
+
+
+블록 vs 인라인
+
+- 블록 레벨 요소
+  - 혼자 한 줄을 차지하는 요소
+  - div, h1, p 등
+  - 블록 레벨 요소는 모두 **박스 모델 요소** 임
+- 인라인 레벨 요소
+  - 콘텐츠 만큼만 영역을 차지함: 나머지 공간에 다른 "인라인 레벨"요소가 올 수 있음
+  - span, img, strong 등
+
+
+
+박스 모델의 구성
+
+![box model](https://s3.amazonaws.com/viking_education/web_development/web_app_eng/css_box_model_chrome.png)
+
+- contents
+  - 글, 이미지, 비디오 등 **요소의 내용**
+  - width, height 속성으로 크기를 지정할 수 있음
+  - 크기(px, em단위), 백분율(**부모 요소를 기준으로**), auto 사용 가능
 - padding: 내부 여백, 배경색 및 이미지 지정 가능
-- border
+- border: 테두리
 - margin: 바깥쪽 여백, 배경색 지정 불가. 마진은 큰 쪽으로 결합되어 상쇄될 수 있음
 
 
 
+박스 모델의 크기: box-sizing
+
+- border-box
+  - 테두리까지 포함해서 크기를 지정
+  - 보통 CSS 최상단에(body) `box-sizing: border-box;`를 명시해두고 스타일 시트를 작성함
+- content-box
+  - 콘텐츠 영역만 크기를 지정
+  - 기본값임...
 
 
-- Display
-  - block: 기본 요소
-  - inline
-    - 줄바꿈이 일어나지 않는 행의 일부요소
-    - **width, height, mt, mb 지정 불가**
-    - **상하 여백은 line-height로** 지정
-  - inline-block: block속성 사용 가능하고 텍스트 흐름대로 나열함
-  - none
-    - 화면에서 요소가 사라지며 요소가 차지하는 공간도 사라짐
-    - `visibility: hidden`은 공간은 사라지지 않음
-- Position
-  - static: 기본
-  - relative: static을 기준으로 위치 이동
-  - absolute
-    - 부모/조상 기준으로 이동, 부모가 없으면 body에 붙음
-    - 과거 위치에 있던 공간은 사라짐: 다른 것에 상관 없이 독자적인 곳에 놓이게 됨
-    - 팝업 정보 상자 등 다른 요소와 위치에 간섭하지 않는 UI 기능 만들기
-  - fixed: viewport 기준으로 이동 - 항상 같은 곳에 위치
-- float
-  - 옛날에 레이아웃을 만들기 위해 사용되던 기술
-- flexbox
-  - 아이템 간 공간 배분과 정렬
-  - 컨테이너를 선언: `display="flex"`
-  - flex-direction, flex-wrap, flex-flow, jistify-content, align-items, align-self, order, flex-grow
-- bootstrap
+
+박스 모델의 스타일 지정
+
+- 상하좌우 4가지 방향에 대해 각각 지정할 수 있음
+  - top, right, bottom, left 순서대로 지정함
+- border
+  - border-style
+    - 테두리 스타일을 지정
+    - solid, dashed, dotted, double, groove 등
+  - border-width
+    - 테두리의 두께
+    - double 같은 경우엔 두 선 사이의 간격이 border-width가 됨
+  - border-color
+    - 테두리 색상 지정
+  - border
+    - 위 세개를 한 번에 지정: `border: 1px solid black;`
+  - border-radius
+    - 꼭짓점을 둥글게 처리해줌
+- margin
+  - `margin: <크기> | <백분율> | auto;`
+  - 마진을 이용하여 요소를 가운데 정렬하는 방법
+    - `margin: 20px auto;`
+    - 마진을 이용해 가운데 정렬하려면 적용하는 요소의 너비가 지정되어 있어야 함
+  - margin collapse
+    - 요소를 **세로로 배치할 때** 마진이 겹치면 값이 큰 쪽의 마진만 반영되고 작은 쪽은 무시
+    - 여러 요소가 나열될 때 간격이 동일하게 하도록 위함
+    - 가로로 배치할 때는 중첩되지 않음
+- padding
+  - 마진과 같은 식으로 지정할 수 있음
+
+
+
+Display
+
+- display는 속성을 **바꿔줄 요소**에 적용: 부모 요소에 적용하는 것이 아님!
+  - 리스트 내 요소들을 나란히 배치하고 싶으면 ul이 아니라 li 태그에 `display: inline;` 적용
+- block
+  - 인라인 요소를 블록 요소로 만들어줌
+- inline
+  - 블록 요소를 인라인 레벨 요소로 만들어줌
+  - **width, height, mt, mb 지정 불가**, **상하 여백은 line-height로** 지정
+- inline-block
+  - 텍스트 흐름대로 나열하면서(인라인 레벨 속성) 마진, 패딩 지정 가능(block속성)
+- none
+  - 화면에서 요소가 사라지며 요소가 차지하는 **공간도 사라짐**
+  - `visibility: hidden`은 공간은 사라지지 않음
+
+
+
+Float
+
+- 이미지와 텍스트를 나란히 배치하기 위해 등장: 이미지를 텍스트가 둘러쌀 수 있음
+  - margin도 같이 사용해주면 좋음
+  - 웹문서 레이아웃 만드는 데 사용되기도 함
+    - 기본적으로 **비추**: 요즘엔 flexbox를 사용함
+    - **사이드 바 만드는 데 쓰기 좋음**
+- left(왼쪽으로 띄움), right(오른쪽으로 띄움), none(기본값)
+  - clear를 통해서 해제해주면 그 다음에 등장하는 요소부터는 float와 상관없이 아래쪽으로 표시됨
+
+
+
+
+
+#### 2.3.1. 웹 요소 위치 지정
+
+
+
+position
+
+- 문서 상에 **요소를 배치할 방법**을 지정함
+- static: 기본
+  - top, left, right, bottom 등 오프셋이 **아무런 영향도 주지 않음**
+- relative
+  - 자기 자신을 기준으로 위치 이동(top, left, right, bottom)
+  - 오프셋이 적용되어도 다른 요소에는 영향 없음: static 조건 하에서 차지하던 **"공간"은 그대로 남음**
+- absolute
+  - **가장 가까운 위치 지정 조상 요소** 기준으로 이동, 없으면 body에 붙음
+    - 위치 지정 요소: position 속성이 static이 아닌 값을 가지는 요소
+  - static 조건 하에서 차지하던 **공간은 사라짐**: 다른 것에 상관 없이 독자적인 곳에 놓이게 됨
+  - 팝업 정보 상자 등 다른 요소와 위치에 간섭하지 않는 UI 기능 만들 때 사용
+- fixed
+  - viewport 기준으로 이동 - 항상 같은 곳에 위치
+  - static 조건 하에서 차지하던 공간은 사라짐
+- sticky
+  - 요소 자체는 일반적인 문서 흐름에 따라서 배치
+  - **가장 가까운, 스크롤 되는 조상** 기준으로 오프셋 적용
+    - AND 조건임: 스크롤 동작이 존재하고 가장 가까운 조상이 실제 스크롤되지 않는다면 동작하지 않음
+    - 스크롤 동작: `overflow`속성이 hidden, scroll, auto, overlay인 경우
+
+
+
+위치 이동(오프셋)
+
+- top, bottom, left, right
+- z-index
+  - z축 방향의 "쌓임 맥락"을 결정함
+
+
+
+FlexBox
+
+- - 
+- 
+
+
+
+#### 2.3.2. 박스 모델 문제 해결
+
+
+
+부모 박스와 자식 박스의 크기
+
+- 문제) div 내에 100px * 100px의 div가 들어 있고 padding 10px, margin 10px이라면 부모 div의 크기는?
+  - 해답) 110px * 110px
+  - 해설) 자식의 마진이 부모의 크기에 영향을 미치지 않음: 마진은 같은 레벨 요소 간의 위치를 조정할 때 사용되는 개념이기 때문
+- 문제) padding을 제외하고 자식 div로 contents를 꽉 채우려면 자식 div의 크기를 어떻게 설정해야 하는가?
+  - 해답) `width = calc(100% - padding);`
+  - 해설) %는 부모 요소 기준으로 설정되기 때문에 padding을 뺀 값으로 크기를 설정해줘야 함
 
 
 
@@ -342,7 +519,58 @@ CSS Selector
 
 
 
+반응형 웹 디자인
 
+- 기존 웹 사이트의 내용은 그대로 유지하면서 **다양한 화면 크기에 맞게 웹 요소를 배치하는 것**
+  - 모바일 기기 보급에 따라 등장
+  - 사이트를 기기별로 작성할 필요가 없음
+
+
+
+뷰포트 viewport
+
+- 화면에서 실제 내용이 표시되는 영역
+- 모바일 기기별 사이즈에 적합한 사이트를 제작하기 위해 알아둬야 함
+  - **웹키트를 기반으로 한 모바일 브라우저**의 기본 뷰포트 너비는 980px
+  - webkit엔진 기반으로 작동하는 모바일 브라우저: 크롬, 엣지, 사파리 등
+- 뷰포트 작성
+  - head 내에 `<meta>`태그를 이용하여 작성
+  - `<meta name="viewport" content="width=device-width", initial-scale=1.0">`
+    - html에서`!` 입력하면 위와 같이 설정됨: 너비는 스마트폰 화면 너비에 맞추고 초기 화면 배율 1로
+    - content 내부에 뷰포트 너비, 높이, 확대/축소 가능 여부, 초기 확대/축소 값 설정 가능
+- 뷰포트 단위
+  - vw: 뷰포트 너비의 1%
+  - vh: 뷰포트 높이의 1%
+  - vmin: 뷰포트 너비와 높이 중 작은 값의 1%
+  - vmax: 뷰포트 너비와 높이 중 큰 값의 1%
+- 디바이스 모드
+  - 크롬 개발자 도구 좌측 상단의 디바이스 모드 아이콘을 눌러 이용 가능
+  - 화면의 가로, 세로 값을 바꾸면서 기기 별로 화면이 어떻게 표시되는지 확인 가능
+
+
+
+미디어 쿼리
+
+- 사용자가 **어떤 미디어를 사용하는가에 따라 사이트의 형태가 바뀌도록** CSS를 작성하는 것
+  - 기기의 해상도에 따라 달라지게 함
+  - [미디어 쿼리 사이트](http://mediaqueri.es)에서 미디어 쿼리를 이용한 다양한 사이트 확인 가능
+- 
+
+
+
+그리드 레이아웃
+
+
+
+#### 2.7.1 Flexbox
+
+> 2차원 상의 레이아웃을 간단하게(??) 구현하기 위해 등장 [W3C](http://w3.org/TR/css-flexbox-1)
+
+flexbox
+
+- 아이템 간 공간 배분과 정렬
+- 컨테이너를 선언: `display="flex"`
+- flex-direction, flex-wrap, flex-flow, jistify-content, align-items, align-self, order, flex-grow
 
 
 
