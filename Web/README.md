@@ -184,6 +184,12 @@ CSS의 형식
 
 
 
+이거 사실 점수 매겨서 결정됨
+
+CSS 선택자 명시도 https://developer.mozilla.org/en-US/docs/Web/CSS/Specificity
+
+
+
 
 
 
