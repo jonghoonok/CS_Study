@@ -1346,3 +1346,57 @@ REST API란?
   - 따로 설치할 필요 없으나 브라우저 API만 사용가능함
 
 
+
+
+
+## **4. Web Server**
+
+
+
+
+
+## **5. DB**
+
+
+
+### 5.1. JDBC
+
+> OJT에서 JDBC를 이용해 postgresql을  어떻게 조작했는지
+
+
+
+DB 서버 연결하기
+
+
+
+CRUD 만들기
+
+
+
+Insert에서 문제 발생
+
+- 배경
+  - 마지막으로 로그인한 시간을 담는 필드의 타입이 TIMESTAMP로 정의되었기 때문에, 시간을 String으로 받아 이를 다시 타임스탬프로 변환한 뒤 PreparedStatement를 이용하여 데이터를 추가하려고 했으나, **구문 에러 발생**
+- 원인
+  - 정확히 `executeUpdate();`에서 에러가 발생함
+- 해결
+
+```java
+String logDate = "2021-03-19 00:00:00";
+Timestamp LAST_LOG = Timestamp.valueOf(logDate);
+
+String url = "jdbc:postgresql://localhost/postgres";
+String sql = "INSERT INTO TABLE VALUES (?)";
+
+Class.forName("org.postgresql.Driver");
+Connection con = DriverManager.getConnection(url, "postgres", "password");
+PreparedStatement st = con.prepareStatement(sql);
+
+st.setTimestamp(1, LAST_LOG);
+
+st.executeUpdate();
+
+st.close();
+con.close();
+```
+

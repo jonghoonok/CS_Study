@@ -171,7 +171,178 @@ SQL
 
 ## **2. DQL**
 
+> SELECT 문을 이용하여 데이터베이스를 조회, 분석하기
 
+
+
+데이터를 조회하는 3가지 방법
+
+- SELECTION
+  - **행 단위**로 원하는 데이터를 조회
+- PROJECTION
+  - **열 단위**로 원하는 데이터를 조회
+  - SELECTION, PROJECTION을 함께 사용하여 상세하게 조회할 수도 있음
+- JOIN
+  - **두 개 이상의 테이블을 연결하여 하나의 테이블처럼 조회**
+  - SELECT문을 사용할 때 자주 사용됨
+
+
+
+### 2.1. SELECT문의 기본 형식
+
+
+
+`SELECT [조회할 열1 이름], [열2], ..., [열N] FROM [조회할 테이블 이름];`
+
+- 조회할 열 이름에 `*`를 넣으면 전체 열 조회 가능: `SELECT * FROM EMP;`
+- 띄어쓰기와 줄 바꿈 활용
+  - 명령 수행에 영향을 주지 않기 때문에 가독성을 위해 **SELECT와 FROM을 다른 줄에 적는 것 권장**
+
+
+
+중복 제거
+
+- DISTINCT를 이용하여 중복을 제거하고 특정 데이터 종류만 확인 가능
+
+- ```SQL
+  SELECT DISTINCT DEPTNO
+  	FROM EMP;
+  ```
+
+- ALL을 이용하면 반대로 중복을 제거하지 않고 그대로 출력함
+
+- ```SQL
+  SELECT ALL DEPTNO
+  	FROM EMP;
+  ```
+
+
+
+정렬
+
+- ORDER BY를 사용하여 출력 데이터를 정렬함
+
+- SELECT문의 제일 마지막에 `ORDER BY [정렬하려는 열(여러 개 가능)] [정렬 옵션]` 을 붙여 사용
+
+  - 정렬 옵션은 ASC(기본 값), DESC 존재
+
+  - ```SQL
+    SELECT *
+    	FROM EMP
+    ORDER BY SAL;
+    ```
+
+  - 여러 개 조건을 붙이면 먼저 오는 열을 우선 정렬하고 값이 같으면 그 다음 열 기준으로 정렬
+
+    - `ORDER BY DEPTNO DESC, ENAME;`
+
+- 정렬은 느리기 때문에 **가능하면 사용하지 않을 것**을 권장
+
+
+
+별칭 설정
+
+- SELECT 절에 명시한 열 이름이 아니라 별칭이(alias) 출력되도록 할 수 있음
+
+  - 편의를 위해 + 해당 열이 어떻게 도출되었는지 노출되지 않기 위해 사용함
+
+- **별칭을 하나씩 지정**하는 방법과 **연산식을 사용**하는 방법 존재
+
+  - 연산식을 사용하여 연수입 출력하기(월급*12 + 상여)
+
+  - ```SQL
+    SELECT ENAME, SAL, SAL*12+COMM, COMM
+    	FROM EMP;
+    ```
+
+  - 별칭을 지정하는 방법
+
+    - 4가지가 있는데 보통 3번째를 많이 사용(한 칸 띄우기, 한 칸 띄우고 큰 따옴표, **한 칸 띄우고 AS**, 한 칸 띄우고 AS 다음에 큰 따옴표 )
+    - `SELECT ENAME, SAL, SAL*12+COMM AS ANNSAL, COMM FROM EMP;`
+    - SQL문에 따옴표 사용이 좋지 않기 때문: 프로그래밍 언어에서 문자열로 ("SQL") 사용 시 에러 발생
+
+
+
+WHERE
+
+- **특정 조건을 기준으로** 원하는 행을 출력
+
+  - WHERE절에는 조건식이 들어감: 조건식이 참인 경우에만 출력
+
+- FROM 다음에 WHERE 절을 이용함
+
+  - ```SQL
+    SELECT *
+    	FROM EMP
+    WHERE DEPTNO = 30;
+    ```
+
+  -  SQL문에서는 동등 연산자가 ==가 아니라 =임
+
+- WHERE문과 함께 사용하는 연산자
+
+  - **논리 연산자 AND, OR**을 이용하여 **여러 개의 조건식 적용도 가능**: 조건식 갯수는 무제한
+
+    - 여러 개 조건식이 묶여 있을 때 NOT을 이용하여 한번에 뒤집는 경우 많음
+
+  - **IN**을 이용하여 조건식 갯수를 줄일 수 있음
+
+    - OR을 여러 개 사용한 경우
+
+    - ```SQL
+      SELECT *
+      	FROM EMP
+      WHERE JOB = 'MANAGER'
+         OR JOB = 'SALESMAN'
+         OR JOB = 'CLERK';
+      ```
+
+    - IN을 사용한 경우
+
+    - ```SQL
+      SELECT *
+      	FROM EMP
+      WHERE JOB IN ('MANAGER', 'SALESMAN', 'CLERK');
+      ```
+
+  - **BETWEEN A AND B**를 이용하여 조회하기
+
+    - ```SQL
+      SELECT *
+      	FROM EMP
+      WHERE SAL BETWEEN 2000 AND 3000;
+      ```
+
+  - 일부 문자열이 포함된 데이터를 조회할 때 사용하는 **LIKE**
+
+    - ENAME 열 값이 대문자 S로 시작하는 데이터를 조회하라는 SQL문
+
+    - ```SQL
+      SELECT *
+      	FROM EMP
+      WHERE ENAME LIKE 'S%';
+      ```
+
+    - 와일드 카드: ( `%, _` ) 특정 문자 또는 문자열을 대체함
+
+  - **IS NULL**을 이용해 데이터가 NULL인 행을 조회하기
+
+    - ```SQL
+      SELECT *
+      	FROM EMP
+      WHERE COMM IS NULL;
+      ```
+
+    - NULL은 비교 연산자로 비교하면 결과 값도 NULL이 되기 때문에 IS NULL을 이용해야 함
+
+  - **집합 연산자**
+
+    - 두 개 이상의 SELECT문의 결과 값을 연결함
+    - 열 갯수와 각각의 열의 자료형이 일치해야(열 이름은 달라도 ok)연결 가능
+    - UNION: 합집합으로 묶음, 중복 제거
+    - UNION ALL: 합집합으로 묶고 중복 제거하지 않음
+    - MINUS: 차집합 - 먼저 작성한 SELECT문의 결과에서 다음 결과를 빼 줌
+    - INTERSECT: 교집합
 
 
 
@@ -182,6 +353,43 @@ SQL
 
 
 ## **4. DL/SQL**
+
+
+
+## 5. DB 실무
+
+실제로 서비스 개발에서 어떤 식으로 DB를 다루는지 OJT에서 배운 내용을 바탕으로 작성
+
+
+
+### 5.1. JDBC
+
+> DBMS 종류에 상관없이 DB를 조작할 수 있기 위해 사용하는 API
+
+
+
+코딩의 흐름
+
+JDBC 드라이버 로드 > DB 연결 > DB 조작(SQL) > DB 연결 종료
+
+
+
+JDBC 드라이버 로드 [공식문서](https://jdbc.postgresql.org/documentation/81/connect.html)
+
+- JDBC 드라이버란?
+  - 각 DBMS에 맞는 클라이언트
+  - DBMS 별 드라이버가 필요함(`.jar` 파일)
+    - JDBC가 실제로 하는 일은 없고(API니까...) 드라이버가 일을 함
+- `Class.forName("JDBC Name");` 으로 로딩함 
+  - 드라이버의 클래스를 객체화하여 로드
+- 드라이버 매니저를 통해 연결 객체 획득
+  - `Connection con = DriverManager.getConnection(...);` 
+- 실행 도구 생성
+  - `Statement st = con.createStatement();`
+- 결과 실행
+  - `ResultSet rs = st.executeQuery(sql);`
+
+
 
 
 
