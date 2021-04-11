@@ -1,0 +1,37 @@
+body{
+    margin: 0;
+    padding: 0;
+}
+
+.header{
+    background: white;
+    border-bottom: 1px solid lightgray;
+}
+.container{
+    width: 980px;
+    margin: auto;
+}
+.container-left{
+    /* 패딩같은건 가장 하위 요소에 적용하는 것이 좋음 */
+    padding: 20px 0;
+}
+.logo {
+    float: left;
+    margin-right: 10px;
+}
+.logo img {
+    /* 이미지 아래에 살짝 여백이 생기는 현상을 없애줌 */
+    display: block;
+}
+.menu {
+    float: left;
+}
+.menu-item {
+    float: left;    
+    padding: 8px 10px;
+}
+.clearfix::after {
+    content: "";
+    display: block;
+    clear: both;
+}
