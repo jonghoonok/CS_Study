@@ -364,7 +364,9 @@ WHERE
 
 ### 5.1. JDBC
 
-> DBMS 종류에 상관없이 DB를 조작할 수 있기 위해 사용하는 API
+> Java Database Connectivity
+>
+> DBMS 종류에 상관없이 DB를 조작할 수 있기 위해 사용하는 Java API임
 
 
 
@@ -382,14 +384,47 @@ JDBC 드라이버 로드 [공식문서](https://jdbc.postgresql.org/documentatio
     - JDBC가 실제로 하는 일은 없고(API니까...) 드라이버가 일을 함
 - `Class.forName("JDBC Name");` 으로 로딩함 
   - 드라이버의 클래스를 객체화하여 로드
+
+
+
+DB 연결
+
 - 드라이버 매니저를 통해 연결 객체 획득
-  - `Connection con = DriverManager.getConnection(...);` 
-- 실행 도구 생성
+  
+  - 서버 + DB 이름 + user 이름 + password를 전달
+  
+  - ```java
+    String server = "127.0.0.1";
+    String database = "chess";
+    String userName = "jonghoon";
+    String pwd = "4512";
+    
+    Connection con = DriverManager.getConnection(url: "jdbc:mysql://" + server + "/" + database + "?");
+    return con;
+    ```
+
+
+
+DB 조작
+
+- Preparedstatement 혹은 Statement를 이용하여 **SQL문을 전달해 DB를 조작**할 준비를 함
+  - cf) JPA의 경우 java app 내에서 SQL을 적을 필요가 없음
+  - `PreparedStatement pstmt = con.prepareStatement(sql);`
+    - Preparedstatement의 경우 ?를 이용하여 sql문에 원하는 데이터를 세팅할 수 있음
+    - 동일하거나 비슷한 sql문을 반복적으로 실행하기 위해 사용됨: **Cache를 이용**함 → 성능 좋음
+    - 처음 실행될 때만 연결 생성 - 컴파일 - 실행 3단계를 거치고 이후에는 ?의 값만 바꿔서 실행됨
   - `Statement st = con.createStatement();`
-- 결과 실행
-  - `ResultSet rs = st.executeQuery(sql);`
+    - SQL문 수행 과정에서 매번 컴파일이 일어나기 때문에 성능 안 좋음
+  - 여기서 con은 위에서 생성한 DB 연결 객체임
+- DB 조작 실행: execute, executeQuery, executeUpdate
+  - `pstmt.execute();`
+    - boolean 타입의 값을 반환함: 리턴 값이 ResultSet인 경우엔 true, 그 외엔 false
+  - `pstmt.executeQuery();`
+    - ResultSet 객체의 값을 반환함: SELECT 구문을 수행할 때 사용됨
+  - `pstmt.executeUpdate();`
+    - Int 타입의 값을 반환함: SELECT 이외의 구문을 수행할 때 사용됨(반영된 레코드의 건수를 반환)
 
 
 
-
+결과값 획득, 종료
 

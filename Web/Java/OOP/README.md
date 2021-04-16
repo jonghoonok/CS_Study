@@ -176,3 +176,16 @@
 
 
 
+static 변수
+
+![static](https://gitlab.com/easyspubjava/javacoursework/-/raw/master/Chapter2/2-16/img/mem.png)
+
+- 여러 인스턴스에서 **공통으로 사용하는 변수**
+  - 여러 인스턴스가 공유하는 기준 값이 필요한 경우 사용
+  - 예) 학번, 카드 번호, 사원 번호 등
+  - 프로그램이 메모리에 로딩될 때 Data(Static)영역에 할당됨
+- static변수 선언과 사용
+  - `static int serialNum;`
+  - 클래스 변수, 정적 변수라고도 함
+    - 클래스 이름으로 직접 참조 `Student.serialNum = 100;`
+    - 인스턴스 이름으로도 참조할 수 있긴 한데 권장하진 않음
