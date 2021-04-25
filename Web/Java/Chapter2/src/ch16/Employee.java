@@ -15,10 +15,11 @@ public class Employee {
 	public static int getSerialNum() {
 		return serialNum;
 	}
-
-	public static void setSerialNum(int serialNum) {
-		Employee.serialNum = serialNum;
-	}
+	
+//	serialNum은 외부에서 set할 수 없도록 setter를 없앰	
+//	public static void setSerialNum(int serialNum) {
+//		Employee.serialNum = serialNum;
+//	}
 
 	public int getEmployeeId() {
 		return employeeId;

@@ -279,3 +279,118 @@ while, do-while, for문의 비교
 - while은 조건의 결과나 변수가 true, false인 경우에 주로 사용
   - 수행문을 먼저 할지 나중에 할지에 따라 while, do-while 중 무엇을 할지 결정할 것
 - for는 특정 수의 범위나 횟수와 관련하여 반복되는 경우(배열 관련)에 주로 사용
+
+
+
+
+
+## **4. 자바와 자료구조**
+
+
+
+### 배열
+
+
+
+배열이란?
+
+- **동일한 자료형**의 **순차적** 자료구조
+  - 인덱스를 이용하여 O(1)에 빠르게 탐색 가능
+  - 단 삽입-삭제는 O(n)으로 느림
+- 물리적 위치와 논리적 위치가 같음
+  - 실제 메모리 상에도 순차적으로 저장됨: `arr[i]` 옆에 `arr[i+1]`가 있음
+  - 선언할 때 자료형과 크기에 따라 메모리를 차지하는 공간 결정
+
+
+
+배열 선언 및 초기화
+
+- 선언하기
+
+  - **자료형과 길이를 명시**해줘야 함
+
+  - ```java
+    int[] arr1 = new int[10];
+    int arr2[] = new int[10];
+    ```
+
+- 초기화 하기
+
+  - 선언과 동시에 초기화 하는 경우엔 new를 쓸 수도 안 쓸 수도 있음
+
+  - ```java
+    int[] numbers = new int[] {10, 20, 30};
+    int[] numbers = {10, 20, 30};
+    ```
+
+  - 선언 후 초기화 하는 경우에는 new 생략 불가
+
+  - ```java
+    int[] ids;
+    ids = new int[] {10, 20, 30};
+    ```
+
+- 2차원 배열의 선언 및 초기화
+
+  - `int[][] arr = {{1,2,3}, {4,5,6}};`
+
+
+
+배열의 사용
+
+- `arr.length`와 배열 안에 있는 데이터의 갯수는 다름
+  - 배열의 길이는 초기화 때 정해짐
+- 향상된 for문
+  - `for(int num : arr) { ... }`
+  - 이거 파이썬의 `for num in nums`랑 같은 방식으로 사용 가능
+
+
+
+객체 배열
+
+- 객체를 요소로 갖는 배열
+
+  - int, double 등의 primitive type의 원소를 갖는 것은 기본 자료형 배열이라고 함
+  - 객체 배열은 선언될 때 객체의 **주소가 들어갈 메모리만 할당**됨
+    - 각 요소 객체는 생성해서 저장해야 함
+
+-  객체 배열 복사
+
+  - 얕은 복사
+
+    - 복사 메서드`System.arrayCopy(src, srcPos, dest, destPos, length)` 이용
+    - 주소가 복사되기 때문에 한쪽 배열의 요소를 수정하면 복사한쪽에도 반영됨
+
+  - 깊은 복사
+
+    - 각각의 객체를에 대해 생성한 후 똑같은 값으로 복사하고 배열에 넣어줌
+
+    - 이건 뭐 일일이 반복문으로 해주는 수밖에 없다
+
+    - ```java
+      for(int i = 0; i< library.length; i++) {
+      			copiedLibaray[i].setTitle(library[i].getTitle());
+      			copiedLibaray[i].setAuthor(library[i].getAuthor());
+      		}
+      ```
+
+
+
+ArrayList
+
+- `java.util` 패키지 내에 **객체 배열**을 구현해 둔 클래스
+
+- 많은 메서드들이 최적의 알고리즘으로 구현되어 있어 사용 방법만 익히면 유용하게 사용할 수 있음
+
+  - 주요 메서드
+
+    ![메서드](https://gitlab.com/easyspubjava/javacoursework/-/raw/master/Chapter2/2-23/img/method.png)
+
+  - E는 뭐냐?
+
+    - 객체 배열의 element(인스턴스)에 해당하는 클래스를 E로 표기함
+
+- 선언 및 초기화
+
+  - `ArrayList<Book> library = new ArrayList<Book>(); `
+  - 객체 타입에 해당하는 Class를 import해야 함(위에서는 Class Book)
