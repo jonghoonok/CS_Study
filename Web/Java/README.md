@@ -282,13 +282,106 @@ while, do-while, for문의 비교
 
 
 
-
-
-## **4. 자바와 자료구조**
+## **4. 자바의 유용한 클래스들**
 
 
 
-### 배열
+Object 클래스
+
+- 모든 자바 클래스의 root 클래스
+  - 모든 클래스는 Object 클래스를 (자동으로) 상속받음
+  - Object 클래스 내에 final로 선언되지 않은 메서드들은 재정의하여 사용 가능: `toString()` 등
+- Object 클래스는 java.lang 패키지 안에 들어있음
+  - java.lang 패키지는 자동으로 import 됨
+
+
+
+Object 클래스의 메서드들
+
+- `toString()`
+  - 객체의 정보를 String으로 표현할 때
+  - 객체를 println해보면 메모리 주소가 나오는데 String 객체에 대해서는 문자열의 내용물이 나옴
+  - String, Integer 클래스에 대해서는 이미 재정의가 되어 있다
+- `equals()`
+  - 두 인스턴스의 **주소값을 비교하여** true/false를 반환함
+    - 물리적으로 동일한지 판단
+    - `==` 연산자는 주소값만 비교
+  - 재정의하여 두 인스턴스가 논리적으로 동일한지 구현**할 수 있음**
+    - 메모리 내부에 저장된 "값"이 동일한지 판단
+    - equals() 메서드의 원형은 물리적 판단만 하지만 보통 재정의해서 논리적으로도 판정함
+- `hashCode()`
+  - **인스턴스의 저장 주소를 반환**함
+  - JVM이 힙 메모리를 관리할 때 해시 함수를 이용함
+- `Clone()`
+  - 객체의 원본을 복제하는 데 사용
+  - 사용이 권장되지는 않음
+    - 정보 은닉, 객체 보호 관점에서 안 좋음
+    - cloneable 인터페이스를 명시해 준 경우에 사용
+    - `public class Student implements Cloneable{ ... }`
+- 재정의 불가한 메서드들
+  - 스레드 관련
+    - `wait()`
+    - `notify()`
+  - `finalize()`: GC가 인스턴스를 메모리에서 해제할 때 사용. 이제는 사용되지 않지만..
+  - `getClass()`
+
+
+
+String 클래스
+
+- 선언하기
+
+  - 인스턴스로 생성: `String str1 = new String("abc");`
+    - char Array를 만들어 그 안에 문자를 집어넣음
+    - 내부적으로 final로 선언되기 때문에 변경 불가
+  - 리터럴로 생성: `String str2 = "abc";`
+    - constant pool 안에 생성, 마찬가지로 변경 불가
+
+- 한 번 선언된 **String은 불변**(immutable)
+
+- String의 연결
+
+  - `+`로 연결
+  - `concat()`로 연결: 기존의 String에 연결되는 것이 아닌 새로운 문자열이 생성됨 (메모리 낭비)
+  - StringBuilder, StringBuffer 사용을 권장
+
+- **StringBuilder vs StringBuffer**
+
+  - 둘 다 내부적으로 가변적인 char[]를 멤버 변수로 가짐: **문자열 변경에 유리**함
+  - StringBuffer는 멀티쓰레드 프로그래밍에서 유리: 동기화를 보장함
+  - StringBuilder는 싱글쓰레드에서 사용하는 것을 권장
+  - buffer에 문자열을 넣고, 출력할 때는 `toString()`을 이용함
+
+- text block
+
+  - Java 13부터 지원하는 기능으로 문자열을 """ """ 사이에 이어서 만들 수 있음
+
+  - html, json 문자열을 만드는데 유용함
+
+    - ```java
+      String strBlock = """
+      				This 
+      				is 
+      				text
+      				block
+      				test.""";
+      ```
+
+
+
+Class 클래스
+
+- 
+
+
+
+
+
+## **5. 자바와 자료구조**
+
+
+
+### 5.1. 배열
 
 
 
@@ -354,7 +447,7 @@ while, do-while, for문의 비교
   - 객체 배열은 선언될 때 객체의 **주소가 들어갈 메모리만 할당**됨
     - 각 요소 객체는 생성해서 저장해야 함
 
--  객체 배열 복사
+- 객체 배열 복사
 
   - 얕은 복사
 
