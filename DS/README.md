@@ -87,7 +87,7 @@
 - Complete Binary Tree
   - 마지막 레벨을 제외하고 모든 레벨이 완전히 채워져 있음
   - 마지막 레벨의 노드들은 왼쪽부터 채워짐
-- Perfect Binary Tree
+- Perfect Binary Tree(Fully Complete Binary Tree)
   - 모든 노드는 2개의 자식 노드를 가짐
   - 모든 리프 노드가 동일한 높이를 가짐
 
@@ -101,13 +101,20 @@
 
 
 
+특징
+
+- 중복을 허용하지 않음
+
+
+
 BST의 필요성
 
 - 이름부터가 그렇지만 이진 탐색을 위해 고안됨
   - 균형이 완벽히 잡힌 perfect binary tree의 경우 시간 복잡도 O(log n)
-- 단 트리의 균형이 깨지면 최악의 경우 O(n)까지도 증가할 수 있음
+  - 단 트리의 균형이 깨지면 최악의 경우 O(n)까지도 증가할 수 있음
   - **자가 균형 이진 탐색 트리**(Self-Balancing BST)가 필요!
     - AVL 트리, 레드-블랙 트리 등
+- inorder traversal 탐색을 통해 자료를 정렬하여 출력 가능
 
 
 

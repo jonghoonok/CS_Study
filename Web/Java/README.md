@@ -371,7 +371,21 @@ String 클래스
 
 Class 클래스
 
-- 
+- 컴파일 된 **class 파일**을 로드하여 객체를 **동적으로 로드**(바인딩)하고 정보를 가져오는 메서드를 제공함
+  - 자바의 모든 클래스, 인터페이스는 컴파일 후 class 파일을 생성함
+  - `Class.forName(String className)` 메서드를 이용해 클래스를 로드
+    - `Class c = Class.forName("java.lang.String");`
+  - 동적으로 로드: 컴파일 시가 아니라 실행 중에(runtime) 데이터 타입을 바인딩 함
+    - 프로그래밍 시에는 문자열 변수로 처리, 런타임시에 원하는 클래스를 로딩
+    - 오류가 발생하면(Class Not Found) 심각한 장애가 될 수도 있음
+- Class 클래스의 메서드
+  - 클래스의 정보 알아보기(**reflection 프로그래밍**)
+    - 로컬 메모리에 객체 없는 경우, 원격 프로그래밍, 객체의 타입을 알 수 없는 경우에 사용
+    - `.getConstructors()`
+    - `.getMethods()`
+  - 인스턴스 생성
+    - `.newInstance()`
+    - 이것도 로컬에 해당 객체가 없을 때 사용
 
 
 
@@ -381,7 +395,7 @@ Class 클래스
 
 
 
-### 5.1. 배열
+### 5.1. Array
 
 
 
@@ -393,6 +407,7 @@ Class 클래스
 - 물리적 위치와 논리적 위치가 같음
   - 실제 메모리 상에도 순차적으로 저장됨: `arr[i]` 옆에 `arr[i+1]`가 있음
   - 선언할 때 자료형과 크기에 따라 메모리를 차지하는 공간 결정
+- jdk 클래스로 **ArrayList**, Vector가 있음
 
 
 
@@ -487,3 +502,131 @@ ArrayList
 
   - `ArrayList<Book> library = new ArrayList<Book>(); `
   - 객체 타입에 해당하는 Class를 import해야 함(위에서는 Class Book)
+
+
+
+### 5.2. LinkedList
+
+
+
+연결 리스트란?
+
+- **동일한 데이터 타입**을 순서에 따라 관리하는 자료 구조
+- 데이터를 저장하는 노드에는 **자료와 다음 요소를 가리키는 링크**(포인터)가 있음
+  - 데이터가 추가 될때 노드 만큼의 메모리를 할당 받고 이전 노드의 링크로 연결함 (정해진 크기가 없음)
+  - 연결 리스트의 i 번째 요소를 찾는데 걸리는 시간은 요소의 개수에 비례 : O(n)
+  - 삭제/추가는 O(1)이지만 삭제할 곳을 찾는 데 O(n)이 걸리기 때문에 전체적으로 느리다
+- jdk 클래스 : LinkedList
+
+
+
+
+
+### 5.3. Stack, Queue
+
+
+
+스택의 특징
+
+- 맨 마지막 위치(top)에서만 자료를 추가,삭제, 꺼내올 수 있음 ( 중간의 자료를 꺼낼 수 없음)
+  - Last In First Out ( 후입선출 ) 구조: 택배 상자가 쌓여있는 모양
+  - 응용: 가장 최근의 데이터를 찾아오거나 게임에서 히스토리를 유지하고 이를 무를때
+- 함수의 메모리는 호출 순서에 따른 stack 구조로 되어 있음
+- jdk 클래스 : Stack
+
+
+
+Queue의 특징
+
+- 맨 앞(front) 에서 자료를 꺼내거나 삭제하고, 맨 뒤(rear)에서 자료를 추가 함
+  - Fist In First Out (선입선출) 구조: 일렬로 줄 서 있는 모양
+  - 순차적으로 입력된 자료를 순서대로 처리하는데 많이 사용됨
+  - 응용: 콜센터에 들어온 문의 전화, 메세지 큐 등
+- jdk 클래스 : ArrayList
+
+
+
+### 5.4. Generic
+
+
+
+제네릭이란?
+
+- 자료형을 지정하지 않고 프로그래밍하는 것
+  - 클래스에서 사용하는 변수의 자료형이 여러개 일수 있고, 그 **기능(메서드)은 동일한 경우**
+  - 자료형을 특정하지 않고 **추후 해당 클래스를 사용할 때 지정** 할 수 있도록 선언
+
+- 실제 사용되는 자료형의 변환은 컴파일러에 의해 검증되므로 안정적임
+- 컬렉션 프레임워크에서 많이 사용되고 있음
+
+
+
+자료형 매개변수
+
+- T(type parameter)를 사용하여 클래스를 사용하는 시점에 실제 타입을 지정함
+  - E : element, K: key, V : value 등 여러 알파벳을 의미에 따라 사용 가능
+- 선언: `public class GenericPrinter<T> { ... }`
+- 사용: `GenericPrinter<Powder> powderPrinter = new GenericPrinter<>();`
+  - 다이아몬드 연산자를 생략해도 되지만 인스턴스를 사용할 때 형변환 `(Powder)` 필요
+- static 변수는 사용 불가
+
+
+
+`<T extends Class>` 
+
+- **T 자료형의 범위를 제한** 할 수 있음
+  - 상위 클래스에서 선언하거나 정의하는 메서드를 활용할 수 있음
+  - 상속을 받지 않는 경우 T는 Object로 변환되어 Object 클래스가 기본으로 제공하는 메서드만 사용가능
+- 구현하기
+  - `public class GenericPrinter<T extends Material>`
+  - GenericPrinter 에 material 변수의 자료형을 상속받아 구현
+  - T에 들어가는 것을 Material 클래스를 상속받은 클래스로 한정
+
+
+
+제네릭 메서드
+
+- 말 그대로 제네릭을 이용한 메서드
+  - `public <자료형 매개 변수> 반환형 메서드 이름(자료형 매개변수.....) { }`
+  - 자료형 매개 변수가 하나 이상인 경우도 있음
+- 제네릭 클래스가 아니어도 내부에 제네릭 메서드는 구현하여 사용 할 수 있음  
+
+
+
+### 5.5. Collection Framework
+
+
+
+컬렉션 프레임워크란?
+
+- 자바에서 사용되는 자료구조를 구현해 놓은 JDK 라이브러리
+  - `java.util` 패키지에 구현되어 있음
+- Collection과 Map으로 나뉨
+  - ![collection framework](https://gitlab.com/easyspubjava/javacoursework/-/raw/master/Chapter5/5-09/img/collection.png)
+- Collection
+  - 하나의 객체를 관리함
+    - 이름, 주민번호, 아이디 등 
+  - List와 Set으로 나뉨: **중복을 허용하는지** 아닌지
+- Map
+  - 쌍(key-value)로 이루어진 객체를 관리함
+  - key는 중복을 허용하지 않음
+
+
+
+#### List 인터페이스
+
+> 멤버십 관리하기
+
+
+
+ArrayList 활용
+
+- 멤버를 순차적으로 관리
+
+
+
+Vector 활용
+
+
+
+LinkedList 활용
