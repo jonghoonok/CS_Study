@@ -11,7 +11,7 @@ public class StringConcatTest {
 		strImpl.makeString(s1, s2);
 		
 		StringConcat concat = (s, v) -> System.out.println(s+","+v);
-		concat.makeString(s1, s2);
+		concat.makeString(s1, s2); 
 	}
 
 }
