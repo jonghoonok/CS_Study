@@ -39,6 +39,8 @@
   - 시간 순으로 프로그래밍 하는 것은 **절차 지향**(procedural prigramming)
 - 장점
   - 재사용성, 유지보수, 코드 관리, 고신뢰성
+- 단점
+  - 실행속도 느림, 개발속도 느림(객체 설계에 시간이 소요된다고 한다), 코드의 복잡성
 
 
 
@@ -101,6 +103,9 @@
 - 변하지 않는 수
   - 변하지 않는 값을 반복하여 사용할 때
   - 값을 변경할 수 없기 때문에 **초기화를 해주지 않으면 오류 발생**
+  - 수 뿐만 아니라 클래스와 객체도 상수로 지정 가능
+    - 이러한 참조 변수가 상수인 경우에는 메모리의 주소값이 변하지 않음
+    - **주소가 가리키는 데이터들이 변하지 않는 것은 아님**
 - final 예약어를 이용하여 선언
 - 대문자와 언더바를 이용하여 이름을 선언함
   - `final MATH_PI;`
@@ -109,11 +114,14 @@
 
 리터럴
 
-- 프로그램에서 사용하는 숫자, 문자, 논리 **값**을 뜻함
+- 값이 변하지 않는 데이터: 프로그램에서 사용하는 숫자, 문자, 논리 **값**
+  - 정수 리터럴은 int, 실수 리터럴은 double, 문자열 리터럴은 String으로 저장됨
 - 리터럴은 **상수 풀 constant pool**에 존재함
-  - **Data 영역**이라고도 함
   - 프로그램이 실행되자마자 메모리에 올라와서 종료될 때까지 존재함
-- 정수 리터럴은 int, 실수 리터럴은 double로 저장됨
+  - **Runtime Constant Pool**
+    - String, Integer, Double 등의 reference type을 리터럴로 생성할 때 constant pool에 저장됨
+    - constant pool은 heap 위에 있으나 조금씩 다를 수 있음
+    - 자세한 것은 [String 클래스](#String-클래스) 참고
 
 
 
@@ -834,7 +842,7 @@ Object 클래스
 Object 클래스의 메서드들
 
 - `toString()`
-  - 객체의 정보를 String으로 표현할 때
+  - **객체의 정보를 String으로 표현**할 때
   - 객체를 println해보면 메모리 주소가 나오는데 String 객체에 대해서는 문자열의 내용물이 나옴
   - String, Integer 클래스에 대해서는 이미 재정의가 되어 있다
 - `equals()`
@@ -845,8 +853,12 @@ Object 클래스의 메서드들
     - 메모리 내부에 저장된 "값"이 동일한지 판단
     - equals() 메서드의 원형은 물리적 판단만 하지만 보통 재정의해서 논리적으로도 판정함
 - `hashCode()`
-  - **인스턴스의 저장 주소를 반환**함
+  - heap에 저장된 **객체의 메모리 주소를 반환**함
+    - 다른 방식도 있음: 객체의 모든 attribute에 대하여 각각의 hashcode를 구하여 최종적으로 다시 하나의 hashcode를 구하도록 하여 서로 다른 객체인지 판명
   - JVM이 힙 메모리를 관리할 때 해시 함수를 이용함
+  - equals()를 재정의한다면 hashCode()도 재정의해야 함
+    - 두 객체가 동일하다면 두 객체의 hashCode값도 일치해야 하기 때문
+    - equals 재정의로 다른 곳에 저장된 두 객체가 같다는 판정이 나올 수 있으니 이를 보정하기 위해 hashCode재정의 필요
 - `Clone()`
   - 객체의 원본을 복제하는 데 사용
   - 사용이 권장되지는 않음
@@ -862,26 +874,48 @@ Object 클래스의 메서드들
 
 
 
-String 클래스
+#### String 클래스
 
 - 선언하기
 
   - 인스턴스로 생성: `String str1 = new String("abc");`
     - char Array를 만들어 그 안에 문자를 집어넣음
     - 내부적으로 final로 선언되기 때문에 변경 불가
+    - 추천하지 않는 방법: 기존에 이미 같은 문자열이 있어도 heap에 새롭게 생성됨
   - 리터럴로 생성: `String str2 = "abc";`
-    - constant pool 안에 생성, 마찬가지로 변경 불가
+    - Heap 내부의 string constant pool 안에 생성
+    - 마찬가지로 변경 불가
 
 - 한 번 선언된 **String은 불변**(immutable)
 
-- String의 연결
 
-  - `+`로 연결
-  - `concat()`로 연결: 기존의 String에 연결되는 것이 아닌 새로운 문자열이 생성됨 (메모리 낭비)
-  - StringBuilder, StringBuffer 사용을 권장
 
-- **StringBuilder vs StringBuffer**
 
+String constant pool
+
+![string pool](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FCZS5V%2FbtqFPrKJ713%2F7k48Gu8Hr6mdNmGO9wtTMK%2Fimg.png)
+
+- literal로 생성된 string은 string pool안에 저장되어 재사용됨
+  - JVM이 String constant pool 영역에서 이전에 같은 값을 갖고있는 String 객체가 있는지 찾음
+  - 같은 값을 갖고있는 String 객체가 존재 하면 해당 객체의 주소값을 반환하여 참조하도록 함
+- `String.intern()`
+  - 호출하는 String 객체의 문자열 값이 string pool 안에 있는지 찾아보고 있으면 주소값을 반환하는 메서드
+  - 리터럴을 이용해서 String 객체를 생성하면 내부적으로 intern() 메소드가 호출됨
+- - 
+
+
+
+String의 연결
+
+- `+`로 연결
+- `concat()`로 연결: 기존의 String에 연결되는 것이 아닌 새로운 문자열이 생성됨 (메모리 낭비)
+- StringBuilder, StringBuffer 사용을 권장
+
+
+
+기타
+
+- StringBuilder vs StringBuffer
   - 둘 다 내부적으로 가변적인 char[]를 멤버 변수로 가짐: **문자열 변경에 유리**함
   - StringBuffer는 멀티쓰레드 프로그래밍에서 유리: 동기화를 보장함
   - StringBuilder는 싱글쓰레드에서 사용하는 것을 권장
@@ -983,9 +1017,12 @@ Class 클래스
 
 - `arr.length`와 배열 안에 있는 데이터의 갯수는 다름
   - 배열의 길이는 초기화 때 정해짐
-- 향상된 for문
+- 향상된 for문: **for each**
   - `for(int num : arr) { ... }`
-  - 이거 파이썬의 `for num in nums`랑 같은 방식으로 사용 가능
+    - 파이썬의 `for num in nums`랑 같은 방식으로 사용 가능
+  - 괄호 뒤의 iterate 객체에 한개씩 순차적으로 괄호 뒤의 var가 대입되어 루프를 순회함
+    - for each문을 사용할 수 있는 iterate 객체는 iterator 인터페이스를 상속받음
+    - 자세한 내용은 [5.5. Collection Framework](# 5.5.-Collection-Framework) 참고
 
 
 
@@ -1002,19 +1039,26 @@ Class 클래스
   - 얕은 복사
 
     - 복사 메서드`System.arrayCopy(src, srcPos, dest, destPos, length)` 이용
-    - 주소가 복사되기 때문에 한쪽 배열의 요소를 수정하면 복사한쪽에도 반영됨
+    - **주소가 복사**되기 때문에 한쪽 배열의 요소를 수정하면 복사한쪽에도 반영됨
 
   - 깊은 복사
 
     - 각각의 객체를에 대해 생성한 후 똑같은 값으로 복사하고 배열에 넣어줌
 
-    - 이건 뭐 일일이 반복문으로 해주는 수밖에 없다
+    - **일일이 반복문으로** 해주거나
 
     - ```java
       for(int i = 0; i< library.length; i++) {
       			copiedLibaray[i].setTitle(library[i].getTitle());
       			copiedLibaray[i].setAuthor(library[i].getAuthor());
       		}
+      ```
+      
+    - `System.arraycopy`를 이용하여 가능
+    
+    - ```java
+      for (int i = 0; i < result.length; i++)
+          System.arraycopy(library[i], 0, copiedLibaray[i], 0, library[i].length);
       ```
 
 
@@ -1115,7 +1159,7 @@ Queue의 특징
 - 구현하기
   - `public class GenericPrinter<T extends Material>`
   - GenericPrinter 에 material 변수의 자료형을 상속받아 구현
-  - T에 들어가는 것을 Material 클래스를 상속받은 클래스로 한정
+  - T에 들어가는 것을 Material 클래스를 **상속받은 클래스로 한정**지음
 
 
 
@@ -1125,6 +1169,12 @@ Queue의 특징
   - `public <자료형 매개 변수> 반환형 메서드 이름(자료형 매개변수.....) { }`
   - 자료형 매개 변수가 하나 이상인 경우도 있음
 - 제네릭 클래스가 아니어도 내부에 제네릭 메서드는 구현하여 사용 할 수 있음  
+
+
+
+Generic vs non-Generic
+
+- 
 
 
 
@@ -1161,6 +1211,12 @@ Iterator의 활용
 - Set에는 Get(i)가 없기 때문에 Iterator를 이용하여 **순회**함
   - 순회: 컬렉션 프레임워크에 저장된 요소들을 하나씩 차례로 참조하는것
 
+for each
+
+다음 데이터를 얻는 메서드
+
+iterator vs iterable
+
 
 
 Set 인터페이스
@@ -1182,6 +1238,8 @@ Tree 인터페이스
 Map 인터페이스
 
 - 검색을 위한 자료구조로 key - value를 쌍으로 관리하는 메서드를 구현함
+- HashTable
+  - 
 - HashMap
   - 가장 많이 사용되는 Map 인터페이스 기반 클래스
   - **hash 알고리즘으로 key를 이용**하여 값을 저장하고 꺼내오는 방식
