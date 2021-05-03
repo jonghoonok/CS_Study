@@ -901,7 +901,6 @@ String constant pool
 - `String.intern()`
   - 호출하는 String 객체의 문자열 값이 string pool 안에 있는지 찾아보고 있으면 주소값을 반환하는 메서드
   - 리터럴을 이용해서 String 객체를 생성하면 내부적으로 intern() 메소드가 호출됨
-- - 
 
 
 
@@ -1134,9 +1133,12 @@ Queue의 특징
 - 자료형을 지정하지 않고 프로그래밍하는 것
   - 클래스에서 사용하는 변수의 자료형이 여러개 일수 있고, 그 **기능(메서드)은 동일한 경우**
   - 자료형을 특정하지 않고 **추후 해당 클래스를 사용할 때 지정** 할 수 있도록 선언
-
-- 실제 사용되는 자료형의 변환은 컴파일러에 의해 검증되므로 안정적임
-- 컬렉션 프레임워크에서 많이 사용되고 있음
+- 제네릭의 장점
+  - 실제 사용되는 자료형의 변환은 컴파일러에 의해 검증되므로 안정적임
+    - **잘못된 타입이 사용될 수 있는 문제**를 컴파일 과정에서 차단
+  - 불필요한 casting을 제거하여 **성능을 향상**
+    - 여러 타입을 받는 경우에(다형성) non-generic의 경우 객체를 얻을 때마다 casting이 필요
+    - 이런 이유에서 컬렉션 프레임워크에서 많이 사용되고 있음
 
 
 
@@ -1174,7 +1176,7 @@ Queue의 특징
 
 Generic vs non-Generic
 
-- 
+![non-generic](https://kottans.org/csharp-slides/presentations/9-collections-generics/images/generic_vs_nongeneric.png)
 
 
 
@@ -1188,34 +1190,23 @@ Generic vs non-Generic
   - `java.util` 패키지에 구현되어 있음
 - Collection과 Map으로 나뉨
   - ![collection framework](https://gitlab.com/easyspubjava/javacoursework/-/raw/master/Chapter5/5-09/img/collection.png)
-- Collection
-  - 하나의 객체를 관리함
-    - 이름, 주민번호, 아이디 등 
-  - List와 Set으로 나뉨: **중복을 허용하는지** 아닌지
-- Map
-  - 쌍(key-value)로 이루어진 객체를 관리함
-  - key는 중복을 허용하지 않음
+  - Collection 인터페이스
+    - 하나의 객체를 관리함: 이름, 주민번호, 아이디 등 
+    - 하위에 List, Set 인터페이스가 있음: **중복을 허용하는지** 아닌지
+  - Map 인터페이스
+    - 쌍(key-value)로 이루어진 객체를 관리함
+    - key는 중복을 허용하지 않음
 
 
 
 List 인터페이스
 
-- 멤버를 순차적으로 관리
+- 멤버를 순차적으로 관리하는 자료형으로 배열과 비슷함
+  - 구현하기에 따라 ArrayList나 LinkedList가 될 수 있음
+  - ArrayList는 Vector를 개선하여 배열로 구현한 List
+  - LinkedList는 다음 노드의 주소를 기억하고 있는 List
 - 기본적으로 object 10개가 들어가고, 길이 지정 가능
   -  `add()`하게 되면 `ensureCapacity`로 체크한 후 10개를 **다 썼다면 새로운 ArrayList를 파서 복사**함
-
-
-
-Iterator의 활용
-
-- Set에는 Get(i)가 없기 때문에 Iterator를 이용하여 **순회**함
-  - 순회: 컬렉션 프레임워크에 저장된 요소들을 하나씩 차례로 참조하는것
-
-for each
-
-다음 데이터를 얻는 메서드
-
-iterator vs iterable
 
 
 
@@ -1223,6 +1214,11 @@ Set 인터페이스
 
 - 중복을 허용하지 않도록 관리: **인스턴스의 동일성을 확인**하고 add해야 함
   - 동일성 구현을 위해 필요에 따라 equals()와 hashCode()메서드를 재정의
+- 순차적으로 관리하지 않기 때문에 **저장된 순서와 출력 순서가 다를 수 있음**
+  - TreeSet은 값에 따라 순서가 결정되고 HashSet은 순서 없음
+    - 근데 LinkedHashSet은 또 입력한 순서에 따라 출력됨
+- 많은 자료를 관리할 때는 HashSet 클래스를 사용해야 함
+  - List보다 검색 속도가 훨씬 빠르기 때문: O(1)
 
 
 
@@ -1235,20 +1231,55 @@ Tree 인터페이스
 
 
 
+Iterator
+
+![iterable](https://3.bp.blogspot.com/-q6R4oRfsx9E/WhfwSinEwZI/AAAAAAAAFgk/68bQD-J0T90nIYn5NBWp-aONvEnoe_dMQCLcBGAs/s1600/Screenshot-2017-11-24%2BUntitled%2BDiagram%2B-%2Bdraw%2Bio.png)
+
+- Iterator: **Collection 요소를 순회하게 해주는 인터페이스**
+  - 선언 : `Iterator<Member> ir = arrayList.iterator();`
+  - Iterator 내부에는 `hasNext()`, `next()`, `remove()`가 있고 이는 각 컬렉션의 특성에 맞게 구현됨
+- Itertor의 메서드
+  - boolean hasNext(): 이후에 요소가 더 있는지를 체크하는 메서드, 요소가 있다면 true를 반환
+  - E next() : 다음에 있는 요소를 반환
+- Iterator의 이용
+  - Set에는 Get(i)가 없기 때문에 Iterator를 이용하여 순회함
+- Iterator vs Iterable
+  - **Iterable은 Collection의 상위 인터페이스**
+    - Iterable 인터페이스를 implement하면 객체는 for-each loop를 사용할 수 있음
+  - Iterable은 `iterator()` 메서드를 추상 메서드로 선언하고 있음
+    - 따라서 컬렉션의 하위 클래스들은 iterator()를 구현해야 함
+    - Iterable은 iterator() 메소드가 호출이 될 때마다 Iterator의 새로운 instance를 생성
+    - Iterator instance는 iteration 상태를 모아둔 곳으로 현재 element에 대해 다음 element로 이동하는 메소드를 제공
+
+
+
+```java
+private ArrayList<Member> arrayList;  // ArrayList 선언 
+
+public MemberArrayList(){
+	arrayList = new ArrayList<Member>();  //멤버로 선언한 ArrayList 생성
+}
+```
+
+
+
 Map 인터페이스
 
 - 검색을 위한 자료구조로 key - value를 쌍으로 관리하는 메서드를 구현함
-- HashTable
-  - 
 - HashMap
   - 가장 많이 사용되는 Map 인터페이스 기반 클래스
-  - **hash 알고리즘으로 key를 이용**하여 값을 저장하고 꺼내오는 방식
-    - key가 되는 객체는 중복될 수 없음:  `equals()`와 `hashCode()` 메서드를 구현
+  - HashTable을 사용하며 **key 값에 hash 알고리즘을 적용해 얻은 index를 이용**하여 값을 저장하고 꺼내오는 방식
+    - key가 되는 객체는 중복을 허용하지 않음:  `equals()`와 `hashCode()` 메서드를 구현
+    - 순서가 없음
+- HashTable
+  - HashMap과의 차이는 **동기화 보장을 해주느냐**(Table) 안해주느냐(Map), **key-value에 null이 가능한가**(Table) 아닌가(Map)
 - TreeMap
   - key-value 쌍의 자료를 **key값 기준으로 정렬**하여 관리
+    - Red-Black Tree를 이용하여 구현
     - key가 되는 클래스에 Comparable이나 Comparator인터페이스를 구현
-
-
+- LinkedHashMap
+  - LinkedList로 구현한 HashMap
+  - List로 구현되어 있어 순서가 보장되지만 **랜덤 접근이 느림**
 
 
 
@@ -1411,3 +1442,29 @@ Map 인터페이스
 17. [Thread 클래스의 여러 메서드들](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-21/README.md)
 18. [멀티 Thread 프로그래밍에서의 동기화](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-22/README.md)
 19. [wait()/notify() 에서드를 활용한 동기화 프로그래밍](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-23/README.md)
+
+
+
+
+
+## 7. 예상 질문 리스트
+
+
+
+- effective java 관련
+  - equals() 와 hashCode()의 관계는?
+  - JVM의 구성은?
+  - gc에 대해서
+- 자료구조 관련
+  - HashTable, HashMap이 어떻게 구현되어 있고 어떤 연산을 하는지?
+- 기타
+  - ThreadSafe
+  - StringBuffer, StringBuilder
+- Spring
+  - bin의 생성 주기
+  - filter, intercepter가 언제 어떤 순서로 호출되는지
+  - MVC의 탄생 배경
+  - Spring framework의 탄생 배경과 목적
+- JPA
+  - 연관관계 매핑: N+1 문제가 언제 발생하고 어떻게 해결하는지?
+  - DB를 설계해봤는지?
