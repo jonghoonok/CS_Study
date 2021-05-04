@@ -1423,14 +1423,286 @@ Map 인터페이스
 
 
 
-1. [스트림(Stream)](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-05/README.md)
-2. [연산 수행에 대한 구현을 할 수 있는 reduce()연산](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-06/README.md)
-3. [스트림을 활용하여 패키지 여행 비용 계산하기](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-07/README.md)
-4. [예외 처리는 왜 해야 하나? 자바에서 제공되는 클래스들](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-08/README.md)
-5. [예외 처리하기와 미루기](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-09/README.md)
-6. [사용자 정의 예외 클래스와 그 활용](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-10/README.md)
-7. [오류의 로그를 남기기 - java.util.logging.Logger 활용](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-11/README.md)
-8. [자바의 입출력을 위한 I/O 스트림](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-12/README.md)
+#### 스트림이란?
+
+
+
+- 자료의 **대상과 관계없이 동일한 연산을 수행하는 객체**
+  - 배열, 컬렉션을 대상으로 연산을 수행 함
+  - `Stream<String> stream = sList.stream();`
+    - stream에 점을 찍어서 다양한 메서드(sum, map, forEach 등) 사용 가능
+    - 근데 굳이 저렇게 객체 선언을 안 하고 한 줄로 처리하는 것이 나음
+- 스트림을 사용하는 이유
+  - **일관성 있는 연산**으로 자료의 처리를 쉽고 간단하게 함
+  - 자료 처리에 대한 추상화를 구현
+
+
+
+스트림 특징
+
+- 재사용 불가
+  - 스트림을 생성해 연산을 수행하면 스트림이 소모됨: 다른 연산하려면 스트림을 다시 생성해야 함
+  - 이래서 굳이 객체 생성해서 코드를 2줄 쓸 필요가 없음: 어차피재사용 못할건데 뭐하러 씀
+- 자료 변경 없음
+  - **스트림이 사용하는 메모리 공간은 별도로 생성됨**: 연산이 수행돼도 자료 변경은 발생하지 않음
+  - 이거 뭔가 중요할거 같지 않음?
+- 중간연산과 최종연산으로 구분됨
+  - 중간 연산은 여러 개의 연산이 적용될 수 있지만 최종 연산은 마지막에 한 번만 적용됨
+  - 최종연산이 호출되어야 중간 연산에 대한 수행이 이루어 지고 그 결과가 만들어짐
+  - 따라서 중간 연산에 대한 결과를 연산 중에 알수 없음: **지연 연산**
+
+
+
+스트림 중간연산과 최종연산
+
+- 중간연산: `filter()`, `map()`, `sorted()` 등
+
+- 최종연산: `forEach()`, `count()`, `sum()` 등
+
+- 중간 연산과 최종 연산에 대한 구현은 **람다식을 활용**함
+
+- 예시
+
+  - 문자열 리스트에서 문자열의 길이가 5 이상인 요소만 출력
+
+    - ```java
+      sList.stream().filter(s->s.length() >= 5).forEach(s->System.out.println(s));
+      ```
+
+    - filter()는 중간 연산이고, forEach()는 최종 연산
+
+  - 고객 클래스 배열에서 고객 이름만 가져오기
+
+    - ```java
+      customerList.stream().map(c->c.getName()).forEach(s->System.out.println(s)); 
+      ```
+
+    - map()은 중간 연산이고, forEach()는 최종 연산
+
+
+
+#### 스트림의 활용
+
+
+
+reduce() 연산
+
+- 정의된 연산이 아닌 프로그래머가 직접 구현한 연산을 적용
+
+- **최종 연산으로 스트림의 요소를 소모**하며 연산을 수행
+
+- 사용
+
+  - ```java
+    T reduce(T identify, BinaryOperator<T> accumulator) 
+    ```
+
+    - 첫 번째 parameter는 기본 값(초기값)
+    - 두 번째에는 **BinaryOperator 인터페이스를 구현한 클래스를 넣거나 직접 람다식을 넣음**
+
+  - 예) 배열의 모든 요소의 합을 구하는 reduce() 연산
+
+    - `Arrays.stream(arr).reduce(0, (a,b)->a+b));`
+    - 값을 더하기 위해 첫 번째 파라미터에 초기값으로 0을 넣고 이후 값들을 다 더해서 반환함
+    - sum() 이랑 똑같은데 그냥 프로그래머가 이렇게 구현할 수 있다는 뜻
+
+
+
+### 6.4. 예외 처리
+
+> 자바의 안정성을 보장하기 위해서는
+>
+> 1. 시스템이 죽지(abort) 않도록 예외 처리를 반드시 할 것
+> 2. 로그를 잘 남길 수 있도록 해서 bug fix를 용이하게 할 것
+
+
+
+프로그램의 오류
+
+- Compile Error
+  - 프로그램 **코드 작성 중 발생**하는 문법적 오류
+  - 최근에는 대부분의 컴파일 오류가 개발 환경(eclipse)에서 detection 됨
+- Runtime Error
+  - 실행 중인 프로그램이 의도 하지 않은 동작(bug)을 하거나 프로그램이 중지 되는 오류
+  - 실행 오류는 비정상 종료가 되는 경우 시스템에 **심각한 장애가 발생**할 수 있음
+  - 런타임 에러를 최대한 피해야 함!
+    - **예외 처리**를 통해 일단 회피
+    - 오류가 발생한 경우 log를 남겨서 추후 log 분석을 통해 그 원인을 파악하고 bug를 수정
+    - 오류의 과정을 재현하는 것은 현실적으로 어렵고 로그 분석하는 것이 중요함
+
+
+
+오류와 예외
+
+- Error
+  - 가상 머신에서 발생하고, 시스템 오류기 때문에 프로그래머가 처리 할 수 없음
+  - 동적 메모리가 없는 경우, 스택 메모리 오버플로우 등
+- Exception
+  - 프로그램에서 제어할 수 있는 오류
+    - 파일이 존재하지 않거나, DB연결이 안되는 경우 등
+  - exception을 처리하지 않으면 애초에 컴파일이 안 됨: 안정성 확보
+  - 다양한 예외를 처리하기 위해 class Exception 밑에 수많은 예외 클래스가 있음
+    - IOException, RuntimeExeption, ClassNotFoundException 등
+
+
+
+#### 예외 처리하기와 미루기
+
+> 예외가 발생하는 문장에서 try-catch 블록으로 처리하는 방법
+>
+> 발생하는 문장에서 일단 throws하고 사용하는 부분에서 try-catch로 처리하는 방법
+
+
+
+try-catch
+
+- 예외를 처리하는 구문
+
+  - try 블록에는 예외가 발생할 가능성이 있는 코드를 작성하고 **예외가 발생하면 catch 블록이 수행**됨
+
+  - ```java
+    int[] arr = {1,2,3,4,5};
+    try{
+    	for(int i=0; i<=5; i++){
+    		System.out.println(arr[i]);
+    	}
+    }catch(ArrayIndexOutOfBoundsException e){
+    	System.out.println(e);
+    }
+    ```
+
+- catch 안에서는 로그를 찍을 수 있게 해야 함
+
+  - e.toString() 은 해당 exception의 이름 + 메세지로 구성됨
+    - `java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for length 5`
+  - 로그를 통해 왜 오류가 났는지 파악하고 버그를 수정
+    - e.printStackTrace() 는 어디서 에러가 났는지 볼 수 있게 해줌
+
+- **catch에서 예외를 처리해주지 않으면 abort** 발생
+
+  - try-catch를 통해 예외를 처리하면 다음 코드도 정상적으로 수행됨
+
+- throw
+
+  - 에러를 발생시킴: `throw new Exception();`
+  - throws와는 다르다!
+
+
+
+finally
+
+- try-catch에서 예외 발생 여부에 관계 없이 실행됨
+  - 무조건 호출됨: 리턴이 있어도 호출됨
+- 파일를 닫거나 네트웍을 닫는 등 **오픈된 리소스를 해제**하는 역할을 함
+  - catch가 여러 개 있을 때 유용함
+  - 각각의 catch에 대해 닫아주는 것보다 finally에 한 번만 작성 
+
+
+
+try-with-resource문
+
+```java
+// 기존 방식
+FileInputStream fis = null;
+try{
+    fis = new FileInputStream("a.txt");
+}
+
+// resource문 이용
+try(FileInputStream = new FileInputStream("a.txt")){...}
+```
+
+- try() 내부에서 리소스를 선언하는 경우 close()하지 않아도 자동으로 해제됨
+  - 단, **해당 리소스 클래스가 AutoCloseable 인터페이스를 구현해야** 함
+  - FileInputStream의 경우에는 AutoCloseable을 구현하고 있음
+- try() 외부에서 리소스를 선언하더라도 try(obj)와 같이 써주면 자동으로 해제됨
+  - 이건 java 9부터 가능
+  - 위 예시의 경우 그냥 `try(fis){...}`와 같이 쓰면 자동 해제 가능
+
+
+
+throws
+
+- 예외가 발생할 수 있는 부분(메서드 정의)에서는 미루고 사용하는 부분(메서드 호출)에서 try-catch로 처리
+
+  - 무슨 차이가 있는가?
+
+    - main에서 해당 메서드를 여러차례 호출하는 경우를 생각해보자
+
+    - ```java
+      public static void main(String[] args) {
+          Test test = new Test();
+          try {
+              test.sayNick("fool");
+              test.sayNick("genious");
+          }
+      ```
+
+    - sayNick() 메서드 선언 시 예외처리를 하면 예외가 발생해도 다음 메서드가 실행됨
+
+    - throws한 뒤 위의 예제처럼 main에서 try-catch 처리하면 예외 발생시 다음 메서드 실행되지 않음
+
+  - **트랜잭션 처리할 때 throws가 이점을 가짐**
+
+    - 메서드 중 하나라도 예외가 발생하면 모두 취소해야하기 때문
+
+- 하나의 try{} 블록에서 예외가 여러개 발생하는 경우
+
+  - 발생하는 부분에서 throws로 미룬 뒤 사용하는 부분에서 각각 처리
+
+  - ```java
+    public class ThrowsException {
+    
+    	public Class loadClass(String fileName, String className) throws FileNotFoundException, ClassNotFoundException{
+    		FileInputStream fis = new FileInputStream(fileName);
+    		Class c = Class.forName(className);
+    		return c;
+    	}
+    
+    	public static void main(String[] args) {
+    
+    		ThrowsException test = new ThrowsException();
+    		
+    		try {
+    			test.loadClass("a.txt", "java.lang.String");
+    		} catch (FileNotFoundException e) {
+    			e.printStackTrace();
+    		} catch (ClassNotFoundException e) {
+    			e.printStackTrace();
+    		} catch (Exception e) {
+    			e.printStackTrace();
+    		}
+    	}
+    }
+    ```
+
+  - 이 때 Exception으로 처리하는 블록은 맨 마지막에 위치해야 함
+
+    - 명시해준 예외 이외에 모든 예외가 들어가기 때문
+    - 이게 위에 있으면 아래에 있는 블록에 Unreachable이 뜸
+
+
+
+사용자 정의 예외 클래스
+
+- 자바에서 제공되는 예외 클래스 외에 필요한 경우 프로그래머가 exception을 만들 수 있음
+  - 회원가입 시 규칙에 맞는 패스워드를 입력하지 않으면 에러를 발생시키는 등 응용 가능
+  - 기존 예외 클래스중 가장 유사한 예외 클래스에서 상속 받아 사용자 정의 예외 클래스를 작성
+  - 기본적으로 Exception 클래스를 상속
+
+
+
+#### 로그 남기기
+
+logging이란?
+
+- 
+
+
+
+
+
+1. [자바의 입출력을 위한 I/O 스트림](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-12/README.md)
 9. [표준 입출력 스트림](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-13/README.md)
 10. [바이트 단위 입출력 스트림](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-14/README.md)
 11. [문자 단위 입출력 스트림](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-15/README.md)
