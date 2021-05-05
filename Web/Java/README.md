@@ -1694,32 +1694,216 @@ throws
 
 #### 로그 남기기
 
+
+
 logging이란?
 
-- 
+- 시스템 운영에 대한 기록: 주로 오류가 발생 했을 때 그 **오류에 대한 기록**을 남겨 디버깅을 용이하게 함
+  - 디버깅, 시스템 에러 추적, 성능, 문제점 향상들을 위해 사용
+  - **로그 파일에 기록**하는 코드를 추가하여 필요한 정보가 로그로 남을 수 있도록 한다
+- 어느정도까지 로그를 남길 것인가?
+  - 회사마다 로그 정책이 있음: **로그 레벨**을 정의
+    - severe, warning, info, config, fine, finer, finest 등
+  - 너무 적은 로그 : 정확한 시스템의 상황을 파악하기 어려움
+  - 너무 많은 로그 : 빈번한 file I/O의 오버헤드와 로그 파일의 백업 문제등...
+
+
+
+로그 패키지
+
+- log4j(오픈소스)
+- java.util.logging(자바 기본 제공)
+  - 파일이나 콘솔에 로그 내용을 출력할 수 있음
+    - Logger가 Handler를 이용하여 로그를 남김
+    - ConsoleHandler, FileHandler를 편집해서 로그의 출력 방식, 레벨 변경 가능
+    - ConsoleHandler는 jre/lib/logging.properties 파일에서 편집 가능
+  - logging 패키지에서 제공하는 로그 레벨은 severe, warning, info, config, fine, finer, finest
+    - warning 이상은 exception이 발생하는 경우
+    - config 밑으로는 별 문제 없고 info부터는 정보를 남김 
+    - 처음에는 모든 레벨에 대해 다 로그를 남기고 시스템이 안정화되면 info부터 남기거나 함
+
+
+
+### 6.5. 입출력
+
+
+
+입출력 스트림이란?
+
+- 스트림(네트워크용어): 자료의 흐름. 물의 흐름과 같다는 비유에서 유래됨
+- 자바에서 입출력 스트림은 **다양한 입출력 장치에 독립적으로 일관성있는 입출력을 제공**
+  - 파일 디스크, 키보드, 마우스, 네트웍, 메모리 등 모든 자료가 입력되고 출력되는 곳
+
+
+
+입출력 스트림의 구분
+
+- 대상 기준
+  - 입력 스트림 : 대상으로부터 자료를 읽어 들이는 스트림
+    - FileInputStream, FileReader, BufferedInputStream, BufferedReader 등
+  - 출력 스트림 : 대상으로 자료를 출력하는 스트림
+    - FileOutputStream, FileWriter, BufferedOutputStream, BufferedWriter 등
+- 자료의 종류
+  - 바이트 단위 스트림 : 동영상, 음악 파일, 실행 파일등의 자료를 읽고 쓸 때 사용
+    - FileInputStream, FileOutputStream, BufferedInputStream, BufferedOutputStream 등
+  - 문자 단위 스트림 : 인코딩에 맞게 2바이트 이상으로 문자를 처리하도록 구현된 스트림
+    - 바이트 단위로 문자를 처리하면 깨지기 때문
+    - FileReader, FileWriter, BufferedReader, BufferedWriter 등
+- 기능
+  - 기반 스트림 : 대상에 직접 자료를 읽고 쓰는 기능의 스트림
+    - FileInputStream, FileOutputStream, FileReader, FileWriter 등
+  - 보조 스트림 : 직접 읽고 쓰는 기능은 없이 추가적인 기능을 더해주는 스트림
+    - 기반 스트림이나 또 다른 보조 스트림을 생성자의 매개 변수로 포함함, Wrapper Stream이라고도 함
+    - InputStreamReader, OutputStreamWriter, BufferedInputStream, BufferedOutputStream 등
+
+
+
+표준 입출력 스트림
+
+- System 클래스에 static으로 정의되어 있어 인스턴스 생성 없이 불러올 수 있음
+
+  - System.out : 표준 출력 스트림
+
+    - `System.out.println("출력 메세지");`
+
+  - System.in : 표준 입력 스트림
+
+    - ```java
+      int d = System.in.read() // 한 바이트 읽기
+      ```
+
+    - **바이트 단위로 읽기** 때문에 한글을 읽어서 출력하면 깨짐
+
+    - 이럴 때 보조 스트림을 쓰면 됨!
+
+    - 이 경우엔 InputStreamReader(바이트를 문자로 바꿔주는 Class)로 System.in을 감싼다 
+
+  - System.err : 표준 에러 출력 스트림
+
+    - `System.err.println("에러 메세지");`
+
+
+
+바이트 단위 입출력 스트림
+
+- InputStream
+  - 바이트 단위 입력 스트림 최상위 추상 클래스
+  - 많은 추상 메서드가 선언되어 있고 이를 하위 스트림이 상속받아 구현함
+  - 주요 하위 클래스
+    - FileInputStream : 파일에서 바이트 단위로 자료를 읽음
+    - ByteArrayInputStream byte : 배열 메모리에서 바이트 단위로 자료를 읽음
+    - FilterInputStream : 자료를 읽을 때 추가 기능을 제공하는 모든 보조 스트림의 최상위 클래스
+  - 주요 메서드 : 사용할 때 파라미터와 리턴 값의 의미를 잘 이해하고 쓰자
+    - `int read()` : 입력 스트림으로부터 한 바이트의 자료를 읽고, 읽은 데이터 or -1를 반환(EOF인 경우)
+    - `int read(byte b[])` : b[] 크기의 자료를 b[]에 읽고, 읽은바이트 수를 반환
+    - `int read(byte b[], int off, int len)` : b[] 크기의 자료를 b[]의 **off변수 위치부터 저장**하며 len 만큼 읽고, 읽은 바이트 수를 반환
+    - `void close()` : 입력 스트림과 연결된 대상 리소스를 닫음
+    - close하지 않으면??
+- OutputStream
+  - 바이트 단위 출력 스트림 최상위 추상 클래스
+  - 주요 하위 클래스
+    - FileOutputStream : 파일에서 바이트 단위로 자료를 씀
+      - 생성자 2번째 파라미터로 true를 받으면 파일 뒤에 이어쓰고 **default는 overwrite**임
+    - ByteArrayOutputStream byte : 배열 메모리에서 바이트 단위로 자료를 씀  
+    - FilterOutputStream : 자료를 쓸 때 추가 기능을 제공하는 모든 보조 스트림의 상위 클래스
+  - 주요 메서드
+    - `int write()` : 한 바이트를 출력
+    - `int write(byte b[])` : b[] 크기의 자료를 출력
+    - `int write(byte b[], int off, int len)` : b[] 배열의 off 위치부터 len 개수만큼 출력
+    - `void flush()` : **출력 버퍼**를 강제로 비워 자료를 출력합니다. 
+      - 소켓에서 많이 쓰임 : 기본적으로 버퍼가 꽉 차야 출력되는데 덜 찼을 때도 출력 가능하게 해줌
+    - `void close()` : 출력 스트림과 연결된 대상 리소스를 닫고 출력 버퍼를 비움(flush() 동시 호출)
+
+
+
+문자 단위 입출력 스트림
+
+- Reader와 Writer를 이용하면 됨
+
+
+
+보조 스트림
+
+- 실제 읽고 쓰는 스트림이 아닌 보조 기능을 제공하는 스트림으로 **Decorator Pattern**으로 구현 됨
+  - 생성자의 매개변수로 또 다른 스트림(기반 스트림이나 다른 보조 스트림)을 가짐
+  - 기반 스트림과 보조 스트림을 감싸서 decorate함
+- 예시
+  - InputStreamReader와 OutputStreamWriter
+    - 바이트 단위로 읽거나 쓰는 자료를 문자로 변환해주는 보조 스트림
+    - `InputStreamReader isr = new InputStreamReader(new FileInputStream("reader.txt"))`
+  - BufferedInputStream과 BufferedOutputStream
+    - 입출력을 빠르게 하는 기능이 제공되는 보조 스트림, 문자용으로는 BufferedReader/Writer가 있음
+    - buffer의 크기는 기본 8k이며 변경 가능함
+    - `BufferedInputStream bis = new BufferedInputStream(new FileInputStream("a.zip"));`
+    - BufferedReader는 `br.readLine()` 메서드를 가지는데 한 줄씩 읽을 때 많이 사용됨
+  - DataInputStream과 DataOutputStream
+    - 자료가 **메모리에 저장된 상태 그대로** 읽거나 쓰는 스트림
+
+
+
+Decorator Pattern
+
+![decorator](https://gitlab.com/easyspubjava/javacoursework/-/raw/master/Chapter6/6-19/img/decorator.png)
+
+- 상속보다 유연하고 **기능확장에 용이함**
+  - 데코레이터를 추가하면 기능이 추가되고, 빼면 기능도 삭제됨
+  - 데코레이터를 추가할수록 기능이 더해짐: 위의 그림을 보면 Decorator에서 Operation을 구현하고 추가로 다른 데코레이터를 덧붙일때마다 다른 기능(AddedBehavior)을 할 수 있음
+  - 여러 데코레이터를 조합하여 다양한 기능을 할 수 있음
+- 데코레이터는 component를 하나 포함해야 함: object일 수도 있고 다른 decorator일 수도 있음
+
+
+
+직렬화
+
+- 어떤 데이터 구조나 객체를 **저장될 수 있는 상태로 전환**하고 나중에 재구성 가능한 포맷으로 변환하는 것
+
+  - 역직렬화(deserialization) : 직렬화된 데이터를 다시 복원하는 것
+
+- 직렬화는 왜 해야 하는가?
+
+  - Reference Type 데이터들은 재사용이 불가 : 프로그램이 종료되면 메모리에서 해제되기 때문
+  - 따라서 이를 전부 끌어모아서 **Value Type 데이터로 변환**해야 함
+
+- 자바에서는 ObjectOutputStream으로 직렬화, ObjectInputStream으로 역직렬화를 수행
+
+  - 직렬화를 하기 위해서는 Serializable 인터페이스를 구현해야 함
+
+  - Socket등 직렬화 할 수 없는 객체에서는 직렬화 하지 않으려는 멤버 변수에 `transient`를 사용
+
+  - 프로그래머가 직접 직렬화/역직렬화 하려면 Externalizable 인터페이스를 구현하면 됨
+
+    - `writerExternal()`과 `readExternal()`메서드를 구현
+
+    - ```java
+      @Override
+      public void writeExternal(ObjectOutput out) throws IOException {
+      	out.writeUTF(name);
+      }
+      ```
+
+
+
+기타 입출력 클래스들
+
+- File 클래스
+  - **파일의 속성**을 알 수 있음: 파일의 이름, 경로, 읽기 전용 여부 등
+  - C언어와 달리 입출력 기능은 없음
+- RandomAccessFile 클래스
+  - 입출력 클래스 중 유일하게 **파일에 대한 입력과 출력을 동시에 할 수 있는** 클래스
+  - 파일포인터를 움직여서 데이터를 읽고 쓰는 위치의 이동이 가능함
+    - `seek()` 메서드를 이용
+
+
+
+### 6.6. Tread
 
 
 
 
 
-1. [자바의 입출력을 위한 I/O 스트림](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-12/README.md)
-9. [표준 입출력 스트림](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-13/README.md)
-10. [바이트 단위 입출력 스트림](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-14/README.md)
-11. [문자 단위 입출력 스트림](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-15/README.md)
-12. [여러가지 보조 스트림 클래스들](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-16/README.md)
-13. [직렬화 (serialization)](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-17/README.md)
-14. [그외 여러가지 입출력 클래스들](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-18/README.md)
-15. [데코레이터 패턴을 활용한 커피 머신 프로그램](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-19/README.md)
-16. [자바에서 Thread 만들기](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-20/README.md)
-17. [Thread 클래스의 여러 메서드들](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-21/README.md)
-18. [멀티 Thread 프로그래밍에서의 동기화](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-22/README.md)
-19. [wait()/notify() 에서드를 활용한 동기화 프로그래밍](https://gitlab.com/easyspubjava/javacoursework/-/blob/master/Chapter6/6-23/README.md)
 
 
-
-
-
-## 7. 예상 질문 리스트
+## **7. 예상 질문 리스트**
 
 
 
