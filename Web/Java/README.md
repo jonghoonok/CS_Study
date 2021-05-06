@@ -1899,7 +1899,91 @@ Decorator Pattern
 
 
 
+스레드란?
 
+- 프로세스와 스레드
+  - process : 실행 중인 프로그램. 프로그램이 실행되면 OS로 부터 메모리를 할당받아 프로세스 상태가 됨
+  - thread : 프로세스에서 실제 작업을 수행하는 단위. 하나의 프로세스는 하나 이상의 thread를 가짐
+- 멀티 스레딩
+  - 여러 thread가 동시에 실행되는 것처럼 보임 : 사실 **context switching**을 통해 번갈아서 실행되는 것
+  - thread는 각각 자신만의 작업 공간을 가짐 ( context )
+  - thread 간 공유하는 자원이 있을 수 있음 (자바에서는 static instance)
+    - 자원을 공유하여 작업이 수행되는 경우 서로 자원을 차지하려는 race condition이 발생할 수 있음
+    - 경쟁이 발생하는 부분을 critical section 이라고 함
+    - critical section에 대한 **동기화 구현**이 필요
+
+
+
+스레드 생성
+
+- Thread 클래스를 상속 extends
+- Runnable interface를 구현 : 이미 다른 클래스를 상속받은 상황에서는 Thread를 상속할 수 없기 때문
+  - 스레드를 생성할 때는 runnable 객체를 먼저 생성한 뒤 이를 Thread 생성자의 인자로 넣어줌
+- 두 경우 모두 `run()`을 구현해야 함
+  - 스레드가 시작되면(`start()`) 불리는 메서드
+
+
+
+Thread Status
+
+- 스레드가 생성되면(start) 스레드 풀 안에서 CPU 배분을 기다림(Runnable)
+  - CPU를 배분받으면 Run, 스레드가 종료되면 Dead, 대기 상태로 들어가면 Not Runnable
+- 자바에서 Not Runnable 상태로 진입하는 방법
+  - sleep(time)
+    - time만큼 잠들었다가 Runnable로 재진입 가능한 상태로 바뀜
+  - wait()
+    - 동기화 이슈가 있을 때 (공유 자원을 사용할 수 없을 때) 재움
+    - resource가 available해지면 프로그램에서 `notify()`나 `notify all()`로 깨움
+  - join()
+    - 특정 스레드의 결과가 필요할 때 해당 스레드가 끝날 때까지 Not Runnable 상태에 들어감
+    - `th1.join();`을 호출하면 **호출한 스레드에서** th1 스레드를 기다리는 것
+- Thread가 not runnable 상태일 때 `interrupt()` 메서드를 호출하면 다시 runnable 상태가 될 수 있음
+
+
+
+Thread 우선순위
+
+- 우선 순위가 높은 Thread가 CPU의 배분을 받을 "확률이" 높음
+  - 우선순위가 비슷한 경우에는 높아도 늦게 끝날 수 있음
+  - `Thread.MIN_PRIORITY(=1)`부터 `Thread.MAX_PRIORITY(=10)` 까지 있음
+
+
+
+Thread 종료
+
+- 과거에는 `stop()` 메서드를 사용했으나 현재는 사용되지 않음
+- while(flag)의 flag 변수값을 false로 바꾸는 식으로 종료시킴
+
+
+
+#### 동기화
+
+critical section 과 semaphore
+
+- critical section : 두 개 이상의 thread가 동시에 접근할 수 없는 영역
+- semaphore : 스레드가 critical section에 진입할 수 있게 하는 시스템 객체
+  - get/release 두 개의 기능이 있음
+  - semaphore를 얻은 thread만이 critical section에 진입하고 나머지 thread들은 대기(blocking) 
+
+
+
+동기화 (synchronization)
+
+- 자바에서는 synchronized 메서드나 synchronized 블럭을 사용하여 공유자원에 lock을 건다
+- synchronized 블럭 : 현재 객체 또는 다른 객체에 lock을 걸어 접근을 제어
+- synchronized 메서드 : 객체의 메소드에 synchronized 키워드를 사용해 메서드가 속해있는 객체에 lock
+  - 자바는 deadlock 방지가 없어 synchronized 메서드에서 다른 synchronized 메서드를 호출하면 안 됨
+  - 상호배제, 점유대기, 비선점, 순환대기 4가지 조건 중 일부가 성립되지 않게 코드를 짜야 함
+
+
+
+wait()과 notify()
+
+- 리소스가 유효하지 않은 경우 Thread를 `wait()` 시키고, 유효해지면`notify()`로 깨움 
+  - `notify()`는 대기중인 Thread 중 무작위로 하나를 재시작
+  - `notifyAll()`이 호출되는 경우 wait() 하고 있는 모든 Thread가 재시작
+    - 이 때 유효한 리소스만큼의 Thread만이 수행 : 자원을 갖지 못한 Thread는 다시 wait() 상태로
+    - 자바에서는 notifyAll() 메서드의 사용을 권장
 
 
 
