@@ -10,7 +10,6 @@ public class Subject {
 	private ArrayList<Student> studentList = new ArrayList<Student>();
 	
 	public Subject(int subjectId, String subjectName) {
-		super();
 		this.subjectId = subjectId;
 		this.subjectName = subjectName;
 		this.gradeType = Define.ATOF;

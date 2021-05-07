@@ -44,29 +44,36 @@ public class GenerateGradeReport {
 			buffer.append(student.getMajor().getSubjectName() + "\t");
 			buffer.append(" | ");
 			
-			getScoreGrade(student, subject.getSubjectId());  //학생별 해당과목 학점 계산
+			getScoreGrade(student, subject);  //학생별 해당과목 학점 계산
 			buffer.append("\n");
 			buffer.append(LINE);
 		}
 	}
 	
-	public void getScoreGrade(Student student, int subjectId) {
+	public void getScoreGrade(Student student, Subject subject) {
 		
 		ArrayList<Score> scoreList = student.getScoreList();
 		int majorId = student.getMajor().getSubjectId();
 		
-		GradeEvaluation[] gradeEvaluation = {new BasicEvaluation(), new MajorEvaluation()};
+		GradeEvaluation[] gradeEvaluation = {new BasicEvaluation(), new MajorEvaluation(), new PassFailEvaluation()};
 		
 		for(Score score : scoreList) {
-			String grade;
-			if(score.getSubject().getSubjectId() == majorId)
-				grade = gradeEvaluation[Define.STOF].getGrade(score.getPoint());
-			else
-				grade = gradeEvaluation[Define.ATOF].getGrade(score.getPoint());
-			buffer.append(score.getPoint());
-			buffer.append(":");
-			buffer.append(grade);
-			buffer.append(" | ");
+			if(score.getSubject().getSubjectId() == subject.getSubjectId()) {
+				String grade;
+				if(subject.getGradeType() == Define.PF)
+					grade = gradeEvaluation[Define.PF].getGrade(score.getPoint());
+				else {
+					if(score.getSubject().getSubjectId() == majorId)
+						grade = gradeEvaluation[Define.STOF].getGrade(score.getPoint());
+					else
+						grade = gradeEvaluation[Define.ATOF].getGrade(score.getPoint());
+				}
+				buffer.append(score.getPoint());
+				buffer.append(":");
+				buffer.append(grade);
+				buffer.append(" | ");
+				
+			}
 		}
 		
 	}
