@@ -7,6 +7,7 @@
 - Do It! HTML + CSS + 자바스크립트 웹 표준의 정석
 - 삼성 청년 SW 아카데미 4기 수업자료
 - Softbank 신입사원 OJT
+- MDN
 
 
 
@@ -58,6 +59,59 @@
   - JS 실행 속도가 굉장히 빠른 크롬의 출시로 자바스크립트 이용률 증가
 - 표준화 논의: ES5출시(2009), ES6출시(2015)
   - 현재는 모든 브라우저가 ES를 잘 따르고 있음
+
+
+
+#### JSON
+
+- XML
+
+  - HTML과 같은 마크업 언어로, 태그를 이용하여 데이터를 표현함
+  - 아웃룩이 XML을 이용하여 데이터를 주고받았기 때문에 AJAX(Asynchronous Javascript And XML), XHR(XML Http Request)에 XML 이름이 들어가 있음
+
+- JSON: JavaScript Object Notation
+
+  - JS의 object가 키-밸류로 이루어져 있듯 JSON도 그러함
+  - 프로그래밍 언어나 플랫폼에 상관 없이 사용 가능
+
+- Serialization
+
+  - (언어별로) object를 JSON으로 변환하는 것
+
+  - Object to JSON
+
+    - `JSON.stringify(object)`: object 뒤에 callback함수를 넣어서 변환을 통제할 수 있음
+    - 오브젝트 함수는 JSON으로 변환되지 않음: JSON이 될 때 전부 String으로 바꾸기 때문
+
+  - JSON to Object(deserialization)
+
+    - `JSON.parse(json)`
+
+    - json뒤에 reviver이라는 콜백함수를 이용하여 스트링으로 변환된 원본의 객체를 살릴 수 있음
+
+    - ```javascript
+      const obj = JSON.parse(json, (key, value) => {
+          console.log(`key: ${key}, value: ${value}`);
+          return key === 'birthDate' ? new Date(value) : value;
+      })
+      ```
+
+
+
+#### Event
+
+> HTML 문서 내에서 일어나는 일
+>
+> `click`, `submit`, `keydown`, `mouseover`, `submit`, `change` ...
+
+- addEventListener
+
+  - `EventTarget.addEventListener(type, listener)`
+  - 이벤트가 발생하면 listener가 실행된다
+
+- event.preventDefault()
+
+  - 각 태그의 기본 이벤트가 동작하지 않도록 막음
 
 
 
@@ -149,26 +203,38 @@ console
 
 
 
-조건문
+#### 조건문
 
-- If
 
-  - ```javascript
-    const name = 'df';
-    if (name === 'ellie') {
-        console.log('Welcome, Ellie!')
-    } else if (name === 'coder') {
-        console.log('You are amazing coder')
-    } else {
-        cosole.log('unknown')
-    }
-    ```
 
-  - Ternary operator: 간단할 때만 쓰자
+If문
+
+- ```javascript
+  const name = 'df';
+  if (name === 'ellie') {
+      console.log('Welcome, Ellie!')
+  } else if (name === 'coder') {
+      console.log('You are amazing coder')
+  } else {
+      cosole.log('unknown')
+  }
+  ```
+
+- 삼항 연산자 Ternary operator
 
   - ```javascript
     console.log(name === 'ellie' ? 'yes' : 'no')
     ```
+
+  - 길어지면 줄을 분리할 수 있음
+
+  - ```javascript
+    let text = array.length === 0 
+      ? '배열이 비어있습니다' 
+      : '배열이 비어있지 않습니다.';
+    ```
+
+  - Nesting도 가능하지만 비추 : 그럴거면 그냥 if -else 문을 쓰자
 
 - Switch
 
@@ -193,7 +259,79 @@ console
 
 
 
-반복문
+Truthy and Falsy
+
+- Boolean은 아니지만 조건식 내부에서 **true 또는 false와 같이 처리되는 것**
+- Falsy는 아래의 5가지가 있음
+  - undefined, 0, null, '', NaN
+  - NaN(Not A Number) : 문자열을 숫자로 변환하는 parseInt 라는 함수를 사용하게 될 때 볼 수 있음
+- 나머지는 전부 Truthy로 처리됨
+  - **빈 객체나 빈 배열도 Truthy**임에 주의
+
+
+
+Short circuit evaluation
+
+- AND(&&) 연산
+
+  - `A && B` 에서 A 가 Truthy 한 값이라면 **B 가 결과값**이 됨
+
+    - B가 False여도 상관 없이 B를 리턴함
+    - 반대로 **A가 Falsy하다면 A가 결과값**이 됨
+
+  - 특정 값이 유효할때에만 어떤 값을 조회하는 작업을 해야 할 때 매우 유용함
+
+  - ```javascript
+    function getName(animal) {
+      return animal && animal.name;
+    }
+    ```
+
+- OR(||)연산
+
+  - `A || B` 에서 A 가 Falsy 하다면 결과는 **B 가 결과값**이 됨
+
+    - B가 False여도 상관 없이 B를 리턴함
+    - 반대로 **A가 Truthy하다면 A가 결과값**이 됨
+
+  - 어떤 값이 Falsy 하다면 그 대신 사용 할 값을 지정해줄 때 매우 유용함
+
+  - ```javascript
+    function getName(animal) {
+      const name = animal && animal.name;
+      return name || '이름이 없는 동물입니다.';
+    }
+    ```
+
+- 함수같이 무거운 것은 최대한 뒤로 빼서 short circuit evaluation을 활용하는 것이 좋음
+
+
+
+조건문 응용 : 값에 따라 다른 결과물을 반환 해야 할 때
+
+- 예) 동물 이름을 받아오면, 동물의 소리를 반환하는 함수를 어떻게 구현할 것인가?
+
+  - 방법 1 : 조건문 떡칠 - 동물 이름마다 조건 부여
+
+  - 방법 2 : **객체를 활용**
+
+  - ```javascript
+    function getSound(animal) {
+      const sounds = {
+        개: '멍멍!',
+        고양이: '야옹~',
+      };
+      return sounds[animal] || '...?';
+    }
+    ```
+
+- 값에 따라 실행하는 코드 구문 자체가 다른 경우에는 객체 내에 함수를 넣어서 해결 가능
+
+
+
+
+
+#### 반복문
 
 - for
 
@@ -284,6 +422,18 @@ Template Literal
 
 
 
+기본 파라미터
+
+- 다음과 같이 파라미터에 기본 값을 지정할 수 있음(ES6 이후)
+
+- ```javascript
+  function calculateCircleArea(r = 1) {
+    return Math.PI * r * r;
+  }
+  ```
+
+
+
 자바스크립트 함수의 특징
 
 **추후 보강**
@@ -297,10 +447,100 @@ Template Literal
     - 변수에 할당된 이후에만 실행
   - anonymous function: 이름 없이 기능만 작성해서 변수에 할당
   - named function: 디버깅하기 편하려고 씀
-- Callback
-  - 조건에 맞으면 다른 함수(callback func)를 호출
 - IIFE(Immediately Invoked Function Expression)
   - 함수를 선언하는 즉시 실행하는 것: 함수를 괄호로() 둘러싸면 됨
+
+
+
+Callback Function
+
+- 함수 타입의 값을 파라미터로 넘겨줘서, **파라미터로 받은 함수를 특정 작업이 끝나고 호출**을 해주는 것
+
+
+
+#### Scope
+
+
+
+Scope의 종류
+
+- **Global Scope**: 코드의 모든 범위에서 사용이 가능
+- **Function Scope**: 함수 안에서만 사용이 가능
+- **Block Scope**: if, for, switch 등 특정 블록 내부에서만 사용이 가능
+
+
+
+Global Scope
+
+- 어플이 종료될 때까지 메모리를 차지하므로 사용 최소화 권장
+- 클래스, 함수, 반복문 등 필요한 부분에서만 쓰자
+
+
+
+Block Scope
+
+- 블럭 {} 밖에서 접근할 수 없게 함
+- `let`, `const` 로 선언한 값은 Block Scope 로 선언
+  - 블록 내부에서만 사용 가능하며, 블록 밖에서 똑같은 이름을 가진 값이 있어도 영향을 주지 않음
+- **`var` 는 Function Scope 로 선언**이 됨
+  - if 문 블록 내부에서 선언한 value 값이 블록 밖의 value 에도 영향을 미침
+  - 함수 밖에서 선언한 var 변수가 함수 내에 영향을 주지는 않음
+
+
+
+Hoisting
+
+- 아직 선언되지 않은 함수/변수를 "끌어올려서" 사용 할 수 있는 자바스크립트의 작동 방식
+
+- 단, `const` 와 `let` 은 hoisting 이 발생하지 않고, 에러가 발생함
+
+  - `var`는 가능
+
+  - ```javascript
+    console.log(number);	// undefined가 출력됨
+    var number = 2;			
+    ```
+
+  - `const`, `let`은 불가능
+
+  - ```javascript
+    function fn() {
+        console.log(a); // Reference Error : Cannot access 'a' before initialization
+        let a = 2;
+    }
+    fn();
+    ```
+
+  - Codesandbox 에서는 **Babel**이 `const`, `let` 을 `var` 로 변환하기 때문에 오류가 발생하지 않음
+
+- Hoisting은 방지하는 것이 좋음
+
+  - 이해하기 어렵기 때문에 유지보수도 힘들어지고 의도치 않는 결과물이 나타나기 쉬움
+
+
+
+**Dynamic typing**
+
+- 어떤 타입인지 선언하지 않고 런타임 때 타입을 변경할 수 있음
+
+- 빠르게 프로토타이핑할 때 유용하지만 규모가 커지면 머리 아플 수 있음!
+
+- ```javascript
+  let text = 'hello';
+  console.log(`value: ${text}, type: ${typeof text}`)
+  text = 1;
+  console.log(`value: ${text}, type: ${typeof text}`)
+  text = '7' + 5;
+  console.log(`value: ${text}, type: ${typeof text}`)
+  text = '8' / '2';
+  console.log(`value: ${text}, type: ${typeof text}`)
+  // value: hello, type: string
+  // value: 1, type: number
+  // value: 75, type: string
+  // value: 4, type: number
+  ```
+
+- 중간에 타입이 바껴서 (스트링 -> 넘버) 인덱싱을 못하는 바람에 런타임 에러가 생기는 등의 문제가 있을 수 있음: TypeScript로 해결
 
 
 
@@ -344,29 +584,6 @@ Template Literal
     print(ironMan);
     ```
 
-- 객체 비구조화 할당
-
-  - 객체에서 값들을 추출해서 새로운 상수로 선언해 주는 것
-
-  - ```javascript
-    function print(hero) {
-      const { name, actor } = hero;		// 비구조화 할당
-      const text = `${name} 역할을 맡은 배우는 ${actor} 입니다.`;
-      console.log(text);
-    }
-    ```
-
-  - 파라미터 단계에서 객체 비구조화 할당을 할 수도 있음
-
-  - ```javascript
-    function print({ name, actor }) {
-      const text = `${name} 역할을 맡은 배우는 ${actor} 입니다.`;
-      console.log(text);
-    }
-    ```
-
-  - 코드를 짧고 가독성 좋게 작성할 수 있음
-
 - 객체 관련 함수
 
   - `in` : 키가 있는지 체크하는 bool 함수
@@ -386,6 +603,54 @@ Template Literal
     - `const user2 = Object.assign({}, user);`
     - source가 여러 개이고 같은 필드가 있으면 뒤에 있는 것이 덮어씌우게 됨
   - **object는 call by reference**이기 때문에 deep copy하려면 위와 같이 해야 함
+
+
+
+객체 비구조화 할당
+
+- 객체에서 값들을 추출해서 새로운 상수로 선언해 주는 것 : 코드를 **짧고 가독성 좋게** 작성할 수 있음
+
+- ```javascript
+  function print(hero) {
+    const { name, actor } = hero;		// 비구조화 할당
+    const text = `${name} 역할을 맡은 배우는 ${actor} 입니다.`;
+    console.log(text);
+  }
+  ```
+
+- 파라미터 단계에서 객체 비구조화 할당을 할 수도 있음
+
+- ```javascript
+  function print({ name, actor }) {
+    const text = `${name} 역할을 맡은 배우는 ${actor} 입니다.`;
+    console.log(text);
+  }
+  ```
+
+- 비구조화 할당에도 기본 값 설정 가능함
+
+- 비구조화 할당시 **이름 변경 가능**함
+
+- ```javascript
+  const animal = {
+    name: '멍멍이',
+    type: '개'
+  };
+  
+  const { name: nickname } = animal
+  console.log(nickname);			// animal 객체 안에 있는 name 을 nickname 이라고 선언
+  ```
+
+- 배열에서도 비구조화 할당 가능함
+
+- ```javascript
+  const array = [1, 2];
+  const [one, two] = array;
+  
+  console.log(one);
+  ```
+
+- 비구조화 할당은 가독성이 목적이므로 이를 해치지 않는 선에서 적당히 잘 이용하자
 
 
 
@@ -697,6 +962,16 @@ splice vs slice
 - `includes()`
 
   - 존재여부 찾기 : bool 값을 반환
+
+    - 특정 값이 여러 값 중 하나인지 확인할 때 이용하면 좋음
+
+    - ```javascript
+      function isAnimal(name) {
+        const animals = ['고양이', '개', '거북이', '너구리'];
+        return animals.includes(name);
+      }
+      ```
+
   - indexOf()도 사용 가능한데, 포함 안 되어 있으면 -1이 반환되고 포함 되어 있으면 인덱스를 반환
 
 - `findIndex()` 
@@ -730,116 +1005,220 @@ splice vs slice
 
 
 
-## **3. 자바스크립트 고급 문법**
-
-콜백함수 추가할 것
+### 2.6. 기타
 
 
 
-**Block Scope**
+spread
 
-- 블럭 {} 밖에서 접근할 수 없게 함
-
-- 블럭 밖의 변수는 Global Scope
-
-  - 어플이 종료될 때까지 메모리를 차지하므로 사용 최소화 권장
-  - 클래스, 함수, 반복문 등 필요한 부분에서만 쓰자
-
-- **Dynamic typing**
-
-  - 어떤 타입인지 선언하지 않고 런타임 때 타입을 변경할 수 있음
-
-  - 빠르게 프로토타이핑할 때 유용하지만 규모가 커지면 머리 아플 수 있음!
+- 스프레드 연산자 `...`를 이용하여 기존의 것을 건드리지 않고, 새로운 객체나 배열을 만들 수 있음
 
   - ```javascript
-    let text = 'hello';
-    console.log(`value: ${text}, type: ${typeof text}`)
-    text = 1;
-    console.log(`value: ${text}, type: ${typeof text}`)
-    text = '7' + 5;
-    console.log(`value: ${text}, type: ${typeof text}`)
-    text = '8' / '2';
-    console.log(`value: ${text}, type: ${typeof text}`)
-    // value: hello, type: string
-    // value: 1, type: number
-    // value: 75, type: string
-    // value: 4, type: number
+    // 객체
+    const slime = {
+      name: '슬라임'
+    };
+    
+    const cuteSlime = {
+      ...slime,
+      attribute: 'cute'
+    };
+    
+    //배열
+    const numbers = [1, 2, 3, 4, 5];
+    
+    const spreadNumbers = [...numbers, 1000, ...numbers];
+    console.log(spreadNumbers); // [1, 2, 3, 4, 5, 1000, 1, 2, 3, 4, 5]
     ```
 
-  - 중간에 타입이 바껴서 (스트링 -> 넘버) 인덱싱을 못하는 바람에 런타임 에러가 생기는 등의 문제가 있을 수 있음: TypeScript로 해결
-
-Operation
-
-- Short circuit evaluation
-  - 파이썬과 마찬가지로 or(||)연산은 true가 나오면 끝
-  - 따라서 함수같이 무거운 것은 최대한 뒤로
 
 
+rest
 
+- 객체, 배열, 함수의 파라미터에서 이용 가능
 
+- 비구조화 할당 문법과 함께 사용하여 객체나 배열을 분리할 수 있음
 
+  - ```javascript
+    const purpleCuteSlime = {
+      name: '슬라임',
+      attribute: 'cute',
+      color: 'purple'
+    };
+    
+    const { color, ...rest } = purpleCuteSlime;
+    console.log(rest);		// Object {name : '슬라임', attribute : 'cute'}
+    ```
 
+  - 추출한 값의 이름이 꼭 rest 일 필요는 없음
 
-#### JSON
+  - 배열에서 rest를 사용할 경우 rest는 반드시 맨 뒤로 가야 함
 
-- XML
+- 함수의 파라미터가 몇개가 될 지 모르는 상황에서 rest 파라미터를 사용하면 매우 유용함
 
-  - HTML과 같은 마크업 언어로, 태그를 이용하여 데이터를 표현함
-  - 아웃룩이 XML을 이용하여 데이터를 주고받았기 때문에 AJAX(Asynchronous Javascript And XML), XHR(XML Http Request)에 XML 이름이 들어가 있음
-
-- JSON: JavaScript Object Notation
-
-  - JS의 object가 키-밸류로 이루어져 있듯 JSON도 그러함
-  - 프로그래밍 언어나 플랫폼에 상관 없이 사용 가능
-
-- Serialization
-
-  - (언어별로) object를 JSON으로 변환하는 것
-
-  - Object to JSON
-
-    - `JSON.stringify(object)`: object 뒤에 callback함수를 넣어서 변환을 통제할 수 있음
-    - 오브젝트 함수는 JSON으로 변환되지 않음: JSON이 될 때 전부 String으로 바꾸기 때문
-
-  - JSON to Object(deserialization)
-
-    - `JSON.parse(json)`
-
-    - json뒤에 reviver이라는 콜백함수를 이용하여 스트링으로 변환된 원본의 객체를 살릴 수 있음
-
-    - ```javascript
-      const obj = JSON.parse(json, (key, value) => {
-          console.log(`key: ${key}, value: ${value}`);
-          return key === 'birthDate' ? new Date(value) : value;
-      })
-      ```
-
-
-
-#### Event
-
-> HTML 문서 내에서 일어나는 일
->
-> `click`, `submit`, `keydown`, `mouseover`, `submit`, `change` ...
-
-- addEventListener
-
-  - `EventTarget.addEventListener(type, listener)`
-  - 이벤트가 발생하면 listener가 실행된다
-
-- event.preventDefault()
-
-  - 각 태그의 기본 이벤트가 동작하지 않도록 막음
+  - ```javascript
+    function sum(...rest) {
+      return rest.reduce((acc, current) => acc + current, 0);
+    }
+    
+    const result = sum(1, 2, 3, 4, 5, 6);
+    ```
 
 
 
 
 
-## **4. 비동기 처리**
+## **3. 비동기 처리**
 
 > 자바스크립트 자체는 동기적: 호이스팅이 된 이후로는 하나씩 순서대로 실행
 >
 > 비동기 함수를 만나면 webAPI, 태스크큐 등을 거쳐 비동기적 실행
+
+
+
+![synchronous](https://i.imgur.com/hh3Mawr.png)
+
+
+
+비동기 처리란?
+
+- 한 작업이 끝나야 다른 작업을 처리하는 동기적 처리와 달리 **동시에 여러 가지 작업을 처리**하는 것
+  - 주로 많은 시간이 걸리는 작업에 대해 비동기 처리를 함
+  - JS 엔진이 싱글 쓰레드기 때문에 **자바스크립트 자체는 기본적으로 동기적**임
+- 자바스크립트에서 비동기적으로 처리하는 작업 예시
+  - Ajax Web API 요청
+  - 파일 읽기
+  - 암호화-복호화
+  - 작업 예약
+
+
+
+### 3.1. 비동기 처리 방법
+
+
+
+`setTimeout()`
+
+- ```javascript
+  function work() {
+    setTimeout(() => {
+      const start = Date.now();
+      for (let i = 0; i < 1000000000; i++) {}
+      const end = Date.now();
+      console.log(end - start + 'ms');
+    }, 0);
+  }
+  
+  console.log('작업 시작!');
+  work();
+  console.log('다음 작업');
+  ```
+
+  - 작업 시작! → 다음 작업 → 600ms 순으로 log가 찍힘
+
+- 첫번째 파라미터에 넣는 함수를, 두번째 파라미터에 넣은 **시간(ms 단위)이 흐른 후 호출**해 줌
+
+  - 최소 단위로 4ms가 지정되어 있음
+  - 지정한 시간이 흘렀어도 **다른 작업이 진행중이라면 호출되지 않음** : 그거 끝나고 호출함
+
+- 함수가 끝난 뒤 다른 작업을 처리해야 하는 경우에는 콜백 함수를 이용해서 처리
+
+
+
+#### Promise
+
+Promise란?
+
+- 비동기 작업을 조금 더 편하게 처리 할 수 있도록 ES6 에 도입된 Object
+  - 과거에는 비동기 처리를 위해 콜백 함수를 이용했었는데, 복잡한 작업의 경우 **콜백 지옥**에 빠짐
+  - 이를 해결하기 위해 Promise를 도입
+- 기능이 수행됐다면(`resolve`) 성공 메시지를, 실패했다면(`reject`) 실패 메시지를 보냄
+  - Promise 객체는 성공하는 경우, 실패하는 경우에 대해 각각 콜백 함수를 받아서 비동기 처리를 수행
+
+
+
+Producer
+
+- 원하는 기능을 수행하여 데이터(리턴 값)를 만들어 내는 쪽 : Promise 객체
+
+  - ```javascript
+    const promise = new Promise((resolve, reject) => {
+        console.log('doing something...');
+        setTimeout(() => {
+            //resolve('ellie')
+            //reject(new Error('no network'));
+        }, 1000);
+    });
+    ```
+
+- Promise 객체는 executor 콜백 함수를 인자로 받아서 생성됨
+
+  - 객체가 만들어지는 순간 executor 콜백 함수를 실행함
+  - 성공/실패 각각에 대해 executor를 받음 (위 예제에서는 둘 다 주석 처리 했지만)
+
+
+
+Consumer
+
+- 제공되는 데이터를 사용하는 쪽
+  - 여기서 `then`, `catch`를 묶어서(chaining) 연속적인 비동기 처리를 수행함
+- `promise.then()` 
+  - promise 객체가 수행한 결과를 받아와 then 내부의 콜백 함수를 실행
+  - 이 때 **promise 객체를 리턴**함
+- `promise.catch()` 
+  - error가 발생했을 때 어떻게 처리할 것인지 나타내는 콜백 함수를 등록
+- `promise.finally()`
+  - 성공, 실패 여부와 관계 없이 무조건 실행됨
+
+
+
+**Promise Chaining**
+
+- `then` 내부에 넣은 함수에서 리턴하는 Promise 를 받아 연달아서 사용하는 것
+
+  - 예제 : 숫자를 입력받아 1씩 증가시키며 5가 될 때까지 console에 찍음
+
+  - ```javascript
+    function increaseAndPrint(n) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          const value = n + 1;
+          if (value === 5) {
+            const error = new Error();
+            error.name = 'ValueIsFiveError';
+            reject(error);
+            return;
+          }
+          console.log(value);
+          resolve(value);
+        }, 1000);
+      });
+    }
+    
+    increaseAndPrint(0)
+      .then(increaseAndPrint)	// 리턴 값을 그대로 콜백함수에 사용하는 경우 parameter 생략
+      .then(increaseAndPrint)
+      .then(increaseAndPrint)
+      .then(increaseAndPrint)
+      .then(increaseAndPrint)
+      .catch(e => {
+        console.error(e);
+      });
+    ```
+
+  - 콜백 지옥이 일어나는 부분이 깔끔히 정리된 것을 확인할 수 있음
+
+- 단점
+
+  - 에러를 잡을 때 몇번째에서 발생했는지 알아내기도 어려움
+  - 특정 조건에 따라 분기를 나누는 작업이 어려움
+  - 특정 값을 공유해가면서 작업을 처리하기 까다로움
+
+
+
+#### async, await
+
+
 
 
 
