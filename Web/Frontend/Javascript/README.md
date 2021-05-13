@@ -19,8 +19,8 @@
 
 자바스크립트란?
 
-- 웹 브라우저에서 사용하기 위하여 만들어진 **프로그래밍 언어**
-  - 기존에는 브라우저에서만 사용해왔음
+- 웹 브라우저에서 지원하는 유일한 **프로그래밍 언어**
+  - 기존에는 브라우저에서만 사용해왔음 : 애초에 브라우저에서 사용하려고 개발됨
   - 최근에는 Node.js 런타임을 통하여 서버 쪽에서도 사용을 할 수 있게 됨
 - 스크립트 언어는 **이미 존재하는 소프트웨어를 제어**하기 위한 용도로 사용되는 프로그래밍 언어
   - 새로운 프로그램을 만들기보다는 기존 프로그램을 제어하고 그 위에서 구동이 지원되는 것
@@ -32,79 +32,147 @@
 
 
 
-자바스크립트의 특징
-
-- 
-
-
-
-### 자바스크립트의 역사
+자바스크립트의 역사
 
 - 넷스케이프에서 동적 웹페이지 만들기 위해 최초로 개발
   - Scheme Script를 베이스로 자바 문법과 비슷하게 제작
 - ECMA International에서 문법적 사항을 정리한 문서 ECMA Script 발간(1997)
-- 그러나 MS에서 이를 무시했고, 파이어폭스도 출시(2004)되면서 **크로스 브라우징 이슈** 심화
-  - 이를 해결하기 위해 JQuery, dojo, mootools 등의 라이브러리를 이용
-  - 다양한 브라우저에서 동작하는 동적 웹사이트를 만들게 됨
-- **AJAX**(Asynchronous JavaScript And XML) 도입
-  - CSR을 구현하기 위한 비동기적 웹 어플리케이션 개발 기법
-    - 렌더링이 끝난 후에 데이터를 받아오는 것을 비동기로 수행
-  - 서버와 통신할 때  **XHR(XMLHttpRequest)**객체를 사용
-    - xhr은 데이터를 받아오는 객체로 페이지의 일부를 업데이트 하고 HTML, JSON, Txt를 교환
-    - 옛날 방식으로 요즘엔 **서드파티 라이브러리**가 많이 사용됨
-    - 서드파티란 제3자(툴 제작자가 아닌 개인, 팀, 업체 등)가 만든 **라이브러리**나 **플러그인**으로 프로그래밍을 돕기 위해 존재함
-      - 라이브러리: 재사용이 필요한 기능을 미리 만들어두고 모듈화하여 사용
-      - 플러그인: 특정 문제를 해결하기 위한 컴포넌트(라이브러리: 플러그인의 집합)
-- 크롬 도입(Just In Time compliation)
-  - JS 실행 속도가 굉장히 빠른 크롬의 출시로 자바스크립트 이용률 증가
-- 표준화 논의: ES5출시(2009), ES6출시(2015)
+  - 웹 표준화 움직임 시작
+- 그러나 MS가 ECMA에 참여하지 않고, 파이어폭스도 출시(2004)되면서 **크로스 브라우징 이슈** 심화
+  - 이를 해결하기 위해 JQuery, dojo, mootools 등의 라이브러리 등장
+    - 이들 라이브러리를 이용해 다양한 브라우저에서 동작하는 동적 웹사이트를 만들 수 있게 됨
+- 크롬 도입
+  - JS 실행 속도가 굉장히 빠른 Just In Time compliation 엔진 탑재
+  - 다른 브라우저도 성능 개선 필요 대두 : 표준화 논의 진행
+- ES5출시(2009), ES6출시(2015)
   - 현재는 모든 브라우저가 ES를 잘 따르고 있음
+  - 이제는 JQuery 등의 라이브러리에 의존하지 않고 웹 API만으로도 동적 페이지 작성 가능
 
 
 
-#### JSON
+### 1.1. 자바스크립트의 작동 방식
+
+
+
+HTML안에 JS를 어떻게 포함하는가에 따라 페이지 로딩이 달라짐
+
+- HTML 헤더 안에서 `<script>`로 감싸는 방식
+
+  - HTML을 파싱하다가 JS코드를 만나면 서버에서 **JS 파일을 다운로드**받고 다시 파싱함
+    - 모든 파일을 한꺼번에 서버에서 받는 것이 아니라 필요에 따라서 받음
+    - 이런 식으로 받아오는 것을 **AJAX**기법이라고 함
+  - 로딩이 느림
+
+- HTML body 끝에 JS를 포함
+
+  - HTML 파싱을 끝낸 후 스크립트를 fetching(다운로드) - 실행
+  - JS를 받기 전에도 컨텐츠를 볼 수 있음
+  - JS에 의존적인 페이지라면 결국 스크립트 실행 때까지 기다려야만 한다는 단점 존재
+
+- 헤더 안에 `async` 를 이용하여 JS를 포함
+
+  - ```html
+    <script async src = "main.js"></script>
+    ```
+
+  - HTML parsing과 병렬적으로 JS코드를 fetching하고 JS코드 **다운로드가 끝나면 바로 실행**(executing)
+
+    - 파싱이 끝나기 전에 실행되기 때문에 필요한 DOM요소가 아직 없다면 문제가 생길 수 있음
+    - 코드 순서가 아니라 다운로드 종료 순으로 실행되므로 순서 의존적인 코드라면 문제가 생길 수 있음
+
+  - JS코드 실행 중에는 파싱을 중단하기 때문에 페이지를 보기까지 시간이 걸림
+
+- 헤더 안에 `defer` 를 이용하여 JS를 포함
+
+  - ```html
+    <script defer src = "main.js"></script>
+    ```
+
+  - HTML parsing과 병렬적으로 JS코드를 fetching하되 **파싱이 완료되면** JS코드를 작성 순서에 따라 실행
+
+  - 관련 컴포넌트들이 준비되지 않은 상태에서 화면을 보게 됨: **사용불가 처리**를 해줘야 함
+
+
+
+AJAX란?
+
+- Asynchronous JavaScript And **XML** : CSR을 구현하기 위한 **비동기적 정보 교환 기법**
+  - 렌더링이 끝난 후에 비동기적으로 데이터를 받아옴
+  - JavaScript와 XML을 이용함 : 최근에는 JSON이 이용됨
+- 작동 방식
+  1. 브라우저가 사이트에 접속하면 서버는 사이트의 기본 얼개를 담은 '템플릿'을 전달
+  2. 브라우저는 수신받은 템플릿(HTML, CSS)을 해석해 화면의 기본 모양을 그림
+  3. 서버는 데이터의 요청 방식과 가공 방식을 기술한 자바스크립트 파일을 전달
+  4. 브라우저는 자바스크립트 파일을 해석해서 파일에 기술된 방식대로 **서버에 추가 데이터를 요청**
+     - **XHR객체** 혹은 **서드파티 라이브러리**(jQuery 등)를 통해서 수행
+  5. 서버는 **순수 데이터**를 응답으로 리턴
+     -  XHR(XMLHttpRequest) 객체가 데이터를 받아 옴
+  6. 브라우저는 수신한 데이터를 해석하여 템플릿의 적절한 위치에 삽입
+     - 데이터의 가공 방식에 따라 삽입 외의 작업(변경, 삭제)을 할 수도 있음
+- 단점
+  - 자바스크립트를 해석하지 못하는 검색 엔진에서는 내용이 검색되지 않음
+  - 초기 화면 로딩이 느림
+    - 최소 두 번의 데이터 요청(일반적으로 4회 이상. HTML, CSS, JS 로딩 후 Ajax call 1회)을 해야 함
+    - 레이아웃이 복잡한 사이트는 서버가 모든 페이지를 그려서 전달 : SSR
+  - 양방향 기술이 아니며 '요청-응답' 사이클이 지나고 나면 통신 소켓을 닫아버림
+    - 실시간 통신을 지원하기 위해 **웹 소켓** 개발
+
+
+
+웹 데이터 전송 양식
 
 - XML
 
-  - HTML과 같은 마크업 언어로, 태그를 이용하여 데이터를 표현함
-  - 아웃룩이 XML을 이용하여 데이터를 주고받았기 때문에 AJAX(Asynchronous Javascript And XML), XHR(XML Http Request)에 XML 이름이 들어가 있음
-
-- JSON: JavaScript Object Notation
-
-  - JS의 object가 키-밸류로 이루어져 있듯 JSON도 그러함
-  - 프로그래밍 언어나 플랫폼에 상관 없이 사용 가능
-
-- Serialization
-
-  - (언어별로) object를 JSON으로 변환하는 것
-
-  - Object to JSON
-
-    - `JSON.stringify(object)`: object 뒤에 callback함수를 넣어서 변환을 통제할 수 있음
-    - 오브젝트 함수는 JSON으로 변환되지 않음: JSON이 될 때 전부 String으로 바꾸기 때문
-
-  - JSON to Object(deserialization)
-
-    - `JSON.parse(json)`
-
-    - json뒤에 reviver이라는 콜백함수를 이용하여 스트링으로 변환된 원본의 객체를 살릴 수 있음
-
-    - ```javascript
-      const obj = JSON.parse(json, (key, value) => {
-          console.log(`key: ${key}, value: ${value}`);
-          return key === 'birthDate' ? new Date(value) : value;
-      })
-      ```
+  - HTML과 같은 **마크업 언어**로, 태그를 이용하여 데이터를 표현함
+    - 웹상에서 구조화된 문서를 전송가능하도록 고안됨
+    - 메타데이터 기술 가능 : 데이터 타입 - 데이터 내용을 구분하여 표기
+    - 수많은 종류의 데이터를 유연하고 자유롭게 기술할 수 있어 **범용성이 뛰어남**
+  - 웹을 중심으로 빠르게 퍼져 데이터 통신에도 많이 사용됨
+    - 아웃룩이 XML을 이용하여 데이터를 주고받았기 때문에 AJAX(Asynchronous Javascript And XML), XHR(XML Http Request)에 XML 이름이 들어가 있음
+  - 데이터 내용물에 비해 용량이 너무 커서 JSON이 고안됨
+- JSON
+  - JavaScript Object Notation
+    - JSON의 표기 양식은 JavaScript 객체 표기법의 부분집합임
+    - JS의 object가 key-value로 이루어져 있는 것처럼 key-value pair로 데이터를 표현함
+  - XML의 장점을 계승하면서 단점을 보완함
+    - 높은 범용성 : 프로그래밍 언어나 플랫폼에 상관 없이 사용 가능
+    - 간결하고 통일된 양식
 
 
 
-#### Event
+Serialization
 
-> HTML 문서 내에서 일어나는 일
->
-> `click`, `submit`, `keydown`, `mouseover`, `submit`, `change` ...
+- object를 JSON으로 변환하는 것
 
-- addEventListener
+  - Java편에도 나와있지만 Reference Type 데이터(객체)를 저장하기 위해 value type으로 바꾸는 것 
+  - 꼭 JSON으로 할 필요는 없는데 여긴 자바스크립트니까ㅎㅎ
+
+- Object to JSON(serialization)
+
+  - `JSON.stringify(object)`: object 뒤에 callback함수를 넣어서 변환을 통제할 수 있음
+  - 오브젝트 함수는 JSON으로 변환되지 않음: JSON이 될 때 전부 String으로 바꾸기 때문
+
+- JSON to Object(deserialization)
+
+  - `JSON.parse(json)`
+
+  - json뒤에 reviver이라는 콜백함수를 이용하여 스트링으로 변환된 원본의 객체를 살릴 수 있음
+
+  - ```javascript
+    const obj = JSON.parse(json, (key, value) => {
+        console.log(`key: ${key}, value: ${value}`);
+        return key === 'birthDate' ? new Date(value) : value;
+    })
+    ```
+
+
+
+Event란?
+
+- HTML 문서 내에서 일어나는 일
+  - `click`, `submit`, `keydown`, `mouseover`, `submit`, `change` 등
+
+- addEventListener()
 
   - `EventTarget.addEventListener(type, listener)`
   - 이벤트가 발생하면 listener가 실행된다
@@ -112,6 +180,36 @@
 - event.preventDefault()
 
   - 각 태그의 기본 이벤트가 동작하지 않도록 막음
+
+
+
+### 1.2. 자바스크립트의 구성
+
+![event loop](https://miro.medium.com/max/2048/1*FA9NGxNB6-v1oI2qGEtlRQ.png)
+
+- **JS 엔진**
+  - 메모리 힙: 메모리 할당을 실시
+  - 콜 스택: 스택 프레임 코드를 실행, 함수 호출을 일시적으로 저장-관리
+    - **JS는 single thread** : 콜 스택은 단 한 개!! 만 존재함
+  - 구글의 V8 Engine 등이 있음
+- Web API
+  - 웹 브라우저에서 제공하는 API
+  - 콜 스택에서 [**비동기 함수**](#3.-비동기-처리)를(ajax, setTimeout) 만나면 Web API를 호출
+  - Web API는 **콜백 함수를 태스크 큐로** 이동시킴
+    - setTimeout의 경우 타이머 완료 후 콜백이 Task Queue에 담김
+- task queue(callback queue)
+  - 태스크 큐에서 대기하던 콜백 함수들은 콜 스택이 비어있을 경우 콜스택으로 전달
+  - 마이크로 태스크 큐
+    - 태스크 큐보다 **우선순위 높음** : 이벤트 루프가 여기 있는 함수를 우선적으로 처리
+    - Promise의 `then()` 의 콜백이 여기에 추가됨
+  - Animation Frame
+    - requestAnimationFrame API가 실행되면 콜백이 Animation Frames에 담김
+    - 콜백 이동 우선순위는 Microtask Queue > Animation Frames > Task Queue
+- 이벤트 루프
+  - 현재 실행중인 태스크가 없는지(콜스택이 비었는지), 태스크 큐가 비었는지 반복적으로(tick) 확인
+  - 콜스택이 비었으면 태스크큐의 첫번째 태스크를 가져옴
+- 실행 컨텍스트
+  - 실행 가능한 코드를 형상화하고 구분
 
 
 
@@ -144,7 +242,8 @@ console
 - var : 예전에 사용되던 변수
   - 이제 쓰면 안 됨: **블럭을 무시**하기 때문
   - Hoisting: 선언 위치에 상관 없이 (제일 위로) 선언을 끌어올림
-  - 간단한 프로그램에서는 유연하고 좋지만 규모가 커지면 에러의 원인이 됨
+    - 간단한 프로그램에서는 유연하고 좋지만 규모가 커지면 에러의 원인이 됨
+    - Hoisting을 원천 차단하기 위해 JS 파일 최상단에`'use strict'`를 작성하면 좋음
 - const : **상수** (read only)
 
   - 포인터가 잠겨있기 때문에 값을 재할당할 수 없음(immutable)
@@ -368,8 +467,6 @@ Short circuit evaluation
 
 
 
-
-
 ### 2.3. 함수
 
 
@@ -436,13 +533,12 @@ Template Literal
 
 자바스크립트 함수의 특징
 
-**추후 보강**
-
 - Early return, Early exit
   - 조건이 만족될 때 특정 로직이 도는 함수가 있다면
   - 조건이 안 맞는 경우 먼저 리턴, 그 후에 조건이 맞는 경우에 대한 로직을 작성하는 것이 효율적
 
 - function expression: **1급 객체**로 기능하게 해 줌
+  - 1급 객체: 리턴값으로 사용가능, 함수 인자로 사용가능, 변수 할당가능
   - function declaration은 호이스팅 가능하나 이것은 불가
     - 변수에 할당된 이후에만 실행
   - anonymous function: 이름 없이 기능만 작성해서 변수에 할당
@@ -454,7 +550,14 @@ Template Literal
 
 Callback Function
 
-- 함수 타입의 값을 파라미터로 넘겨줘서, **파라미터로 받은 함수를 특정 작업이 끝나고 호출**을 해주는 것
+- 어떤 일이 "일어나면" 자동적으로 호출되는 함수
+  - 함수 타입의 값을 파라미터로 넘겨줘서, **파라미터로 받은 함수를 특정 작업이 끝나고 호출**을 해주는 것
+  - 함수의 제어권을 넘겨 원하는 시점에(setTimeout등을 이용) 불러와서(back) 호출하게(call) 해줌
+  - 단 연쇄적인 콜백함수의 사용은 **콜백 지옥**으로 이어짐
+- 콜백 지옥
+  - 비동기 처리 로직을 위해 콜백 함수를 연속해서 사용할 때 발생하는 문제
+  - 콜백이 끝없이 이어지면서 가독성이 심각하게 저하됨
+  - [Promise](#Promise), async/await를 사용해서 해결
 
 
 
@@ -1132,8 +1235,13 @@ Promise란?
 - 비동기 작업을 조금 더 편하게 처리 할 수 있도록 ES6 에 도입된 Object
   - 과거에는 비동기 처리를 위해 콜백 함수를 이용했었는데, 복잡한 작업의 경우 **콜백 지옥**에 빠짐
   - 이를 해결하기 위해 Promise를 도입
-- 기능이 수행됐다면(`resolve`) 성공 메시지를, 실패했다면(`reject`) 실패 메시지를 보냄
+- 정해진 *장시간의 기능* 을 수행하고, 성공하면(`resolve`) 결과를 실패하면(`reject`) 에러 결과를 보냄
+  - 장시간의 기능 : network, read files 등
   - Promise 객체는 성공하는 경우, 실패하는 경우에 대해 각각 콜백 함수를 받아서 비동기 처리를 수행
+- State
+  - pending: operation이 실행중일 때(resolve, reject 둘 다 호출하지 않으면 이렇게 됨)
+  - fulfilled: operation을 성공적으로 마쳤을 때(resolve)
+  - rejected: 파일을 찾을 수 없거나 네트워크에 문제가 생김
 
 
 
@@ -1151,10 +1259,13 @@ Producer
     });
     ```
 
-- Promise 객체는 executor 콜백 함수를 인자로 받아서 생성됨
+- Promise 객체는 resolve, reject를 parameter로 갖는 **executor 함수**를 인자로 받아 생성됨
 
   - 객체가 만들어지는 순간 executor 콜백 함수를 실행함
-  - 성공/실패 각각에 대해 executor를 받음 (위 예제에서는 둘 다 주석 처리 했지만)
+  - executor는 성공/실패 각각의 경우에 대해 무슨 작업을 할 지 정의
+    - 둘 중 하나만 있어도 되고 둘 다 있어도 됨(위 예제에서는 둘 다 주석 처리 했지만)
+    - 둘 다 안하면 promise의 state가 계속 pending에 머무름
+  - reject는 Error Object를 통해 에러 메시지나 값을 전달
 
 
 
@@ -1165,6 +1276,8 @@ Consumer
 - `promise.then()` 
   - promise 객체가 수행한 결과를 받아와 then 내부의 콜백 함수를 실행
   - 이 때 **promise 객체를 리턴**함
+    - 객체를 받아오기 때문에 변수명을 줄줄이 쓸 필요 없고
+    - 변수가 1개면 생략도 가능하기 때문에 코드 가독성이 좋아져 콜백 지옥 탈출!
 - `promise.catch()` 
   - error가 발생했을 때 어떻게 처리할 것인지 나타내는 콜백 함수를 등록
 - `promise.finally()`
@@ -1184,8 +1297,7 @@ Consumer
         setTimeout(() => {
           const value = n + 1;
           if (value === 5) {
-            const error = new Error();
-            error.name = 'ValueIsFiveError';
+            const error = new Error('ValueIsFiveError');
             reject(error);
             return;
           }
@@ -1213,155 +1325,8 @@ Consumer
   - 에러를 잡을 때 몇번째에서 발생했는지 알아내기도 어려움
   - 특정 조건에 따라 분기를 나누는 작업이 어려움
   - 특정 값을 공유해가면서 작업을 처리하기 까다로움
-
-
-
-#### async, await
-
-
-
-
-
-### 자바스크립트의 구성
-
-- **JS 엔진**
-  - 메모리 힙: 메모리 할당을 실시
-  - 콜 스택: 스택 프레임 코드를 실행, 함수 호출을 일시적으로 저장-관리
-- 이벤트 루프
-  - 현재 실행중인 태스크가 없는지(콜스택이 비었는지), 태스크 큐가 비었는지 반복적으로(tick) 확인
-  - 콜스택이 비었으면 태스크큐의 첫번째 태스크를 가져옴
-- web api
-  - 스택에서 비동기 함수를(ajax, setTimeout) 만나면 여기로 이동
-  - 여기서 실행된 함수의 리턴값은 태스크 큐로 이동함
-- task queue(callback queue)
-  - FIFO
-  - 스택이 비어있을 경우 태스크 큐에서 콜스택으로 전달
-  - **마이크로 태스크 큐**
-    - Promise의 `then()` 메서드는 여기에 추가됨
-    - 이벤트 루프는 태스크 큐보다 여기 있는 함수를 우선적으로 처리
-  - Animation Frame이라는 것도 있는데 일단 생략
-
-- 실행 컨텍스트
-  - 실행 가능한 코드를 형상화하고 구분
-- 특징
-  - 비동기성: 싱글 스레드이기 때문
-    - 특정 시점에 어떤 일(콜백 함수)을 이어나감
-  - Callback 함수: 어떤 일이 "일어나면" 자동적으로 호출되는 함수, 1급 객체임
-    - **1급 객체**: 리턴값으로 사용가능, 함수 인자로 사용가능, 변수 할당가능
-    - 연쇄적인 콜백함수의 사용은 콜백 지옥으로 이어짐
-  - Promise
-    - 주로 서버에서 받아온 데이터를 화면에 표시할 때 사용하는 것으로, 콜백 지옥을 해결
-    - 콜백 지옥이란?
-      - 비동기 처리 로직을 위해 콜백 함수를 연속해서 사용할 때 발생하는 문제
-      - Promise나 async/await를 사용해서 해결
-    - 성공/실패의 상황을 가정하고 새로운 promise를 리턴함으로써 콜백지옥 해결
-
-
-
-
-
-- `async` vs `defer`
-  - 공통점: JS코드를 만나면 parsing과 병렬적으로 JS코드를 다운로드(fetching)
-  - async
-    - 해당 JS코드 다운로드가 끝나면 실행(executing)
-    - 순서에 의존적인 JS코드라면 문제가 생길 수 있음
-    - 파싱이 끝나기 전에 실행되기 때문에 필요한 DOM요소가 아직 없다면 문제가 생길 수 있음
-    - 파싱을 중단하기 때문에 페이지를 보기까지 시간이 걸림
-  - defer
-    - 파싱이 완료되면 JS코드를 작성 순서에 따라 실행
-    - 관련 컴포넌트들이 준비되지 않은 상태에서 화면을 보게 됨: **사용불가 처리**를 해줘야 함
-- `'use strict'`를 맨 위에 침으로써(ES5에 도입됨) 호이스팅 방지
-
-
-
-
-
-- **Callback**
-
-  - synchronous callback
-  - asynchronous callback
-  - callback hell
-    - 코드 가독성이 심각함
-
-- **Promise**
-
-  - 비동기를 간편하게 처리할 수 있도록 도와주는 Object
-
-    - 정해진 *장시간의 기능* 을 수행하고 성공한다면 결과를, 실패한다면 에러를 전달
-    - 시간이 오래걸리는 코드를 동기적으로 처리하면 다음 라인의 코드가 실행되지 않기 때문에 Promise를 만들어 비동기적으로 처리하는 것이 좋다
-      - ex) network, read files
-    - Promise 객체를 만들면 executor가 자동적으로 실행됨
-
-  - State
-
-    - pending: operation이 실행중일 때(resolve, reject 둘 다 호출하지 않으면 이렇게 됨)
-    - fulfilled: operation을 성공적으로 마쳤을 때(resolve)
-    - rejected: 파일을 찾을 수 없거나 네트워크에 문제가 생김
-
-  - Producer vs Consumer
-
-    - Producer: 원하는 기능을 수행하여 해당 데이터를 만들어 냄
-      - 특정 기능이 성공하면 resolve를 통해 데이터를 전달
-      - reject는 Error Object를 통해 값을 전달
-    - Consumer: 원하는 데이터를 소비함
-      - then: promise가 정상적으로 수행되어 resolve를 통해 전달한 값이 value라는 parameter로 들어옴
-      - catch: 에러가 발생했을 때 처리하는 방식을 정의하는 callback함수
-      - finally: 성공/실패 관계없이 마지막에 호출됨
-    - Promise Chaining
-      - then을 호출하면 promise가 리턴되고, 여기에 다시 catch를 등록함
-      - 이게 콜백지옥을 깔끔하게 만들어주는 핵심
-        - 프로미스 객체를 받아오기 때문에 변수명 줄줄이 쓸 필요 없음 [참고](https://youtu.be/JB_yU6Oe2eE?t=1123)
-        - 심지어 변수가 1개면 생략도 가능함ㄷㄷㄷ
-
-  - **Async** (ES8에 등장)
-
-    - promise를 동기적으로 실행하는 것처럼 보이게 해 줌
-    - promise위에 API를 제공해줌(`syntatic sugar`)
-    - 함수 앞에 async를 써주면 자동으로 (함수 안의 내용물을 실행하는) Promise가 됨
-
-  - **Await**
-
-    - async가 붙은 함수 안에서만 쓸 수 있음
-    - 비동기적인 수행 앞에 붙여주면 해당 수행을 마친 이후에 다음으로 넘어가게 됨
-
-  - async & await의 사용
-
-    - Promise도 중첩하게되면 결국 콜백지옥과 다를 것이 없음
-
-    - ```javascript
-      function pickFruits() {
-          return getApple().then(apple => {
-              return getBanana().then(banana => `${apple} + ${banana}`);
-          });
-      }
-      ```
-
-    - ```javascript
-      async function pickFruits() {
-          const apple = await getApple();
-          const banana = await getBanana();
-          return `${apple} + ${banana}`;
-      }
-      ```
-
-    - 다만 독립적인 두 과정을 직렬로 수행하면 낭비: 병렬처리 가능
-
-    - ```javascript
-      async function pickFruits() {
-          const applePromise = getApple();
-          const bananaPromise = getBanana();
-          const apple = await applePromise;
-          const banana = await bananaPromise;
-          return `${apple} + ${banana}`;
-      }
-      // 또는 API 사용
-      function pickAllFruits() {
-          return Promise.all([getApple(), getBanana()]).then(fruits =>
-           fruits.join(' + ')                                )
-      }
-      ```
-
-    - 
+  - 서로 다른 함수를 계속 chaining하면 콜백 지옥과 비슷한 모양새가 됨...
+    - 이것을 해결하기 위해 async, await 등 장
 
 
 
@@ -1371,46 +1336,97 @@ Consumer
 >
 > xhr을 직관적으로 사용할 수 있도록 만들었음
 
-- async, await
-  - 비동기로 처리하는 로직을 동기적으로 보이게 만드는 것
-  - 함수 앞에 async를 작성, 비동기로 처리되는 로직 앞에 await 작성
-  - await는 async function 내부에서만 사용
+
+
+async, await이란?
+
+- Promise 를 더욱 쉽게 사용 할 수 있게 하는 문법으로 ES8에 등장
+  - 더 간결하게 해 주고, **동기적으로 실행되는 것처럼** 보이게 만들어 줌(syntatic sugar)
+  - promise chaining이 길어질 때 콜백 지옥과 비슷한 모양이 되는 것을 방지해 줌
+  - java와 동일하게 에러 처리(try-catch)할 수 있어 가독성 향상
 
 
 
-#### TypeScript
+`async` 
 
-- 사용하는 이유
-  - JS의 보완: 컴파일 시 타입을 체크해 에러를 잡아줌
-- 장점
-  - 안정성 업, IDE 지원, ES6지원
-- 단점
-  - 하나의 매개변수가 필요할 때도 적용해줘야 함
-  - 동적언어로써의 매력 감소: **왜??**
-- 동작
-  - 브라우저에서 동작하지 않음: 컴파일러를 이용해 js파일로 변환해야 
+- 함수를 선언 할 때 함수의 앞부분에 붙여 promise를 동기적으로 실행하는 것처럼 보이게 해 줌
+- async를 사용하면, 해당 함수는 자동으로 **Promise 객체를 반환**하게 됨
+  - 이 때 promise 객체는 함수 안의 내용물을 실행함
 
 
 
-### 1.6. Vue
+`await`
+
+- 비동기적인 수행을 포함하는 함수의 앞부분에 붙임
+
+  - await 키워드는 **async가 붙은 함수 내에서만 사용** 가능
+
+- 비동기적인 수행 앞에 붙여주면 **해당 수행을 마친 이후에 다음 작업으로** 넘어가게 됨
+
+  - 이것으로 promise chaining을 개선할 수 있음 
+
+  - ```javascript
+    function delay(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+    async function getApple(){
+        await delay(3000);
+        return 'Apple';
+    }
+    async function getBanana(){
+        await delay(3000);
+        return 'Banana';
+    }
+    
+    async function pickFruits(){
+        return getApple()
+        .then(apple => {
+            return getBanana()
+            .then(banana => `${apple} + ${banana}`);	// Callback Hell과 다를 것이 없음
+        })
+    }
+    
+    async function pickFruits(){
+        const apple = await getApple();
+        const banana = await getBanana();	// 개꿀
+        return `${apple} + ${banana}`;
+    }
+    ```
+
+- await와 비동기처리
+
+  - 위 코드에서는 getApple()이 끝날 때까지 기다렸다가 getBanana()가 실행됨
+
+  - 두 작업이 독립적이라면 낭비 : 아래과 같이 개선 가능
+
+  - ```javascript
+    const applePromise = getApple();
+    const bananaPromise = getBanana();
+    const apple = await applePromise;
+    const banana = await bananaPromise;
+    ```
+
+  - Promise 객체는 생성 즉시 executor 함수를 수행하기 때문에 비동기적으로 실행 가능
 
 
 
-#### 기본개념
+Promise.all
 
+- 위의 await 비동기 처리를 한 줄씩 작성하지 않게 등장한 API
 
+- Promise들의 배열을 전달하면 모든 promise가 끝날 때까지 결과를 모은 후 다 모이면 일괄 리턴
 
-- MVVM
-  - Model : Javascript의 object
-  - View : actual DOM
-  - View Model : model과 view를 연결해주는 것
-    - View Model은 모든 vue instance이다
-    - Directives
-    - DOM Listener
-- 작성 순서
-  - data가 작성되면 DOM이 바뀌는 것이 vue의 기본 로직: 작성도 이 순서를 따름
+  - 아래 코드로 위 예제와 동일한 결과를 얻을 수 있음
 
-- 
+  - ```javascript
+    function pickAllFruits(){
+        return Promise.all([getApple(), getBanana()])
+        .then(fruits => fruits.join(' + '));
+    }
+    ```
 
+  - all() 안의 promise 중 하나라도 에러가 나면 전체 promise가 에러인 것으로 간주됨
 
+- Promise.race를 이용하면 배열 중에서 가장 먼저 결과가 나온 promise만 반환함
 
+  - 가장 빨리 끝난 promise가 에러일 때만 에러로 간주됨
