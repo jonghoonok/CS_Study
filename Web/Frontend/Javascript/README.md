@@ -29,8 +29,8 @@
   - NW.js, Electron 등의 도구를 사용하여 데스크탑 앱을 만들 수도 있음
   - React-native, NativeScript 등의 도구를 사용하여 모바일 앱도 만들 수 있음
   - Node.js 를 통하여 JavaScript 를 사용 할 수 있기 때문에 IoT 진영에서도 사용 될 수도 있음
-
-
+  
+  
 
 자바스크립트의 역사
 
@@ -65,7 +65,7 @@ HTML안에 JS를 어떻게 포함하는가에 따라 페이지 로딩이 달라�
 
 - HTML body 끝에 JS를 포함
 
-  - HTML 파싱을 끝낸 후 스크립트를 fetching(다운로드) - 실행
+  - HTML 파싱을 끝낸 후 스크립트를 fetching(다운로드) - executing(실행)
   - JS를 받기 전에도 컨텐츠를 볼 수 있음
   - JS에 의존적인 페이지라면 결국 스크립트 실행 때까지 기다려야만 한다는 단점 존재
 
@@ -75,7 +75,7 @@ HTML안에 JS를 어떻게 포함하는가에 따라 페이지 로딩이 달라�
     <script async src = "main.js"></script>
     ```
 
-  - HTML parsing과 병렬적으로 JS코드를 fetching하고 JS코드 **다운로드가 끝나면 바로 실행**(executing)
+  - HTML **parsing과 병렬적으로 JS코드를 fetching**하고 JS코드 **다운로드가 끝나면 바로 executing**
 
     - 파싱이 끝나기 전에 실행되기 때문에 필요한 DOM요소가 아직 없다면 문제가 생길 수 있음
     - 코드 순서가 아니라 다운로드 종료 순으로 실행되므로 순서 의존적인 코드라면 문제가 생길 수 있음
@@ -172,14 +172,12 @@ Event란?
 - HTML 문서 내에서 일어나는 일
   - `click`, `submit`, `keydown`, `mouseover`, `submit`, `change` 등
 
-- addEventListener()
-
-  - `EventTarget.addEventListener(type, listener)`
-  - 이벤트가 발생하면 listener가 실행된다
-
-- event.preventDefault()
-
-  - 각 태그의 기본 이벤트가 동작하지 않도록 막음
+- 이벤트 관련 주요 함수
+  - addEventListener()
+    - `EventTarget.addEventListener(type, listener)`
+    - 이벤트가 발생하면 listener가 실행된다
+  - event.preventDefault()
+    - 각 태그의 기본 이벤트가 동작하지 않도록 막음
 
 
 
@@ -242,7 +240,7 @@ console
 - var : 예전에 사용되던 변수
   - 이제 쓰면 안 됨: **블럭을 무시**하기 때문
   - Hoisting: 선언 위치에 상관 없이 (제일 위로) 선언을 끌어올림
-    - 간단한 프로그램에서는 유연하고 좋지만 규모가 커지면 에러의 원인이 됨
+    - 간단한 프로그램에서는 유연하고 좋지만 규모가 커지면 **에러의 원인**이 됨
     - Hoisting을 원천 차단하기 위해 JS 파일 최상단에`'use strict'`를 작성하면 좋음
 - const : **상수** (read only)
 
@@ -366,6 +364,7 @@ Truthy and Falsy
   - NaN(Not A Number) : 문자열을 숫자로 변환하는 parseInt 라는 함수를 사용하게 될 때 볼 수 있음
 - 나머지는 전부 Truthy로 처리됨
   - **빈 객체나 빈 배열도 Truthy**임에 주의
+  - 왜 그럴까?
 
 
 
@@ -425,8 +424,6 @@ Short circuit evaluation
     ```
 
 - 값에 따라 실행하는 코드 구문 자체가 다른 경우에는 객체 내에 함수를 넣어서 해결 가능
-
-
 
 
 
@@ -541,8 +538,9 @@ Template Literal
   - 1급 객체: 리턴값으로 사용가능, 함수 인자로 사용가능, 변수 할당가능
   - function declaration은 호이스팅 가능하나 이것은 불가
     - 변수에 할당된 이후에만 실행
-  - anonymous function: 이름 없이 기능만 작성해서 변수에 할당
-  - named function: 디버깅하기 편하려고 씀
+  - functional expression의 종류
+    - anonymous function: 이름 없이 기능만 작성해서 변수에 할당
+    - named function: 디버깅하기 편하려고 씀
 - IIFE(Immediately Invoked Function Expression)
   - 함수를 선언하는 즉시 실행하는 것: 함수를 괄호로() 둘러싸면 됨
 
@@ -553,7 +551,7 @@ Callback Function
 - 어떤 일이 "일어나면" 자동적으로 호출되는 함수
   - 함수 타입의 값을 파라미터로 넘겨줘서, **파라미터로 받은 함수를 특정 작업이 끝나고 호출**을 해주는 것
   - 함수의 제어권을 넘겨 원하는 시점에(setTimeout등을 이용) 불러와서(back) 호출하게(call) 해줌
-  - 단 연쇄적인 콜백함수의 사용은 **콜백 지옥**으로 이어짐
+  - 단, 연쇄적인 콜백함수의 사용은 **콜백 지옥**으로 이어짐
 - 콜백 지옥
   - 비동기 처리 로직을 위해 콜백 함수를 연속해서 사용할 때 발생하는 문제
   - 콜백이 끝없이 이어지면서 가독성이 심각하게 저하됨
@@ -1087,7 +1085,7 @@ splice vs slice
 
 - `find()` 
 
-  - 찾아낸 값이 몇번째인지 알아내는 것이 아니라, 찾아낸 값 자체를 반환
+  - 찾아낸 값이 몇번째인지 알아내는 것이 아니라, **찾아낸 값 자체를 반환**
   - 사용법은 findIndex()와 동일
 
 
@@ -1140,7 +1138,7 @@ rest
 
 - 객체, 배열, 함수의 파라미터에서 이용 가능
 
-- 비구조화 할당 문법과 함께 사용하여 객체나 배열을 분리할 수 있음
+- 비구조화 할당 문법과 함께 사용하여 **객체나 배열을 분리할 수 있음**
 
   - ```javascript
     const purpleCuteSlime = {
