@@ -134,6 +134,7 @@ AJAX란?
   - JavaScript Object Notation
     - JSON의 표기 양식은 JavaScript 객체 표기법의 부분집합임
     - JS의 object가 key-value로 이루어져 있는 것처럼 key-value pair로 데이터를 표현함
+    - String, number, boolean, array, object가 들어갈 수 있음
   - XML의 장점을 계승하면서 단점을 보완함
     - 높은 범용성 : 프로그래밍 언어나 플랫폼에 상관 없이 사용 가능
     - 간결하고 통일된 양식
@@ -1386,7 +1387,7 @@ async, await이란?
     
     async function pickFruits(){
         const apple = await getApple();
-        const banana = await getBanana();	// 개꿀
+        const banana = await getBanana();	// 개선됨
         return `${apple} + ${banana}`;
     }
     ```
