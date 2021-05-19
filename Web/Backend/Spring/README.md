@@ -36,6 +36,12 @@ Tomcat port 변경하기
 
 
 
+path variable
+
+메소드에 선언한 변수 이름과 일치해야 함
+
+일치하지 않는다면 @PathVariable(name = )속성에 pathvariable로 받는 것과 동일한 이름을 넣어줘야 함 
+
 ### 1.1. GET API
 
 
