@@ -432,6 +432,7 @@ PCB (Process Control Block)
   - 동시 실행을 막는 영역을 **critical section**이라 함
 - locking mechanism
   - **Mutex**(mutual exclusion): 임계 구역에 단일 스레드만 들어갈 수 있음
+    - Lock을 소지하고 있는 스레드만 들어갈 수 있음
   - **Semaphore**: 여러 스레드가 들어가되 갯수를 제한함(바쁜 대기)
     - 한 스레드가 들어갈 때마다 S값을 1깎고 0이되면 대기시킴
     - **대기할 때 루프를 계속** 돌기 때문에 CPU 성능 저하
