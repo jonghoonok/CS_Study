@@ -198,8 +198,27 @@ RDBMS vs NoSQL
 
 ORM이란?
 
-- 객체와 데이터베이스의 데이터를 매핑해주는 것
-- 
+- 객체와 데이터베이스의 데이터를 매핑해주는 것 : 객체 간의 관계를 바탕으로 **SQL을 자동으로 생성**
+  - 객체 모델(클래스)과 관계 모델(테이블)간의 불일치를 해소해 줌
+  - 프로그램에서 객체를 DB에 저장할 때 Object Persistence를 만드는데, 다음과 같은 방법을 활용함
+    - JDBC를 이용해 직접 persistence layer를 구현
+    - **Persistence framework**(SQL Mapper, ORM)을 사용
+- SQL Mapper와의 차이
+  - Mapper의 경우 개발자가 직접 SQL을 작성하여 데이터를 매핑시키도록 함
+  - 세부적인 SQL 변경 시 편리하다는 장점이 있음
+  - 대표적인 Mapper로 Mybatis가 있음
+- ORM의 종류
+  - Java : JPA, Hibernate
+  - Node.js : Sequalize
+  - Django : 내장 ORM
+- 장점
+  - 코드의 재사용성 및 가독성이 향상 : SQL문이 아니라 메서드를 이용하여 데이터를 조작할 수 있음
+  - 객체 지향적인 접근으로 생산성을 올릴 수 있음
+  - DB의 종류별 종속성을 줄이고 호환성을 높일 수 있음
+- 단점
+  - 구현이 어려움 : 설계가 복잡하고, 잘못 구현되면 일관성이 무너질 수 있음
+  - **프로시저**가 많은 시스템에선 ORM의 객체 지향적인 장점을 활용하기 어려움
+    - 특정 작업을 위한 프로그램의 일부로 함수와 같은 의미
 
 
 
@@ -483,7 +502,58 @@ WHERE
 
 JOIN이란?
 
-- 
+- 중복을 없애기 위해서 **정규화**한 테이블들에서 원하는 결과를 도출하기 위해 **다시 조합**하는 것
+- 적어도 하나의 칼럼을 서로 공유하고 있는 테이블들을 연결하여 **데이터 검색에 활용**함
+
+
+
+JOIN의 종류
+
+- INNER JOIN
+  - 키 값이 있는 테이블의 컬럼 값을 비교한 후 조건에 맞는 값을 가져오는 것
+- OUTER JOIN
+  - 한 쪽에는 데이터가 있고 한 쪽에는 없는 경우 데이터가 있는 쪽의 내용을 전부 출력
+- CROSS JOIN
+  - Cartesian Product라고도 하며 곱집합을 반환함
+- SELF JOIN
+  - 한 테이블 내에 이미 종속 관계가 있을 때 자기 자신을 JOIN할 수 있음
+
+
+
+INNER JOIN
+
+![INNER JOIN](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=http%3A%2F%2Fcfile9.uf.tistory.com%2Fimage%2F99799F3E5A8148D7036659)
+
+기준 테이블과 JOIN할 테이블에서 겹치는 값들을 가져오는 것
+
+예) 테이블 A와 B에서 각각 이름과 나이를 가져옴 
+
+```sql
+SELECT
+A.NAME, B.AGE
+FROM EX_TABLE A
+INNER JOIN JOIN_TABLE B ON A.NO_EMP = B.NO_EMP
+```
+
+사원 번호가 같은 사람에 대해 조회 : 사원 별 나이-이름 테이블이 된다
+
+
+
+OUTER JOIN
+
+
+
+CROSS JOIN
+
+
+
+SELF JOIN
+
+
+
+
+
+#### 정규화
 
 
 
