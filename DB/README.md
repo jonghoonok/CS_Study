@@ -496,7 +496,7 @@ WHERE
 
 
 
-#### JOIN
+### 2.2. JOIN
 
 
 
@@ -504,58 +504,324 @@ JOIN이란?
 
 - 중복을 없애기 위해서 **정규화**한 테이블들에서 원하는 결과를 도출하기 위해 **다시 조합**하는 것
 - 적어도 하나의 칼럼을 서로 공유하고 있는 테이블들을 연결하여 **데이터 검색에 활용**함
+  - 보통 공통된 값인 PK 및 FK 값을 사용하여 JOIN
+  - JOIN 연산자에 따라, From 절의 JOIN 형태에 따라서 구별함
 
 
 
 JOIN의 종류
 
-- INNER JOIN
-  - 키 값이 있는 테이블의 컬럼 값을 비교한 후 조건에 맞는 값을 가져오는 것
-- OUTER JOIN
-  - 한 쪽에는 데이터가 있고 한 쪽에는 없는 경우 데이터가 있는 쪽의 내용을 전부 출력
-- CROSS JOIN
-  - Cartesian Product라고도 하며 곱집합을 반환함
-- SELF JOIN
-  - 한 테이블 내에 이미 종속 관계가 있을 때 자기 자신을 JOIN할 수 있음
+- 연산자에 따른 분류
+  - EQUI JOIN : 두 테이블 간의 칼럼 값들이 서로 일치하는 경우(`=`연산자 사용)
+  - NON EQUI JOIN : 두 테이블 간의 칼럽 값들이 일치하니 않는 경우(비교 연산자 사용)
+- FROM 절의 JOIN 형태에 따른 분류
+  - INNER JOIN : JOIN 조건에서 **값이 일치하는 행만** 반환
+  - OUTER JOIN : JOIN 조건에서 **한쪽 값이 없더라도** 행을 반환
+- 동작 방식에 따른 분류
+  - JOIN이 어떤 방식으로 동작하고 있는지는 **실행계획**에서 확인 가능
+    - 적절하지 않은 경우 오라클 힌트를 이용하여 변경 가능
+  - NESTED LOOP JOIN : 중첩 for문과 같은 방식으로 **JOIN 조건을 반복적으로 체크**하면서 수행
+    - INNER TABLE의 INDEX를 이용하지 않으면 굉장한 비효율이 발생함
+    - 1:N관계를 가지는 경우 1인 쪽이 OUTER TABLE로 설정되는 것이 좋음 
+    - 예)걸그룹 테이블과 멤버 이름 테이블을 그룹명 기준으로 JOIN할 때 그룹을 기준으로 멤버 이름 테이블을 scan하면서 멤버 이름을 가져와야 함
+  - SORT MERGE JOIN : 두 테이블을 각각 JOIN 컬럼 기준으로 sort한 후 JOIN을 수행
+    - INNER TABLE에 적절한 INDEX가 없어서 NESTED LOOP JOIN을 사용하기 비효율적인 경우에 이용
+    - 범위로 JOIN을 하는 경우에도 (NON EQUI JOIN) 적절함
+    - sorting은 PGA영역에서 수행됨 : 경합이 발생하지 않아 성능 상 이점이 있음
+  - HASH JOIN
+    - OUTER TABLE을 **Build Input**으로 삼아서 Hash 영역에 저장하고, INNER TABLE의 JOIN 컬럼을 기준으로 해시 함수를 적용하여 해시 테이블을 탐색하면서 JOIN을 수행
+    - EQUI JOIN만 가능함
+    - INNER TABLE이 대용량이고 OUTER TABLE이 작을 때(Hash영역 크기 제한) 좋음
+    - 해시 키 값으로 사용되는 컬럼에 중복이 적어야 함
+    - 배치에서 쓰면 좋음
 
 
 
-INNER JOIN
+#### INNER JOIN
 
 ![INNER JOIN](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=http%3A%2F%2Fcfile9.uf.tistory.com%2Fimage%2F99799F3E5A8148D7036659)
 
-기준 테이블과 JOIN할 테이블에서 겹치는 값들을 가져오는 것
+EQUI JOIN
 
-예) 테이블 A와 B에서 각각 이름과 나이를 가져옴 
+- 기준 테이블과 JOIN할 테이블의 **칼럼 값들이 서로 정확하게 일치하는 경우** 겹치는 값들을 가져오는 것
 
-```sql
-SELECT
-A.NAME, B.AGE
-FROM EX_TABLE A
-INNER JOIN JOIN_TABLE B ON A.NO_EMP = B.NO_EMP
-```
+- WHERE 절에 `=`  동등 연산자를 사용하여 JOIN 조건을 명시
 
-사원 번호가 같은 사람에 대해 조회 : 사원 별 나이-이름 테이블이 된다
+- 일반적으로 PK, FK로 지정된 칼럼을 JOIN으로 많이 사용함
+
+- EQUI JOIN의 성능을 높이려면 **INDEX 기능을 사용하는 것이 좋음**
+
+  - 조건이 일치하는지 확인하기 위해 매번 FULL SCAN을 하면 굉장히 비효율적이기 때문
+
+- 예) 테이블 A와 B에서 각각 이름과 나이를 가져옴 
+
+  - ```sql
+    SELECT A.NAME, B.AGE
+    FROM EX_TABLE A
+    EQUI JOIN JOIN_TABLE B		--EQUI JOIN을 INNER JOIN으로 변경 가능
+    ON A.NO_EMP = B.NO_EMP
+    ```
+
+  - 사원 번호가 같은 사람에 대해 조회 : 사원 별 나이-이름 테이블이 된다
 
 
 
-OUTER JOIN
+NATURAL JOIN
+
+- EQUI JOIN에서 동일한 속성이 두 번 나타나게 되는데, **중복을 제거하여 같은 속성을 한번만 표기**하는 것
+
+- 두 테이블의 **동일한 이름을 가지는 칼럼이 모두 JOIN됨**
+
+  - ```sql
+    SELECT A.NAME, B.AGE
+    FROM EX_TABLE A NATURAL JOIN JOIN_TABLE B
+    ```
+
+  - USING문을 사용하면 칼럼을 선택해서 JOIN할 수 있음
+
+  - ```sql
+    SELECT A.NAME, B.AGE
+    FROM EX_TABLE A JOIN JOIN_TABLE B
+    USING No_EMP;
+    ```
+
+- 테이블 별칭(alias)을 사용하면 오류가 발생함
 
 
 
-CROSS JOIN
+NON EQUI JOIN
+
+- 조인 대상 테이블의 **어떤 칼럼 값도 일치하지 않을 때** 사용하며 '=' 이외의 연산자를 사용
+
+- 사용 빈도가 매우 낮다고 함
+
+- 연산자 : BETWEEN AND, IS NULL, IS NOT NULL, IN, NOT IN, < , >, >=, <=
+
+- ```sql
+  SELECT [테이블명1.]속성명, [테이블명2.]속성명 ....
+  FROM 테이블명1, 테이블명2..
+  WHERE (NON EQUI JOIN 조건)	--JOIN 키워드는 안 쓰고 그냥 조인함
+  ```
 
 
 
 SELF JOIN
 
+- **같은 테이블 내에서** 2개의 속성을 연결하여 EQUI JOIN을 하는 것
+
+  - 주의할 점 : JOIN할 때 **별칭을 반드시 입력**해주어야 함
+
+- 한 테이블 내에 이미 종속 관계가 있을 때 사용(학번 - 학생 이름 - 선배의 학번)
+
+- ```sql
+  SELECT a.S_NO AS 학번, a.S_NAME AS 이름, b.S_NAME AS 선배
+  FROM STUDENT a, STUDENT b
+  WHERE a.S_SENIOR = b.S_NO;
+  ```
 
 
 
+#### OUTER JOIN
 
-#### 정규화
+![LEFT OUTER JOIN](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=http%3A%2F%2Fcfile6.uf.tistory.com%2Fimage%2F997E7F415A81490507F027)
+
+LEFT OUTER JOIN
+
+- JOIN의 왼쪽에 표기된 데이터를 기준으로 OUTER JOIN을 수행함
+
+- 예) 학생 테이블과 학과 테이블에서 학과 코드 값이 같은 튜플을 JOIN하여 출력
+
+  - ```sql
+    SELECT s.S_NO, s.S_NAME, s.D_CODE, d.D_NAME
+    FROM STUDENT s LEFT OUTER JOIN DEPARTMENT d
+    ON s.D_CODE = d.D_CODE;
+    ```
+
+  - INNER JOIN과 달리 **학과 정보가 NULL인 학생도 출력됨**
 
 
+
+RIGHT OUTER JOIN
+
+- JOIN의 왼쪽에 표기된 데이터를 기준으로 OUTER JOIN을 수행함
+
+- LEFT OUTER JOIN이랑 다른 것은 위치 뿐이니 위 예제를 다른 문법으로 해보자
+
+  - ```sql
+    SELECT s.S_NO, s.S_NAME, s.D_CODE, d.D_NAME
+    FROM STUDENT s, DEPARTMENT d
+    WHERE s.D_CODE(+) = d.D_CODE;	--LEFT OUTER JOIN의 경우 오른쪽에 (+)를 붙이면 됨
+    ```
+
+  - 이번엔 학생이 없는(학생 정보가 NULL인 학과)도 출력됨
+
+
+
+FULL OUTER JOIN
+
+- LEFT OUTER JOIN과 RIGHT OUTER JOIN의 결과를 합집합으로 처리한 결과와 동일함
+
+- LEFT, RIGHT OUTER JOIN과 다르게 JOIN을 명시하는 경우만 가능
+
+  - ```sql
+    SELECT s.S_NO, s.S_NAME, s.D_CODE, d.D_NAME
+    FROM STUDENT s FULL OUTER JOIN DEPARTMENT d
+    ON s.D_CODE = d.D_CODE;
+    ```
+
+  - 학과코드가 입력 안 된 학생이나 학과명이 없는 학과코드도 모두 출력됨
+
+
+
+CROSS JOIN
+
+- Cartesian Product라고도 하며 곱집합을 반환함
+
+- 두 테이블 간에 연결될 수 있는 모든 경우의 수를 산출하여 나타내는 JOIN
+
+- ```sql
+  SELECT A.COLOR, B.SIZE
+  FROM EX_TABLE A
+  CROSS JOIN JOIN_TABLE B
+  ```
+
+![cross join](https://www.essentialsql.com/wp-content/uploads/2016/08/Cross-Join-Two-Tables-to-Get-Combinations.png?ezimgfmt=ng%3Awebp%2Fngcb11%2Frs%3Adevice%2Frscb11-1)
+
+
+
+### 2.3. 정규화
+
+
+
+데이터베이스 이상(**anomaly**)이란?
+
+- 잘못된 테이블 설계로 인해 **데이터의 중복이 발생하여 생길 수 있는 부작용**을 이상이라 함
+  - 이상은 **정규화가 되어있지 않기 때문**에 발생함
+  - 이상을 해결하기 위해서 속성들 간의 관련성을 파악해서 정규화를 해주어야 함
+- 삽입 이상
+  - 신규 데이터를 삽입하기 위해 불필요한 데이터를 함께 삽입해야 하는 경우
+  - 예) 학번+과목명을 PK로 갖는 수강 과목 테이블에서 한 과목도 안 듣는 학생을 삽입할 때
+    - PK는 null값을 가질 수 없기 때문에 "미수강" 항목을 추가로 만들어서 넣어줘야 함
+- 갱신 이상
+  - 중복되는 데이터 중 일부만 변경하여 데이터의 불일치가 발생하는 문제
+  - 예) 3과목을 수강하는 학생의 과를 변경할 때 1개만 변경하면 해당 학생의 과가 무엇인지 모르게 됨
+- 삭제 이상
+  - 어떤 튜플을 삭제할 때 삭제가 되지 않아야 할 데이터도 같이 지워지는 문제
+  - 예) 한 과목만 수강하는 어떤 학생이 수강 취소했을 때 해당 학생의 모든 정보가 지워짐
+
+![예제](https://blog.kakaocdn.net/dn/bcDYpO/btqZreZlrwW/PJBOL8oLXU9zKktsxZKJp1/img.png)
+
+
+
+함수적 종속성(Functional Dependency)이란?
+
+- 어떤 릴레이션 R의 속성 X, Y가 있을 때, 다음 상황에서 **Y는 X에 함수적 종속**이라고 함
+  - X의 값을 알면 Y의 값을 식별할 수 있고
+  - X의 값이 변화함에 따라 Y의 값이 달라짐
+- 완전 함수적 종속성(Full Functional Dependency)
+  - Y가 **속성 집합 X 전체에 대해서만 함수적 종속**이 되는 경우
+  - 예) 위 예시에서 학점은 학번+과목명 전체에 대해서만 종속이고 둘 중 하나에 종속되진 않음
+- 부분 함수적 종속성(Partial Functional Dependency)
+  - Y가 **속성 집합 X의 일부에 대해서도 함수적 종속**이 되는 경우
+  - 예) 위 예시에서 이름, 학과는 학번+과목명 전체에 대해서도, 학번에도 종속임
+
+
+
+정규화와 반정규화
+
+- 정규화 데이터베이스
+  - 중복을 최소화하도록 설계된 테이블
+  - 트랜잭션이나 CRUD가 많이 일어나는 경우에 사용(**OLTP**)
+    - On-Line Transaction Processing
+  - 저장 공간 최소화, 안정성/무결성 유지, 이상 현상 제거라는 장점 있음
+- 반정규화 데이터베이스
+  - 개발이나 운영 상의 이슈로 인해 정규화된 **테이블을 역으로 합치는 경우**
+    - 정규화된 테이블을 과다하게 JOIN하면 비용이 크기 때문에 의도적으로 정규화 원칙을 어김
+  - 대량의 데이터를 읽고 처리하는 것이 중요한 경우에 사용(**OLAP**)
+    - On-Line Analytical Processing
+  - 빠른 조회가 가능하고 쿼리가 간단하여 버그 발생 가능성 낮다는 장점 있음
+
+
+
+1NF
+
+![1nf](https://blog.kakaocdn.net/dn/c38D78/btqZpVMHIk8/0YFf9MHNgT4EGad1kGoz2K/img.png)
+
+- 테이블은 **관계**여야 하며, 속성의 **원자성을 확보**하는 것을 제1정규형이라고 함
+  - 각각 관계된 데이터 모임이 되도록 하기 위하여 분리된 테이블을 만들고 PK를 설정함
+  - 도메인이 원자값이어야 함 : **중복되는 항목이 없어야 한다**
+    - 여기에 NULL을 허용하지 않는 등 조건이 좀 추가될 수 있는데 이 정도만 알아두자
+  - 예시에서 한 도메인에 여러 값이 들어가 있는데, 이를 다 나눠줘야 함 
+
+
+
+2NF
+
+![2nf](https://blog.kakaocdn.net/dn/dKQhio/btqZpfLsjIO/CBSqtuNzEW3oPPC4mVMoH0/img.png)
+
+- 후보 키 K와, K에 속하지 않는 속성 A가 있을 때, A를 결정하기 위해 K 전체를 참조해야만 하는 경우
+  - 한 마디로 **1NF 테이블에서 부분 함수적 종속성을 제거**하면 2NF가 됨
+  - 예) 기본키 학번+과목명에 대해 학과, 학비는 부분 함수적 종속성을 가짐(학번→학과, 학번→학비)
+    - 학번, 과목명, 학점 테이블과 학번(PK), 학과, 학비 테이블 이렇게 2개로 분할하여 해결
+
+
+
+3NF
+
+- 2NF인 테이블에서 **모든 속성이 기본키에만 의존**하며, 다른 후보키에 의존하지 않는 경우
+  - **이행적 함수 종속**(Transitive Functional Dependency)을 없애야 함
+    - X→Y이고 Y→Z이면 X→Z이고, Z가 X에 이행적 함수 종속이라고 함
+  - 예) 학번→학비는 사실 학번→학과, 학과→학비 이기 때문에 이행적 함수 종속임
+    - 학번, 학과 테이블과 학과, 학비 테이블로 분할해주어야 함
+
+
+
+BCNF(Boyce-Codd Normal Form)
+
+![bcnf](./img/bcnf.png)
+
+- 3NF인 테이블에서 **모든 종속성**에 대해서 다음을 만족하면 BCNF이다
+
+  - X→Y는 trivial functional dependency이다 (Y는 X에 포함되는 속성이다)
+    - 예) {Employee_ID, Employee_Name} –> Employee_ID
+  - X는 슈퍼키이다
+
+- 예) 테니스 코트 예약을 받는 상황에서 예약 타입→코트 종속성이 있음
+
+  - 예약 타입 SAVER는 회원이 코트1을 예약, STANDARD는 비회원이 1을 예약, PREMIUM-A,B도 회원/비회원이 코트 2를 예약하는 경우
+  - 타입에 의해 코트 번호를 결정할 수 있는 종속성이 있으나 코트 번호는 타입의 부분집합이 아니고, 예약 타입은 슈퍼키가 아님
+    - 예약타입 + 시작 시각 or 종료 시각을 해 줘야 유일성 확보 가능
+  - Rate type을 PK로 가지고 Court, Member flag 속성을 갖는 Rate types table과 {Court, Start time}을 PK로 가지고 Member flag, End Time 속성을 갖는 Today's bookings table으로 분할하여 BCNF 정규화
+
+  ![bcnf2](./img/bcnf2.png)
+
+
+
+4NF
+
+- BCNF에서 **다치 종속**(multivalued dependency)을 제거하면 4NF이다
+
+  - 의미적으로 상관없는 속성을 한 테이블에 표현하면, 같은 값을 여러번 입력해야하는 다치 종속이 발생함
+  - 한 테이블에 X→Y와 X→Z 종속성이 있지만 Y, Z는 아무런 연관이 없는 경우
+  - 예) 피자집, 피자 메뉴, 배달 가능 지역 : 메뉴와 지역은 피자집에 종속되나 이 둘은 관계가 없음
+
+  ![4nf](./img/4nf.png)
+
+
+
+5NF
+
+- 4NF에서 **조인 종속**을 제거하면 5NF이다
+
+  - 조인 종속 : **어떤 릴레이션의 모든 속성이 슈퍼키**인 경우
+
+  - 예) 개발자, 프로그래밍 언어, 자격증
+
+    - 한 명의 개발자는 여러 언어를 가질 수 있고, 한 언어는 여러 개발자에 속할 수 있음
+    - 한 자격증은 여러 개발자에 속할 수 있고, 한 개발자는 여러 자격증을 가질 수 있음
+    - 한 언어는 여러 자격증에 속할 수 있고, 한 자격증은 여러 언어를 가질 수 있음
+
+    ![5nf](https://media.vlpt.us/images/moning02004/post/43a5c09a-d9ce-4b73-9cb7-b6887016de6a/image.png)
 
 
 
@@ -648,6 +914,7 @@ SELF JOIN
     - FK의 값은 NULL이거나 참조하는 테이블의 PK 값 중 하나여야 함
   - 도메인 **무결성** (Domain integrity) 
     - 테이블에 존재하는 필드의 무결성을 보장하기 위한 것으로 올바른 데이터가 입력됐는지를 체크하는 것
+    - 예) 성별 속성의 도메인은 남, 여로 그 외의 값은 입력 불가
   - **사용자 정의 무결성** 규칙 (User-defined Integrity)
     - 사용자가 정의한 무결성 규칙으로 개체, 참조, 도메인 무결성에 포함되지 않는 것
 
