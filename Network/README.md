@@ -583,7 +583,7 @@ Transmission Control Protocol
 
     - 수신 시 이를 참조해 데이터를 조립하고, 확인응답(ACK) 회신
     - 일부 데이터가 제대로 도착하지 않으면 **재송신**
-    - 네트워크 혼잡 시 속도 제한: **플로우 제어**
+    - 네트워크 혼잡 시 속도 제한: **혼잡 제어**
 
 
 
@@ -612,25 +612,34 @@ Flow Control: **송신측과 수신측**의 데이터 처리속도 차이 해결
 Congestion Control: **송신측의 데이터 전달과 네트워크**의 데이터 처리 속도 차이를 해결
 
 - 한마디로 많이보내면 혼잡해지니까 속도를 조절하는 것
-- 해결방법
-  - AIMD(Additive Increase Multicative Decrease, 합 증가 곱 감소)
-    
-    - 윈도우 크기를 선형적으로 증가시키고 혼잡을 감지하면 절반으로 줄임
-    - 처음에 전송 속도를 올리는 데 시간이 너무 길다는 단점 존재
-    - 공평함: 여러 호스트가 한 네트워크 공유시 평형상태로 수렴하게 됨
-    - 반복되면 톱니모양처럼 보인다고 하여 AIMD Sawtooth라고 함
-    
-    ![aimd](https://mlga3gjkilfa.i.optimole.com/7hU5Bn8-edeag6dx/w:351/h:154/q:90/https://www.keyboardbanger.com/wp-content/uploads/2015/08/tcp-congestion-control-sawtooth-AIMD.png)
-    
-  - Slow Start
-    
-    - 패킷을 하나씩 보내고 **임계치에 도달할 때까지 윈도우 사이즈 2배씩 증가**시킴
-    - Timeout 발생시 사이즈를 1로 만들고, 임계치가 될 때까지 지수적으로 증가
-    - Congestion Avoidance: 임계치(혼잡이 발생했던 window size의 절반)를 넘으면 선형적으로 증가
-    - Fast Retransmit: 중복된 패킷을 3개 받으면 혼잡으로 손실됐다고 간주, **즉시 재전송**
-    - Fast Recovery: 패킷 손실 후 임계치와 윈도우 사이즈를 손실 당시의 절반으로 재설정
-    
-    ![slow](https://www.researchgate.net/profile/Romain_Delpoux/publication/267783414/figure/fig5/AS:669531638861835@1536640190532/Slow-start-fast-retransmit-and-fast-recovery-illustration.pbm)
+
+- 먼저 window의 크기를 **1MSS**로 설정한 후 네트워크 상황에 따라 조절
+  
+  - 아래 혼잡제어 정책들은 TCP기준임
+  - MSS(Maximum Segment Size) = MTU - (IP헤더길이 + IP옵션길이) - (TCP헤더길이 + TCP옵션길이)
+  - MTU는 1500byte가 standard이므로 MSS는 1460byte가 기본이 된다
+  
+- 현대 TCP에서는 Tahoe, Reno, Cubic, Elastic-TCP 등에서 AIMD와 SlowStart를 적절히 조합해서 제어함
+
+- AIMD(Additive Increase Multicative Decrease, 합 증가 곱 감소)
+  
+  - 윈도우 크기를 선형적으로 증가시키고 혼잡을 감지하면 절반으로 줄임
+  - 처음에 전송 속도를 올리는 데 시간이 너무 길다는 단점 존재
+  - 공평함: 여러 호스트가 한 네트워크 공유시 평형상태로 수렴하게 됨
+  - 반복되면 톱니모양처럼 보인다고 하여 AIMD Sawtooth라고 함
+  
+  ![aimd](https://mlga3gjkilfa.i.optimole.com/7hU5Bn8-edeag6dx/w:351/h:154/q:90/https://www.keyboardbanger.com/wp-content/uploads/2015/08/tcp-congestion-control-sawtooth-AIMD.png)
+  
+- Slow Start
+
+  - 패킷을 하나씩 보내고 **임계치에 도달할 때까지 윈도우 사이즈 2배씩 증가**시킴
+  - **Timeout** 발생시 사이즈를 1로 만들고, 임계치가 될 때까지 지수적으로 증가
+    - 송신한 패킷이 유실되어 일정 시간이 지나도 응답이 오지 않는 것
+  - Congestion Avoidance: 임계치(혼잡이 발생했던 window size의 절반)를 넘으면 선형적으로 증가
+  - Fast Retransmit: 중복된 패킷을 3개 받으면 혼잡으로 손실됐다고 간주, **즉시 재전송**
+  - Fast Recovery: 패킷 손실 후 임계치와 윈도우 사이즈를 손실 당시의 절반으로 재설정
+
+  ![slow](https://www.researchgate.net/profile/Romain_Delpoux/publication/267783414/figure/fig5/AS:669531638861835@1536640190532/Slow-start-fast-retransmit-and-fast-recovery-illustration.pbm)
 
 
 
@@ -679,15 +688,17 @@ ICMP: Internet Control Message Protocol
 
 라우팅이란?
 
-- **다른 네트워크**에 데이터를 보내기 위해 **IP주소**를 기반으로 데이터의 목적지를 찾는 것
+- 다른 네트워크에 데이터를 보내기 위해 **IP주소를 기반으로 데이터의 목적지를 찾는 것**
   - 라우팅의 반복을 통해 데이터를 목적지까지 송신하는 것이 가능
   - 라우터에서는 연결 대상인 네트워크의 IP주소를 이용해 인터페이스 IP주소를 설정
     - 예) 네트워크1(192.168.1.0/24) - 인터페이스1(192.168.1.254/24)
-- 라우터는 **라우팅 테이블**을 이용하여 IP패킷을 전달
+- 라우터는 **포워딩(라우팅) 테이블**을 이용하여 IP패킷을 전달
+  - 포워딩이란 라우터의 입력 포트에서 출력포트로 **패킷을 이동시키는 것**
+  - 라우팅 알고리즘을 통해 테이블을 만드는 과정이 데이터가 이동하는 경로를 만드는 과정이 됨
 
 
 
-라우팅 테이블
+포워딩 테이블
 
 - 라우팅 테이블에는 **Next Hop**(다음 라우터)와 그에 대응되는 IP 주소가 기록되어 있음
 - 테이블에 경로 등록하는 방법은 3가지 존재
@@ -707,7 +718,7 @@ ICMP: Internet Control Message Protocol
 라우팅 순서
 
 1. 라우터가 호스트로부터 IP 패킷을 수신
-2. **테이블에서 Next Hop을 탐색**
+2. **라우팅 테이블에서 Next Hop을 탐색**
 3. 수신한 IP패킷의 이더넷 헤더에는 현재 라우터의 MAC주소가 목적지로 되어 있음
 4. **ARP를 실행**하여 **Next Hop의 MAC주소를 얻고 이더넷 헤더 + FCS 교체**
 5. IP헤더의 TTL(Time To Live, 패킷의 수명)에서 1을 빼준 후 송신
@@ -719,6 +730,10 @@ ICMP: Internet Control Message Protocol
 
 ARP: Address Resolution Protocol
 
+- ARP의 필요성
+  - 데이터링크 계층에서 이더넷 프레임을 만들 때 수신지의 MAC주소를 입력해야 함
+  - 수신지의 IP주소는 네트워크 계층에서 내려오지만 MAC주소는 없음
+  - 이때 ARP를 작동시켜 수신지의 IP주소를 이용해 MAC주소를 획득함
 - ARP의 원리
   - **브로드캐스트**를 통해 목적지 물리주소를 요청
   - 수신자 중 해당되는 수신자만 **유니캐스트**를 통해 논리주소와 물리주소를 응답
