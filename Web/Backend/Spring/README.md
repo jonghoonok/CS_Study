@@ -159,15 +159,17 @@ AOP 관련 용어
 - Advice
   - 어떤 부가 기능인지
   - Join Point가 메서드 : 실행되는 시점에 따라 5가지로 분류 가능
-    - Before : 메서드 실행 전
-    - AfterReturning : 메서드가 실행되어 결과값을 리턴한 이후
-    - AfterThrowing : 메서드가 실행되었으나 exception이 발생한 이후
-    - After : return/throw 관계 없이 실행 이후
-    - Around : 실행 전후
+    - `@Before` : 메서드 실행 전
+    - `@AfterReturning` : 메서드가 실행되어 결과값을 리턴한 이후
+    - `@AfterThrowing` : 메서드가 실행되었으나 exception이 발생한 이후
+    - `@After `: return/throw 관계 없이 실행 이후
+    - `@Around` : 실행 전후
 - Point cut
   - 실제 advice가 적용되는 지점
     - 어떤 패키지에서 어떤 클래스의 어떤 메서드에 적용할 지?
   - Spring AOP에서는 advice가 적용될 메서드를 선정하는 부분
+    - 예) `@Pointcut("execution(*con.example.aop.controller..*.*(..))")`
+    - controller 패키지 내 모든 메서드에 적용
     - 예) `@Around("@annotation(PerformanceCheck)")`
     - PerformanceCheck이라는 custom annotation을 붙인 메서드의 실행 전후로 해당 advice를 적용
 
@@ -188,6 +190,8 @@ AOP의 구현 방법
 
 
 주요 어노테이션
+
+- `@Aspect` : AOP를 적용할 때 사용
 
 
 
