@@ -27,14 +27,8 @@
 - 안정적임
   - 시스템 메모리를 건드려 다운될 수 있는 C와 달리 안정적인 언어의 필요성에 의해 개발됨
 - 플랫폼에 영향을 받지 않음
-  - OS에 따라 다른 컴파일러와 실행 파일을 갖는 C와 달리 가상머신(**JVM**) 상에서 돌아가기 때문에 플랫폼에 독립적
+  - OS에 따라 다른 컴파일러와 실행 파일을 갖는 C와 달리 가상머신([JVM](#6.7. JVM)) 상에서 돌아가기 때문에 플랫폼에 독립적
 - **객체 지향 언어**임
-
-
-
-JVM이란?
-
-- 
 
 
 
@@ -1511,41 +1505,104 @@ Map 인터페이스
 내부 클래스란?
 
 - 클래스 내부에 선언한 클래스
-  - 외부 클래스와 밀접한 연관이 있으면서
-  - 다른 외부 클래스에서 사용할 일이 거의 없는 경우에 내부 클래스로 선언해서 사용함
-
+  - 외부 클래스와 밀접한 연관이 있으면서 다른 **외부 클래스에서 사용할 일이 거의 없는 경우**에 선언
+  - 주로 **private으로 선언**해서 사용함
 - 중첩 클래스라고도 함
+- 내부 클래스의 종류
+  - 인스턴스 내부 클래스
+  - 정적 내부 클래스
+  - 지역 내부 클래스
+  - **익명 내부 클래스**
+  - 익명 내부 클래스를 제외하면 선언 위치, 라이프 사이클이 **변수와 똑같음** 
 
 
 
-내부 클래스의 종류
+인스턴스 내부 클래스
+- 외부 클래스가 생성된 후 생성됨
+  - 인스턴스 내부 클래스에서는 **정적 변수 선언 불가**
+  - 클래스가 생성이 되어야 정적 변수도 할당할 수 있기 때문
+- private으로 선언하는 것을 권장
+  
+  - private이 아닌 경우 다른 외부 클래스에서도 생성 가능
+  
+  - 이론적으로 가능은 하지만 굳이 그렇게 하지는 않음
+  
+  - ```java
+    OutClass outClass = new OutClass();
+    OutClass.InClass inner = outClass.new InClass();
+    ```
 
-- 인스턴스 내부 클래스
-  - 외부 클래스가 생성된 후 생성됨
-    - 인스턴스 내부 클래스에서는 **정적 변수 선언 불가**
-    - 클래스가 생성이 되어야 정적 변수도 할당할 수 있기 때문...
-  - private으로 선언하는 것을 권장
-    - private이 아닌 경우 다른 외부 클래스에서도 생성 가능
-- 정적 내부 클래스
-  - 외부 클래스 생성과 무관하게 생성될 수 있음
-    - **정적 변수, 정적 메서드 사용 가능**
-  - 정적 내부 클래스에서는 **외부 클래스의 인스턴스 변수 사용 불가**
-    - 정적 메서드에서는 내-외부 클래스의 정적 변수만 호출 가능
-    - 일반 메서드에서는 추가로 내부 클래스(본인)의 인스턴스 변수 호출 가능
-- 지역 내부 클래스
-  - 지역 변수와 같이 **메서드 내부에서 정의**하는 클래스
-  - 지역 내부 클래스에서 사용하는 **지역변수 및 매개변수는 final로 선언**됨
-    - 메서드가 끝나면 메서드 내 지역 변수는 Stack에서 해제됨
-    - 메서드 내부의 지역 내부 클래스가 나중에 또 호출될 수 있기 때문에 내부 변수를 final로 선언해야 함
-    - 컴파일러가 자동으로 final로 선언해줌
-- 익명 내부 클래스
-  - 지역 내부 클래스의 이름은 호출될 일이 없기 때문에 **이름을 없애고 바로 리턴**을 때림
-    - `return new Runnable() { ... }`
-    - 클래스의 이름을 생략하고 주로 하나의 인터페이스나 하나의 추상 클래스를 구현하여 반환
-    - 인터페이스나 추상 클래스 자료형의 변수에 직접 대입하여 클래스를 생성하거나
-    - 지역 내부 클래스의 메서드 내부에서 생성하여 반환
-  - 내부 클래스 중에 가장 많이 활용됨
-    - Android 프로그래밍에서 widget 이벤트 핸들러에 많이 활용됨
+
+
+정적 내부 클래스
+
+- 외부 클래스 생성과 무관하게 생성될 수 있음
+  - **정적 변수, 정적 메서드 사용 가능**
+- 정적 내부 클래스에서는 **외부 클래스의 인스턴스 변수 사용 불가**
+  - 외부 클래스의 인스턴스가 생성되지 않아도 내부 클래스가 생성될 수 있기 때문
+  - 내부 클래스의 정적 메서드에서는 내-외부 클래스의 정적 변수만 호출 가능
+  - 내부 클래스의 일반 메서드에서는 추가로 내부 클래스(본인)의 인스턴스 변수 호출 가능
+
+
+
+지역 내부 클래스
+
+- 지역 변수와 같이 **메서드 내부에서 정의**하는 클래스
+
+- 지역 내부 클래스에서 사용하는 **지역변수 및 매개변수는 final로 선언**됨
+
+  - 메서드가 끝나면 지역 변수는 Stack에서 해제되는데, 지역 내부 클래스는 다시 호출될 수 있기 때문
+  - 컴파일러가 자동으로 final로 선언해줌
+
+- 예시) 지역 내부 클래스로 생성된 MyRunnable 객체를 리턴하는 메서드 getRunnable()
+
+  - ```java
+    Runnable getRunnable(int i){
+        
+        class MyRunnable implements Runnable{
+            
+            @Override
+            public void run(){
+                System.out.println("i = " + i);		// OK
+                i = 50;								// 수정은 불가: final이기 때문       
+            }
+            
+        }
+        
+        return new MyRunnable();
+    }
+    ```
+
+  - 외부에서 `Runnable runner = out.getRunnable(100);`하면 메서드는 객체를 넘겨주면서 끝나는데, 스택에서 해제되며 매개변수가 사라지면 runner 를 사용할 수 없기 때문에 final로 선언해주는 것
+
+
+
+익명 내부 클래스
+
+- 지역 내부 클래스의 이름은 호출될 일이 없기 때문에 **이름을 없애고 바로 리턴**을 때림
+  - ```java
+    Runnable getRunnable(int i){
+        
+        return new Runnable() {
+        
+            @Override
+            public void run(){
+                System.out.println("i = " + i);		// OK
+                i = 50;								// 수정은 불가: final이기 때문       
+            }     
+            
+        }
+        
+    }
+    ```
+  
+  - 클래스의 이름을 생략하고 주로 **하나의 인터페이스나 하나의 추상 클래스를 구현하여 반환**
+  
+    - 예시에서는 Runnable 인터페이스를 구현하여 반환함
+    - 인터페이스나 추상 클래스 자료형의 변수에 직접 대입하여 클래스를 생성하거나 지역 내부 클래스의 메서드 내부에서 생성하여 반환
+- 내부 클래스 중에 **가장 많이 활용됨**
+  
+  - Android 프로그래밍에서 widget **이벤트 핸들러**에 많이 활용됨
 
 
 
@@ -1555,17 +1612,20 @@ Map 인터페이스
 
 함수형 프로그래밍이란?
 
-- 함수형 프로그래밍에서는 함수가 외부의 변수를 사용하지 않고 **인자로 전달된 변수만을 사용**함
-  - 글로벌 변수를 사용하면 side effect가 있을 수 있음(동기화 이슈 등)
-  - 병렬 처리가 가능함
+- **함수의 구현과 호출만**으로 이루어지는 프로그래밍 방식
+- **순수함수**를 이용하여 외부 자료에 대한 side effect를 없앰(동기화 이슈 등)
+  - 순수함수 : 함수가 외부의 변수를 사용하지 않고 **인자로 전달된 변수만을 사용**함
+  - 함수 내부에서 함수 외부에 있는 변수를 사용하지 않아 함수가 수행되어도 외부에 영향 없음
+    - 외부 자료를 이용하지 않으므로 **병렬 처리가 가능**함
   - 함수의 기능이 자료에 독립적임을 보장함
+    - 순수함수는 동일한 인자를 주었을 때 **항상** 같은 값을 리턴하고, 다양한 자료에 대해 같은 기능을 수행
 
 
 
 람다식이란?
 
 - 자바에서 **함수형 프로그래밍**을 지원하기 위해 사용하는 표현
-  - 자바 8부터 지원
+  - 자바 8부터 지원됨
 - 소스가 간결해지나 가독성이 떨어진다는 단점이 있음
 
 
@@ -1583,6 +1643,7 @@ Map 인터페이스
     - `str-> return str.length();  //오류 `
   - 실행문이 한 문장의 반환문인 경우엔 return, 중괄호 모두 생략 가능
     - `str -> str.length;`
+    - `(x, y) -> x + y;`
 
 
 
@@ -1590,49 +1651,65 @@ Map 인터페이스
 
 - 함수형 인터페이스
 
-  - 람다식을 선언하기 위한 인터페이스: 람다식은 함수가 사용되는 곳에서 구현
+  - 람다식을 선언하기 위한 인터페이스
+    - 람다식은 구현에 인터페이스가 필요함 : 자바에서 함수만 갖고 코딩할 수는 없기 때문
+    - main에 람다식 add만 쓰면 당연히 컴파일이 안되고, Add 인터페이스를 선언해야 함
   - `@FunctionalInterface` 어노테이션을 붙여서 선언
+    - 안 붙여도 되긴 함
   - 인터페이스는 **단 하나의 메서드만을 선언**해야함
     - 익명 함수를 구현해야 하는데 메서드가 여러 개면 뭘 구현할지 모르기 때문
+    - 인터페이스에 메서드가 여러 개 있을 때 어노테이션을 붙이면 구현에서 에러 표시가 나고 안 붙이면 호출하는 곳에서 에러 표시가 남
+- 람다식은 가능하면 짧게 구현하자
+- 조건문은 삼항 연산자를 활용하여 짧게 할 수 있음
+  - `LargerNumber largerNumber = (x, y) -> x > y ? x : y;`
 
-- 변수처럼 사용되는 람다식
 
-  - 변수의 선언과 대입
 
-    - ```java
-      interface PrintString{
-      	void showString(String str);
-      }
-      public class PrintStringTest{
-      	PrintString lambdaStr = s -> System.out.println(s);  //람다식을 변수에 대입
-      	lambdaStr.showString("hello lambda_1");    
-      }
-      ```
+OOP와의 비교
 
-  - 매개변수 전달과 사용
+- OOP: 인터페이스 선언 → 인터페이스를 구현한 **클래스 작성 → 인스턴스 생성 후** 메서드 호출
+- 람다식: 함수형 인터페이스 선언 → 람다식 구현하고 메서드 호출
+  - 내부적으로는 **anonymous class가 생성되고 익명 객체가 만들어져** OOP와 동일하게 작동하는 것
 
-    - ```java
-      public static void showMyString(PrintString p){
-          p.showString("hello lambda_2");
-      }
-      showMyString(lambdaStr);
-      ```
 
-  - return값으로 돌아오는 변수
 
-    - ```java
-      public static PrintString returnString(){
-          return s -> System.out.println(s + "world");
-      }
-      PrintString reStr = returnString();
-      reStr.showString("hello ");
-      ```
+변수처럼 사용되는 람다식
 
-- OOP와의 비교
+- 변수가 선언 후 대입되고, 매개변수로 전달되고, return값으로 반환되는 것처럼 람다식도 같은 방식으로 사용될 수 있음
 
-  - OOP: 인터페이스 선언 → 인터페이스를 구현한 클래스 작성 → 클래스 생성 후 메서드 호출
-  - 람다식: 함수형 인터페이스 선언 → 람다식 구현하고 메서드 호출
-  - 람다식도 내부적으로는 anonymous class가 생성되어 OOP와 동일하게 작동함
+- 선언과 대입
+
+  - ```java
+    interface PrintString{
+    	void showString(String str);
+    }
+    public class PrintStringTest{
+        //람다식을 변수 lambdaStr에 대입
+    	PrintString lambdaStr = s -> System.out.println(s);
+    	lambdaStr.showString("hello lambda_1");    
+    }
+    ```
+
+- 매개변수 전달과 사용
+
+  - ```java
+    public static void showMyString(PrintString p){
+        p.showString("hello lambda_2");
+    }
+    
+    showMyString(lambdaStr);	// 람다식을 가리키는 변수 lambdaStr을 매개변수로 전달
+    ```
+
+- return값으로 돌아옴
+
+  - ```java
+    // 람다식을 반환하는 함수 returnString
+    public static PrintString returnString(){
+        return s -> System.out.println(s + "world");
+    }
+    PrintString reStr = returnString();		// returnString의 반환값을 reStr에 저장
+    reStr.showString("hello ");				// reStr은 람다식을 가리키는 객체가 되는 것
+    ```
 
 
 
@@ -1640,15 +1717,19 @@ Map 인터페이스
 
 
 
-#### 스트림이란?
-
-
+스트림이란?
 
 - 자료의 **대상과 관계없이 동일한 연산을 수행하는 객체**
   - 배열, 컬렉션을 대상으로 연산을 수행 함
-  - `Stream<String> stream = sList.stream();`
-    - stream에 점을 찍어서 다양한 메서드(sum, map, forEach 등) 사용 가능
-    - 근데 굳이 저렇게 객체 선언을 안 하고 한 줄로 처리하는 것이 나음
+- 스트림 객체 선언
+  - 예) `Stream<String> stream = sList.stream();`
+    - Collection 객체들은 (sList) 스트림을 호출할 수 있음
+- 스트림 객체 사용 
+  - 예) `sList.stream().forEach(s->System.out.println(s));`
+  - stream에 점을 찍어서 다양한 메서드(sum, map, forEach 등) 사용 가능
+  - 메서드 내부에 **람다식을 사용**하여 연산을 수행
+  - 객체 선언 없이 선언과 사용을 한 줄로 처리할 수 있음
+    - 예) `Arrays.stream(arr).forEach();`
 - 스트림을 사용하는 이유
   - **일관성 있는 연산**으로 자료의 처리를 쉽고 간단하게 함
   - 자료 처리에 대한 추상화를 구현
@@ -1657,71 +1738,77 @@ Map 인터페이스
 
 스트림 특징
 
-- 재사용 불가
-  - 스트림을 생성해 연산을 수행하면 스트림이 소모됨: 다른 연산하려면 스트림을 다시 생성해야 함
-  - 이래서 굳이 객체 생성해서 코드를 2줄 쓸 필요가 없음: 어차피재사용 못할건데 뭐하러 씀
+- **재사용 불가**
+  - 스트림을 생성해 연산을 수행하면 스트림이 **소모됨**
+    - 스트림은 오직 한 번만 사용할 수 있고 다른 연산하려면 스트림을 다시 생성해야 함
+    - 재사용 못하기 때문에 굳이 객체 생성하는 코드를 쓸 필요가 없음
 - 자료 변경 없음
   - **스트림이 사용하는 메모리 공간은 별도로 생성됨**: 연산이 수행돼도 자료 변경은 발생하지 않음
   - 이거 뭔가 중요할거 같지 않음?
-- 중간연산과 최종연산으로 구분됨
+- **중간연산과 최종연산**으로 구분됨
   - 중간 연산은 여러 개의 연산이 적용될 수 있지만 최종 연산은 마지막에 한 번만 적용됨
   - 최종연산이 호출되어야 중간 연산에 대한 수행이 이루어 지고 그 결과가 만들어짐
   - 따라서 중간 연산에 대한 결과를 연산 중에 알수 없음: **지연 연산**
 
 
 
-스트림 중간연산과 최종연산
+중간연산과 최종연산
 
-- 중간연산: `filter()`, `map()`, `sorted()` 등
+- 중간연산의 종류
 
-- 최종연산: `forEach()`, `count()`, `sum()` 등
+  - `filter()` : 조건에 맞는 요소를 추출
+  -  `map()` : 요소를 변환함
+  -  `sorted()` : 정렬함
+  - 기타 등등
 
-- 중간 연산과 최종 연산에 대한 구현은 **람다식을 활용**함
+- 최종연산
 
-- 예시
+  - `forEach()` : 각 요소에 대해 연산을 수행 
+  - `count()` : 요소의 갯수를 구함
+  - `sum()` : 요소들의 합을 구함
+  - 기타 등등
 
-  - 문자열 리스트에서 문자열의 길이가 5 이상인 요소만 출력
+- 예1) 문자열 리스트에서 문자열의 길이가 5 이상인 요소만 출력
 
-    - ```java
-      sList.stream().filter(s->s.length() >= 5).forEach(s->System.out.println(s));
-      ```
+  - ```java
+    sList.stream().filter(s->s.length() >= 5).forEach(s->System.out.println(s));
+    ```
 
-    - filter()는 중간 연산이고, forEach()는 최종 연산
+  - filter()는 중간 연산이고, forEach()는 최종 연산
 
-  - 고객 클래스 배열에서 고객 이름만 가져오기
+- 예2) 고객 클래스 배열에서 고객 이름만 가져오기
 
-    - ```java
-      customerList.stream().map(c->c.getName()).forEach(s->System.out.println(s)); 
-      ```
+  - ```java
+    customerList.stream().map(c->c.getName()).forEach(s->System.out.println(s)); 
+    ```
 
-    - map()은 중간 연산이고, forEach()는 최종 연산
-
-
-
-#### 스트림의 활용
-
+  - map()은 중간 연산이고, forEach()는 최종 연산
 
 
-reduce() 연산
 
-- 정의된 연산이 아닌 프로그래머가 직접 구현한 연산을 적용
+스트림의 활용 : `reduce()` 연산
 
-- **최종 연산으로 스트림의 요소를 소모**하며 연산을 수행
+- 정의된 연산이 아닌 **프로그래머가 직접 구현한 연산**을 적용
 
-- 사용
+- reduce는 **최종 연산**임
+
+  - 스트림의 요소를 소모하며 연산을 수행함
+
+- reduce의 사용
 
   - ```java
     T reduce(T identify, BinaryOperator<T> accumulator) 
     ```
 
-    - 첫 번째 parameter는 기본 값(초기값)
+    - 첫 번째 parameter는 기본 값(초기값)으로 안 받을 수도 있음(parameter가 하나면 연산식만 들어감)
     - 두 번째에는 **BinaryOperator 인터페이스를 구현한 클래스를 넣거나 직접 람다식을 넣음**
 
   - 예) 배열의 모든 요소의 합을 구하는 reduce() 연산
 
     - `Arrays.stream(arr).reduce(0, (a,b)->a+b));`
-    - 값을 더하기 위해 첫 번째 파라미터에 초기값으로 0을 넣고 이후 값들을 다 더해서 반환함
-    - sum() 이랑 똑같은데 그냥 프로그래머가 이렇게 구현할 수 있다는 뜻
+    - 값을 더하기 위해 첫 번째 파라미터에 초기값으로 0을 넣음
+    - 이후에 스트림의 각 요소를 소모하면서 연산 : 더한 결과를 반환하고, 반환값에 다음 요소를 더함
+    - 최종적으로는 `sum()`과 똑같음
 
 
 
@@ -2223,8 +2310,35 @@ wait()과 notify()
 JVM(Java Virtual Machine)이란?
 
 - Java로 개발한 프로그램을 컴파일한 바이트코드(`.class`)를 실행시키기 위한 **가상머신**
+
   - 어디서든(JVM이 실행가능한 환경이라면) Java 프로그램이 실행될 수 있도록 함
-  - Kotlin이나 Scala, Groovy로 생성된 바이트코드도 인식할 수 있음
+    -  JVM을 통해 Write once, Run anywhere를 가능하게 함
+  - JVM은 운영체제에 종속적인 가상머신임
+
+- Java가 아닌 언어로 쓰인 바이트코드도 인식 가능
+
+  - Kotlin이나 Scala, Groovy 등
+
+  
+
+JVM의 구조
+
+- Class Loader
+  - JVM 내로 클래스 파일을 로드하고, 링크를 통해 배치함
+  - 런타임에 동적으로 클래스를 로드한다는 특징이 있음
+- Runtime Data Area
+  - JVM의 메모리 영역 : 자바 애플리케이션을 실행할 때 사용되는 **데이터들을 적재**함
+  - Method Area, Heap, Stack, PC Register, Native Method Stack으로 나뉨
+- Execution Engine
+  - Runtime Data Area에 배치된 바이트 코드들을 instruction 단위로 읽어서 실행함
+  - 인터프리터 방식을 사용하다가 일정한 기준이 넘어가면 **JIT 컴파일러** 방식으로 실행
+    - 과거엔 순수하게 인터프리트만 하였으나 성능 개선을 위해 JIT 컴파일을 도입
+  - JIT 컴파일 : 런타임에 **필요한 부분을 즉석으로 컴파일**하는 방식
+    - 자주 쓸만한 코드들을 기계어로 변환해 저장해 두고 필요시 이미 변환된 기계어 코드를 재사용함
+    - 빠르지만 변환 비용이 발생하기 때문에(초기엔 느림) 모든 코드를 JIT 방식으로 실행하지 않는 것
+- Garbage Collector
+  - 힙 메모리 영역에 생성된 객체들 중에서 **참조되지 않은 객체들을 탐색 후 제거**함
+  - GC가 garbage를 수거하는 시간은 언제인지 정확히 알 수 없음
 
 
 
@@ -2232,26 +2346,62 @@ JVM의 성능
 
 - 같은 기능의 네이티브 언어보다는 **느림**
   - 바이트코드가 기계에서 직접 실행되는 것이 아니라 JVM의 해석 단계를 거쳐 실행되고, 가비지 컬렉션을 위한 시간 등이 필요하기 때문
-  - 과거에는 바이트코드를 순수하게 인터프리트하여 매우 느렸으나 **JIT컴파일**의 도입과 하드웨어의 발전으로 성능이 개선됨
-  - JIT 컴파일 : 프로그램을 실행하는 시점에서 필요한 부분을 즉석으로 컴파일하는 방식
+  - 인터프리터 방식으로 매우 느렸으나 JIT컴파일의 도입과 하드웨어의 발전으로 성능이 개선됨
 - 일부 기능에 대해서는 네이티브 언어보다 **빠를 수 있음**
   - 메모리의 접근을 가상 머신 차원에서 관리하고 있으므로 런타임에 최적화가 가능하기 때문
 
 
 
-JVM의 구조
+JVM의 메모리
 
-- 
+- Method Area
+  - 모든 쓰레드가 공유하는 메모리 영역
+  - 클래스, 인터페이스, 메소드, 필드, Static 변수 등의 바이트 코드를 보관
+- Heap
+  - 모든 쓰레드가 공유하는 메모리 영역
+  - new 키워드로 생성된 객체와 배열을 보관
+    - **Garbage Collector**가 참조되지 않는 메모리를 확인하고 제거하는 영역
+    - Method Area에 로드된 클래스만 생성이 가능함
+  - Heap 메모리 해제는 오로지 Garbage Collection에 의해 수행됨
+- Stack
+  - 메서드 호출 시 각각의 메서드만을 위한 공간(**스택 프레임**)을 생성하는 영역
+  - 호출된 메서드의 매개변수, 지역변수, 리턴 값 및 연산 시 일어나는 값들을 임시로 저장
+  - 메서드 수행이 끝나면 프레임별로 삭제
+- PC Register
+  - 쓰레드마다 하나씩 존재하는 영역
+    - 쓰레드가 시작될 때 생성됨
+  - 현재 수행중인 JVM instruction의 주소를 보관
+    - 쓰레드가 어떤 부분을 무슨 명령으로 실행해야할 지에 대한 기록을 수행
+- Native Method Stack
+  - 자바 외 언어로 작성된 네이티브 코드를 위한 메모리 영역
 
 
 
-heap 영역 중 young영역에서 survivor부분이 survivor1과 survivor2로 나뉘어져있는 이유
+heap 영역(심화)
 
+![heap](https://mirinae312.github.io/img/jvm_memory/JVMObjectLifecycle.png)
 
-
-GC란?
-
-- Garbage Collector : 
+- Young(nursery) space
+  - 새로운 객체를 할당하기 위해 힙에 확보된 공간
+    - 새로 생성된 객체는 Eden에 저장됨
+  - Eden이 가득 차면 **Minor GC**(young collection)를 실행하여 **오래 머문 객체**들을 수집함
+    - 참조되고 있는 Live Object는 Suvivor 영역으로 이동시킴
+    - 참조되고 있지 않은 객체들은(garbage) 버림(메모리 해제)
+    - 모든 Live Object가 Survivor 영역으로 넘어간다면 Eden 영역을 clear함
+  - Survivor영역
+    - 둘 중 한 영역은 비워져 있어야 함
+    - 한 영역이 가득 차면 Minor GC를 수행하여 살아 남은 객체는 다른 survivor로 이동시킴
+    - garbage는 버리고 해당 survivor 영역을 clear함
+- Old space
+  - Survivor에서도 계속 살아 남은 오래된 객체들이 old space로 이동됨
+  - Old Space의 메모리가 충분하지 않으면 **Major GC**를 수행함
+    - 메모리 사이즈도 크고, 워낙 오래 잘 참조된 객체들만 있어서 GC가 자주 일어나진 않음
+- Permanent
+  - 객체에 대한 메타 데이터와 Static Object, String Constant Pool, JIT의 최적화 정보 등이 저장되었었음
+  - JVM에 의해 크기가 강제되던 Perm 영역의 사이즈 제한을 없애기 위해 Java8에서 **공중분해됨**
+    - 기존에 객체를 Perm에 할당하지 못하는 OOM(Out Of Memory)문제가 자주 발생했기 때문
+    - String Constant Pool, Static Object는 Heap 영역으로 이동하여 **GC가 더 잘 일어날 수 있게 됨**
+    - 메타 데이터는 OS가 관리하는 영역(Native Memory)으로 이동
 
 
 
@@ -2259,20 +2409,15 @@ GC란?
 
 
 
-- effective java 관련
-  - equals() 와 hashCode()의 관계는?
-  - JVM의 구성은?
-  - gc에 대해서
 - 자료구조 관련
   - HashTable, HashMap이 어떻게 구현되어 있고 어떤 연산을 하는지?
 - 기타
   - ThreadSafe
   - StringBuffer, StringBuilder
 - Spring
-  - bin의 생성 주기
+  - bean의 생성 주기
   - filter, intercepter가 언제 어떤 순서로 호출되는지
   - MVC의 탄생 배경
   - Spring framework의 탄생 배경과 목적
 - JPA
   - 연관관계 매핑: N+1 문제가 언제 발생하고 어떻게 해결하는지?
-  - DB를 설계해봤는지?
