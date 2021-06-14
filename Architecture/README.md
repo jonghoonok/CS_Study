@@ -152,12 +152,38 @@
   - 데이터를 저장했다가 필요할 때 읽어들이는 저장소
   - 레지스터의 용량이 작아서 만들어짐
 - 프로세서 : 메모리로부터 명령어와 데이터를 가져옴
-  - ALU(산술/논리 연산장치)
-    - 제어신호를 받아 연산을 수행해 제어유닛에 전달
-    - 연산에 필요한 데이터는 레지스터에서 가져오고 결과도 레지스터에 저장
-  - 제어유닛
-    - 명령어에 따라 다른 유닛들의 동작을 제어함
-    - 메모리에서 명령어를 읽어 제어신호를 생성하고, ALU에서 전달받은 값을 주변신호에 전달
+  - ALU(산술/논리 연산장치) : 실제 계산을 수행하는 장치
+  - 제어유닛 : ALU를 포함한 CPU 내 장치들을 제어함
+
+
+
+현대 컴퓨터의 구조
+
+![현대](https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Computer_system_bus.svg/1200px-Computer_system_bus.svg.png)
+
+- Address bus
+  - CPU가 메모리로 주소를 보낼 때 사용됨
+  - 특정 메모리 주소에 접근하여 데이터를 쓰거나, 읽어올 때 사용
+    - 쓰는지 읽는지는 Control bus를 통해서 전달됨
+
+
+
+기계어, 어셈블리어, 고급언어
+
+- 프로그램
+  - 프로그램은 인간이 이해하는 고급언어와 기계어의 번역을 통해 만들어짐
+  - **컴파일러**가 고급언어를 어셈블리어로 번역하고 다시 어셈블러를 거쳐 기계어로 번역됨
+- 고급언어
+  - 일반적으로 언급되는 프로그래밍 언어로 인간이 이해할 수 있는 레벨
+  - C언어, Python, Java 등
+- 어셈블리어
+  - 작업 단위인 **instruction**을 사람이 이해할 수 있게(mnemonic) 번역한 것
+  - 어셈블리어는 프로세서에 따라 달라짐(arm, x86)
+- 기계어
+  - 기계가 이해할 수 있는 **기계사고방식의 언어**
+  - 컴퓨터가 이해할 수 있는 bit들의 집합
+    - 컴퓨터는 전류의 on/off만을 이용하여 모든 작업을 수행
+    - 어떤 배선의 어디에 전류를 on/off할지 나타내는 것이 기계어
 
 
 
@@ -299,6 +325,12 @@ CPU란?
 
 CPU의 구조
 
+- **ALU**
+  - 제어신호를 받아 **연산을 수행해 제어유닛에 전달**
+  - 연산에 필요한 데이터는 레지스터에서 가져오고 결과도 레지스터에 저장
+- **Control Unit**
+  - 명령어에 따라 **다른 유닛들의 동작을 제어**함
+  - 메모리에서 명령어를 읽어 제어신호를 생성하고, ALU에서 전달받은 값을 주변신호에 전달
 - 버스
   - 메모리로부터 읽고 쓴 데이터를 전송하는 통로
   - CPU내부의 레지스터들과 연결되어 있음
@@ -311,8 +343,50 @@ CPU의 구조
     - 항상 데이터를 출력함 : s단자만 있고 e단자가 없음
   - ACC
     - ALU에서 출력되는 바이트를 일시적으로 저장함
-- 제어 장치
-- ALU
+
+
+
+프로세서 vs 코어
+
+![processor](http://melonicedlatte.com/assets/images/201910/cpu_components.jfif)
+
+- 프로세서 : 명령어를 처리할 수 있는 논리 회로
+  - CPU : 디바이스가 해야할 일을 총지휘하는 프로세서
+  - 보조 프로세서 : CPU의 기능을 보조함
+  - 마이크로 프로세서 : 디바이스 컨트롤러 등 소형 디바이스에 장착된 프로세서
+  - MPU(Micro Processor Unit) : 기계어를 해석하고, 연산을 수행하는 기능만 있음
+    - 주변에 RAM, ROM , I/O 등의 장치를 추가해주지 않으면 작동이 불가능
+- MCU(Micro Controller Unit)
+  - CPU 기능을 하는 핵심 장치와 주변 장치들을 포함하여 **다른 부품을 제어할 수 있음**
+  - MPU와 CPU는 크기의 차이만 있고 비슷한 개념이나 MPU와 MCU는 큰 차이가 있다
+- 코어 : 프로세서 내부의 연산 장치(Control Unit + ALU + Register)
+  - ARM계열, MIPS계열, x86계열 등의 ISA(Instruction Set Architecture)으로 구분됨
+
+
+
+CPU의 발전
+
+- 단일 프로세서에서 **멀티코어 프로세서**로 진화
+- 파이프라인 구조를 채택해 병렬성을 높여 처리량 최대화
+- Intel 8086
+  - 최초의 16bit 프로세서: CPU의 아버지
+- 80386 CPU
+  - 최초의 32bit 아키텍쳐: PC의 보급화로 널리 사용됨
+  - 32bit란 1클럭 당 처리할 수 있는 최대 크기가 32bit라는 뜻: 최대 메모리 4GB
+- 펜티엄
+  - 최초로 숫자가 아닌 이름이 붙은 CPU
+  - super-scalar architecture: 파이프라인 2개를 이용해 병렬성 극대화
+- 코어2
+  - 펜티엄4가 발열 문제로 생산이 중단되고 최초로 멀티코어 프로세서를 도입
+  - **암달의 법칙**
+    - 코어 갯수에 비례하여 성능이 향상되지는 않음: 병렬화 문제 때문
+    - 멀티 프로세싱에 최적화된 프로그램을 작성하지 않으면 한 코어에 쏠림
+- i-시리즈
+  - 오버클럭
+    - 설계된 클럭속도보다 높은 클럭속도를 강제로 갖도록 하는 기술
+    - FSB(중앙처리장치 외부접속 버스), CPU배수를 높여 최대 운영 주파수에 다다르게 함
+  - 하이퍼스레딩
+    - 하나의 코어에 또 다른 가상코어를 만들어 2개로 인식하게 만드는 병렬화 방법
 
 
 
@@ -397,14 +471,20 @@ ALU란?
 
 
 
-클록
+클럭(clock)
 
 - 스스로 0과 1을 주기적으로 오가는 비트
   - 아무런 입력 없이 출력 비트(클록 비트)를 생성함
-  - **클록의 반복 속도에 의해 컴퓨터 전체의 동작 속도가 결정**됨
-    - 클록의 속도가 곧 명령어가 실행되는 속도이기 때문
-- NOT게이트의 출력을 다시 입력으로 보냄
-  - 전류가 전선을 타고 돌아가는 시간*2를 주기로 하는 사이클이 됨
+  - 하드웨어 이벤트가 발생하는 시점을 결정함
+- **클록의 반복 속도**
+  - 클럭 주기(사이클): 연산 한 번에 걸리는 시간
+  - 클럭 속도: 클럭 주기의 역수(보통 4GHz)
+  - 클록의 속도가 곧 명령어가 실행되는 속도 : 클럭의 반복 속도가 컴퓨터 전체의 동작 속도를 결정함
+- Clock cycle Per Instruction : 명령어당 평균 클럭 사이클 수
+  - 프로그램의 CPU실행시간 = 명령어 수 * CPI / 클럭 속도
+- 클럭의 구조
+  - NOT게이트의 출력을 다시 입력으로 보냄
+  - 전류가 전선을 타고 돌아가는 시간*2를 주기로 하는 사이클이 생성됨
 
 
 
@@ -492,6 +572,10 @@ Programmable computer란?
 
 
 
+#### 명령어의 종류
+
+
+
 ALU 명령어
 
 - ALU는 8가지의 연산을 가지고 4개의 레지스터 중 1개 또는 2개를 이용해 연산함
@@ -507,10 +591,6 @@ ALU 명령어
   - IR의 4-5번 비트와 6-7번 비트에 디코더를 연결함
   - 4-5번에는 입력 디코더만, 6-7번에는 입력과 출력 모두 연결함
     - 출력을(연산 결과) Reg B에 저장해야하기 때문
-
-
-
-명령어의 종류
 
 
 
@@ -568,14 +648,11 @@ ALU 명령어의 실행
 
 분기 명령어(jump instruction)
 
->  반복 계산을 쉽게 프로그램할 수 있는 명령어
-
-
-
-분기 명령어의 종류
-
-- 레지스터 분기 명령어
-- 직접 분기 명령어
+- 반복 계산을 쉽게 프로그램할 수 있는 명령어
+- 분기 명령어의 종류
+  - 레지스터 분기 명령어
+  - 직접 분기 명령어
+  - 조건 분기 명령어
 
 
 
@@ -653,7 +730,7 @@ ALU 명령어의 실행
 
 
 
-### 2.3. 기타 장치
+## **4. 기타 장치**
 
 
 
@@ -686,177 +763,6 @@ ALU 명령어의 실행
   - 스텝 5
     - 장치에서 데이터를 수신할 수 있음 : 이 때 스텝 4, 6은 skip
     - Reg B의 입력 제어 비트를 켜고 I/O clk e가 1이 되는 순간 데이터를 수신
-
-
-
-
-
-
-
-
-
-현대 컴퓨터의 구조
-
-![현대](https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Computer_system_bus.svg/1200px-Computer_system_bus.svg.png)
-
-- Address bus
-  - CPU가 메모리로 주소를 보낼 때 사용됨
-  - 특정 메모리 주소에 접근하여 데이터를 쓰거나, 읽어올 때 사용
-    - 쓰는지 읽는지는 Control bus를 통해서 전달됨
-
-
-
-기계어, 어셈블리어, 고급언어
-
-- 프로그램
-  - 프로그램은 인간이 이해하는 고급언어와 기계어의 번역을 통해 만들어짐: **컴파일러**
-  - 고급언어: 일반적으로 언급되는 프로그래밍 언어
-    - C언어, Python, Java
-    - 컴파일러가 이를 어셈블리어로 번역
-    - 어셈블리어는 프로세서에 따라 달라짐(arm, x86)
-  - 어셈블리어: 기계가 이해할 수 있는 **기계사고방식의 언어**
-    - 어셈블리어는 다시 어셈블러를 거쳐 기계어로 번역됨
-    - 작업 단위인 **instruction을 사람이 이해할 수 있게(mnemonic) 번역**한 것
-  - 기계어: 기수가 2인 숫자로 구성
-    - 컴퓨터가 이해할 수 있는 bit들의 집합
-- HW/SW 계층
-  - 시스템 소프트웨어: 프로그램과 하드웨어 사이에서 인터페이스 역할을 하는 소프트웨어
-    - 어셈블러, 컴파일러, 운영체제, 로더 등
-    - 자세한 내용은 운영체제 공부
-
-
-
-CPU 성능
-
-- 성능: 시간/리소스 대비 컴퓨터 시스템이 수행하는 작업의 양
-  - 성능은 응답시간이나 처리량 등 다양한 관점에서 측정이 가능
-  - 응답시간: 작업개시-종료까지의 시간
-    - 디스크 접근, 메모리 접근, 입출력, 오버헤드, cpu연산 시간 등을 포함
-    - 프로그램이 필요로 하는 모든 시간
-  - 처리량: 단위 시간 당 처리할 수 있는 task의 양
-  - 응답시간을 단축시키면 처리량 또한 증가함
-- 클럭(clock)
-  - 하드웨어 이벤트가 발생하는 시점을 결정
-  - 클럭 주기(사이클): 연산 한 번에 걸리는 시간
-    - 클럭 속도: 클럭 주기의 역수
-  - 프로그램의 CPU 실행시간 = cpu클럭 사이클 수 * 클럭 주기
-    - 클럭 사이클 수 = 명령어 수 * 명령어당 평균 클럭 사이클 수(CPI)
-    - Clock cycle Per Instruction
-      - 프로그램의 CPU실행시간 = 명령어 수 * CPI / 클럭 속도
-
-
-
-전력
-
-- 사용 원인
-  - 트랜지스터의 스위칭: 스위칭시 소모되는 에너지 * 시간당 논리값의 변경 빈도
-  - 따라서 연산이(클럭 속도) 많을 수록 전력 사용량 증가
-- 문제점
-  - 전압이 낮으면 트랜지스터 누설 전류 증가
-    - 서버 칩의 경우 전체 전력의 40%가 **누설 전류**로 소모
-  - 전력이 높으면 온도 상승으로 인한 냉각 비용 발생
-    - 전력 소모량과 CPU온도는 상관관계가 있음
-
-
-
-CPU의 발전
-
-- 단일 프로세서에서 **멀티코어 프로세서**로 진화
-- 파이프라인 구조를 채택해 병렬성을 높여 처리량 최대화
-- Intel 8086
-  - 최초의 16bit 프로세서: CPU의 아버지
-- 80386 CPU
-  - 최초의 32bit 아키텍쳐: PC의 보급화로 널리 사용됨
-  - 32bit란 1클럭 당 처리할 수 있는 최대 크기가 32bit라는 뜻: 최대 메모리 4GB
-- 펜티엄
-  - 최초로 숫자가 아닌 이름이 붙은 CPU
-  - super-scalar architecture: 파이프라인 2개를 이용해 병렬성 극대화
-- 코어2
-  - 펜티엄4가 발열 문제로 생산이 중단되고 최초로 멀티코어 프로세서를 도입
-  - **암달의 법칙**
-    - 코어 갯수에 비례하여 성능이 향상되지는 않음: 병렬화 문제 때문
-    - 멀티 프로세싱에 최적화된 프로그램을 작성하지 않으면 한 코어에 쏠림
-- i-시리즈
-  - 오버클럭
-    - 설계된 클럭속도보다 높은 클럭속도를 강제로 갖도록 하는 기술
-    - FSB(중앙처리장치 외부접속 버스), CPU배수를 높여 최대 운영 주파수에 다다르게 함
-  - 하이퍼스레딩
-    - 하나의 코어에 또 다른 가상코어를 만들어 2개로 인식하게 만드는 병렬화 방법
-
-
-
-프로세서 vs 코어
-
-![processor](http://melonicedlatte.com/assets/images/201910/cpu_components.jfif)
-
-- 프로세서 : 명령어를 처리할 수 있는 논리 회로
-  - CPU : 디바이스가 해야할 일을 총지휘하는 프로세서
-  - 보조 프로세서 : CPU의 기능을 보조함
-  - 마이크로 프로세서 : 디바이스 컨트롤러 등 소형 디바이스에 장착된 프로세서
-  - MPU(Micro Processor Unit) : 기계어를 해석하고, 연산을 수행하는 기능만 있음
-    - 주변에 RAM, ROM , I/O 등의 장치를 추가해주지 않으면 작동이 불가능
-- MCU(Micro Controller Unit)
-  - CPU 기능을 하는 핵심 장치와 주변 장치들을 포함하여 **다른 부품을 제어할 수 있음**
-  - MPU와 CPU는 크기의 차이만 있고 비슷한 개념이나 MPU와 MCU는 큰 차이가 있다
-- 코어 : 프로세서 내부의 연산 장치(Control Unit + ALU + Register)
-  - ARM계열, MIPS계열, x86계열 등의 ISA(Instruction Set Architecture)으로 구분됨
-
-
-
-CPU와 스레드
-
-
-
-
-
-CPU의 구조
-
-![cpu](data:image/png;base64,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)
-
-- 제어 장치
-- 산술 논리 장치
-- 레지스터: 명부(register) - 데이터를 등록해놓고 사용하는 용도
-  - 프로그램 카운터
-  - 명령어 레지스터
-  - 메모리 주소 레지스터
-  - 메모리 데이터 레지스터
-  - 어큐뮬레이터
-
-
-
-CPU가 일하는 방법
-
-- ```c
-  A = 3;
-  B = 4;
-  C = A + B
-  ```
-
-  라는 프로그램을 실행시킬 때 CPU는 다음과 같이 움직임
-
-  - CPU가 **Program Counter**로부터 프로그램의 시작 지점을 읽음
-  - 해당 주소를 **메모리 주소 레지스터**에 복사함
-  - 메모리 주소 레지스터에 저장된 주소를 참조하면 `LOAD 10`이 있음(10은 A가 저장된 주소)
-  - 해당 instruction을 **메모리 데이터 레지스터**에 저장
-  - 메모리 데이터 레지스터에 저장된 것은 명령어(LOAD)이므로 **명령어 레지스터**로 옮김
-  - PC 값이 하나 올라감
-  - 명령어 레지스터에 있는 명령을 **제어 장치**에 올림
-  - 제어장치는 명령어를 **decode**하여 해야할 작업을 이해함
-    - 10번지에 있는 데이터를 가져와야 함
-    - 메모리 주소 레지스터에 10을 넣어줌
-    - 10에 있는 데이터: "3"을 메모리 데이터 레지스터에 저장
-    - 메모리 데이터 레지스터에 저장된 것은 데이터(3)이므로 **어큐뮬레이터**로 옮김
-  - 100번에 해당하는 작업이 끝났으니 PC를 읽어 101번 작업을 시작
-    - (생략)
-  - 제어장치에 `ADD 11`이 올라감
-    - ALU에 어큐뮬레이터의 데이터를 옮김
-    - 메모리 주소 레지스터에 11을 넣음
-    - 11에서 4를 읽어와 메모리 데이터 레지스터에 넣음
-    - 어큐뮬레이터에 4를 넣음
-    - ALU에 4를 넣어 3+4를 수행
-    - 7을 어큐뮬레이터로 옮김
-  - 102번 작업 수행: `STORE 12`
-    - 제어장치가 어큐뮬레이터에 있는 7을 12번지에 저장하고 종료 
 
 
 
