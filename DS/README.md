@@ -31,6 +31,7 @@ Java에서 사용되는 자료구조는 Java 참조
 자료구조의 종류
 
 - 선형 자료구조
+  - 배열
   - 리스트
   - 스택
   - 큐
@@ -42,18 +43,27 @@ Java에서 사용되는 자료구조는 Java 참조
 
 추상 자료형(Abstract Data Type)
 
-- 구체적인 기능의 완성과정을 언급하지 않고, **기능이 무엇인지만 나열**한 것
-  - 기능에 대해서만 정의하기 때문에 구조체의 정의는 ADT에 포함하지 않음
-  - 자료형의 정의는 구조체의 정의(멤버 변수)에 연산의 종류를 결정하는 것을 통해 이루어짐
-- 내부 구현을 알지 못해도 활용할 수 있도록 함
+- 추상 자료형이란?
+  - 자료 자체의 형태와 그 자료에 관계된 연산들을 **수학적으로**만 정의한 것
+  - 구체적인 기능의 완성과정을 언급하지 않고, **기능이 무엇인지만 나열**한 것
+    - 내부 구현을 알지 못해도 활용할 수 있도록 함
+- 자료구조와의 관계
+  - 자료구조는 추상적 자료형이 정의한 연산들을 구현한 구현체를 가리키는 말
+  - 어떠한 자료구조이건 간에 **자료구조의 구현과 구현된 자료구조의 활용은 구분되도록 정의**되어야 함
+  - 자료구조는 ADT의 정의를 알고 → 정의한 ADT를 구현한 후 → 활용하는 방법을 익혀야 함
 
 
 
-### 1.1. 기본 자료구조
+자료구조와 알고리즘
+
+- 알고리즘은 자료구조에 의존적임
+  - 자료구조가 결정되어야 그에 따른 효율적인 알고리즘을 결정할 수 있음
+- 알고리즘을 사용하기 위해 개발된 자료구조도 존재
+  - 예) 이진 탐색을 하기 위해 이진 탐색 트리가 개발됨
 
 
 
-#### 배열
+### 1.1. 배열
 
 
 
@@ -67,20 +77,29 @@ Java에서 사용되는 자료구조는 Java 참조
 
   - 이 때 **요소의 갯수는 상수**만 사용 가능
 
-    - 변수를 사용하면 런타임에 크기가 변화될 수 있음
-    - **배열은 크기가 변하지 않는 자료구조**로 컴파일 타임에 크기가 결정됨
-
+    - 변수를 사용하면 런타임에 크기가 변화될 수 있음 : 컴파일되지 않음
+  
 - 배열의 개별 요소에는 **인덱스**를 이용하여 접근
 
+  - 인덱스 : 각 원소들에 순서대로 붙인 번호
 
 
-배열의 필요성
+
+배열의 특징
 
 - 빠른 검색
+  - 인덱스를 이용하여 O(1)에 탐색 가능
+  - 임의 접근이(random access) 가능한 자료구조임
+- 크기가 변하지 않음
+  - 배열은 컴파일 타임에 크기가 결정되며 크기가 변하지 않음
+  - 크기를 변화시켜야 할 때는 새 배열을 만들고 기존 내용을 복사하거나, 배열의 일부를 연결 리스트 등으로 다른 곳과 연결함
+- 삽입과 삭제가 느림
+- 캐시 친화적임
+  - 캐시를 적용하는 기준이 일정 크기의 연속된 메모리 영역인 경우가 많기 때문
 
 
 
-#### 구조체
+### 1.2. 구조체
 
 
 
@@ -127,11 +146,314 @@ Java에서 사용되는 자료구조는 Java 참조
 
 
 
-## **2. 스택과 큐**
+자료형의 정의
+
+- 자료형의 정의는 구조체의 정의에 연산의 종류를(ADT) 결정하는 것을 통해 이루어짐
+  - 예) Wallet 구조체에 멤버 변수를 정의하고, 입출금 메소드를 더해 자료형의 정의를 완성함
+  - ADT에 구조체의 정의는 포함하지 않아도 됨
+    - 기능에 대해서만 정의하는 것으로 충분한 경우
 
 
 
-### 2.1. 스택
+## **2. List**
+
+> 데이터를 순서대로 나열, **중복을 허용**한 자료구조
+
+
+
+리스트 자료구조의 ADT
+
+- `void ListInit(List * plist);`
+  - 초기화할 리스트의 주소 값을 인자로 전달함
+  - 리스트 생성 후 가장 먼저 호출 됨
+- `void LInsert(List * plist, LDta data);`
+  - 리스트에 데이터를 저장함
+  - 매개변수 data에 전달된 값을 저장함
+- `bool LFirst(List * plist, LData * pdata);`
+  - 첫 번째 데이터가 **pdata가 가리키는 메모리에 저장**됨
+  - 데이터의 참조를 위한 초기화가 진행됨
+  - 참조 성공/실패를 반환
+- `bool LNext(List * plist, LData * pdata);`
+  - 참조된 데이터의 **다음 데이터가 pdata가 가리키는 메모리에 저장**됨
+  - 순차적인 참조를 위해 반복 호출이 가능함
+  - 참조를 새로 시작하려면 먼저 LFirst 함수를 호출해야 함
+  - 참조 성공/실패 반환
+- `LData LRemove(List * plist);`
+  - LFirst 또는 LNext 함수의 **마지막 반환 데이터를 삭제**함
+    - LFirst, LNext 함수에서 pdata 포인터가 가리키게 된 값을 삭제함
+  - 삭제된 데이터는 반환됨
+  - 마지막 반환 데이터를 삭제하므로 반복 호출을 허용하지 않음
+- `int LCount(List * plist);`
+  - 리스트에 저장되어 있는 데이터의 수를 반환함
+
+
+
+### 2.1. Array List
+
+
+
+순차 리스트란?
+
+- 배열을 기반으로 구현된 리스트
+- 장단점
+  - 쌓이는 데이터의 크기(배열의 길이)를 미리 알아야 하고 변경이 불가능 함
+  - 데이터를 삭제하는 과정에서 데이터를 옮겨야 하기 때문에 효율이 나쁨
+  - 인덱스 값을 기준으로 어디든 한 번에 참조가 가능함
+
+
+
+ArrayList 구현
+
+- 구조체 정의
+
+  - ```c
+    typedef struct __ArrayList{
+        LData arr[LIST_LEN];		// 리스트를 저장할 배열
+        int numOfData;				// 저장된 데이터의 수
+        int curPosition;			// 데이터 참조 위치를 기록
+    }ArrayList;
+    ```
+
+- 삽입
+
+  - ```c
+    void LInsert(List * plist, LData data){
+        if(plist -> numOfData >= LIST_LEN){
+            puts("저장이 불가능합니다");
+            return
+        }
+        plist -> arr[plist->numOfData] = data;	// 데이터 저장
+        (plist->numOfData)++;					// 저장된 데이터의 수 증가
+    }
+    ```
+
+  - 데이터 수가 배열의 길이를 초과했는지 검사하고(validation) 초과하지 않았다면 저장함
+
+  - numOfData를 배열의 인덱스로써 활용함
+
+- 조회
+
+  - ```c
+    bool LFirst(List * plist, LData * pdata){
+        if(plist -> numOfData == 0)		// 저장된 데이터가 없다면 FALSE 반환
+            return FALSE;
+        
+        (plist -> curPosition) = 0;		// 참조 위치 초기화
+        *pdata = plist -> arr[0];
+        return TRUE;
+    }
+    ```
+
+  - 참조 위치를 초기화하여 데이터의 참조가 앞에서부터 진행되도록 함
+
+  - ```c
+    bool LNext(List * plist, LData * pdata){
+        if(plist->curPosition >= (plist->numOfData)-1 ) // 더이상 참조할 데이터가 없으면
+            return FALSE;
+        
+        (plist -> curPosition)++;
+        *pdata = plist -> arr[plist->curPosition];
+        return TRUE;
+    }
+    ```
+
+  - curPosition에 저장된 값을 증가시켜서 데이터의 참조가 순서대로 이루어지도록 함
+
+- 삭제
+
+  - 중간에 데이터가 삭제되면 뒤에 저장된 데이터들을 한 칸씩 이동시켜서 빈 공간을 메워야 함
+
+    - 앞에서부터 데이터를 채워야 하기 때문
+
+  - ```c
+    LData LNext(List * plist){
+        int rpos = plist -> curPosition;
+        int num = plist -> numOfData;
+        int i;
+        LData = rdata = plist -> arr[rpos];
+            
+        for(i=rpos; i<num-1; i++)
+            plist -> arr[i] = arr[i+1];
+        
+        (plist -> numOfData)--;
+        (plist -> curPosition)--;
+        return rdata;
+    }
+    ```
+
+
+
+### 2.2. Linked List
+
+
+
+연결 리스트란?
+
+- 메모리의 동적 할당을 기반으로 구현된 리스트
+  - 필요할 때마다 노드 역할을 하는 구조체 변수를 하나씩 동적 할당하여 이들을 **연결**하는 것
+- 노드들의 연결
+  - 각 노드는 데이터와 **다음 노드를 가리키는 포인터**를 갖고 있음
+  - 각 노드의 앞 노드를 predecessor node, 뒷 노드를 successor node라고 함
+  - 맨 앞 노드는 head node, 맨 뒷 노드는 tail node라고 함
+    - 새 노드를 추가할 때 머리에 추가할 경우엔 tail 변수가 필요 없음
+
+
+
+장단점
+
+- 삽입과 삭제가 빠름
+  - 삽입하는 곳 전후로 새로운 노드와의 연결만 추가하면 됨
+  - 삭제도 마찬가지로 연결만 끊어내면 됨 : O(1)
+- 조회가 느림
+  - 인덱스를 이용할 수 없고 원하는 데이터를 찾을 때까지 링크를 계속 따라가야 함 : O(n)
+- 추가적인 포인터 변수 사용으로 배열 대비 메모리 공간이 낭비됨
+
+
+
+#### 2.2.1. Singly Linked List
+
+
+
+ADT
+
+- 기본적으로 리스트의 ADT와 동일함
+  - 여기서는 정렬 기능을 추가해 봄
+- `void SetSortRule(List * plist, bool (*comp)(LData d1, LData d2));`
+  - 리스트에 정렬의 기준이 되는 함수를 등록함
+  - 두 번째 parameter로 데이터를 비교하여 무엇이 앞에 위치할 지 결정하는 함수 포인터 comp를 받음
+
+
+
+Node 구현
+
+- 하나의 구조체 안에 두 개의 변수 **data**와 **next**가 존재: 포인터를 이용해 다음 노드를 가리킴
+
+- ```c
+  typedef struct __node{
+      int data;
+      struct __node *next;	// 다음 노드를 가리키는 포인터 next
+  } Node;
+  ```
+
+
+
+Singly Linked List 구현
+
+- 맨 앞에 시작 노드인 헤드, 맨 뒤 노드에는 next에 NULL을 담음
+
+- 삽입
+
+  - 새로운 노드를 head, tail 중 어디에 삽입할지 결정해야 함
+
+    - head에 추가할 경우 : tail 변수가 필요하지 않으나 저장된 순서가 유지되지 않음
+    - tail에 추가할 경우 : tail 변수가 필요하지만 저장된 순서가 유지됨
+    - 여기서는 dummy node를 활용해 head에 추가함
+
+  - 정렬의 기준 유무에 따라 다른 삽입 함수를 호출함
+
+  - ```c
+    void LInsert(List * plist, LData data){
+        if(plist -> comp == NULL)
+            FInsert(plist, data);
+        else
+            SInsert(plist, data);
+    }
+    ```
+
+  - 기준이 없는 경우
+
+    - ```c
+      void FInsert(List * plist, LData data){
+          Node * newNode = (Node*)malloc(sizeof(Node));
+          newNode -> data = data;
+          
+          newNode -> next = plist -> head -> next;	//새 노드가 선두의 노드를 가리킴
+          plist -> head -> next = newNode;			//더미 노드가 새 노드를 가리킴
+          
+          (plist -> numOfData)++;
+      }
+      ```
+
+    - 삽입할 위치 이전 노드가 삽입하는 노드를 가리키고, 삽입하는 노드가 다음 노드를 가리키도록 함
+
+    - dummy node가 있기 때문에 모든 **노드의 추가과정이 일관되게 정의**됨
+
+    - 더미가 없으면 예외 처리가 필요함
+
+  - 기준이 있는 경우
+
+    - ```c
+      void SInsert(List * plist, LData data){
+          Node * newNode = (Node*)malloc(sizeof(Node));
+          newNode -> data = data;
+          
+          newNode -> next = plist -> head -> next;	//새 노드가 선두의 노드를 가리킴
+          plist -> head -> next = newNode;			//더미 노드가 새 노드를 가리킴
+          
+          (plist -> numOfData)++;
+      }
+      ```
+
+    - 
+
+- 삭제
+
+  - 삭제할 위치 이전 노드가 다음 노드를 가리키고, 삭제할 노드 **메모리 할당 해제함**
+
+- 참조
+
+  - 현재 노드를 가리키는 cur 포인터를 이용
+
+
+
+연결 리스트 구조체
+
+- 노드를 가리키는 포인터는(head, cur 등) 따로 **구조체로 묶어야 함**
+
+  - 프로그램에서 여러 연결 리스트를 사용할 수 있기 때문
+  - 따라서 전역변수로 선언하는 것은 더더욱 안 됨
+
+- 예시
+
+  - ```c
+    typedef struct __linkedList{
+        Node * head;
+        Node * cur;
+        int numOfData;
+        int (*comp)(LData d1, Ldata d2);
+    } LinkedList;
+    ```
+
+
+
+#### 2.2.2. Circular Linked List
+
+
+
+
+
+#### 2.2.3. Doubly Linked List
+
+
+
+Doubly Linked List
+
+- 머리(head)와 꼬리(tail)를 가짐
+- 각 노드는 data, **next, prev**를 가짐 : 앞 뒤 노드를 가리킴
+- 삽입
+  - 앞 노드의 next가 삽입노드를, 삽입노드의 prev가 앞 노드를 가리키게 함
+  - 뒷 노드의 prev가 삽입노드를, 삽입노드의 next가 뒷 노드를 가리키게 함
+  - 순서 중요함 : 써진 그대로 할 필요는 없으나 꼬이지 않아야 함
+- 삭제
+  - 삭제할 노드의 앞 노드의 next를 뒷 노드로 하고, 해당 노드의 prev가 앞 노드를 가리키게 함
+
+
+
+## **3. 스택**
+
+
+
+### 2.1. 배열로 구현
 
 
 
@@ -181,7 +503,21 @@ Java에서 사용되는 자료구조는 Java 참조
 
 
 
-### 2.2. 큐
+
+
+### 2.2. 연결리스트로 구현
+
+
+
+
+
+### 2.3. Postfix
+
+
+
+
+
+## **3. Queue**
 
 
 
@@ -197,6 +533,10 @@ Java에서 사용되는 자료구조는 Java 참조
 
 
 
+### 3.1. 배열로 구현
+
+
+
 원형 큐의 필요성
 
 - 스택과 달리 **큐에서 데이터를 꺼내는 작업은 O(n)**으로 개선이 필요함
@@ -204,6 +544,10 @@ Java에서 사용되는 자료구조는 Java 참조
 - 데이터를 꺼내도 앞쪽으로 밀어주지 않기 위해 **링 버퍼** 사용
   - **front, rear**를 도입하여 논리적으로 첫 번째, 마지막 요소를 식별하고 이 변수들만 변경해줌
   - 링 버퍼는 **오래된 데이터를 버리는 데 사용**될 수 있음: 가장 최근에 들어온 데이터 n개만 저장함
+
+
+
+### 3.2. 연결리스트로 구현
 
 
 
@@ -242,7 +586,13 @@ Java에서 사용되는 자료구조는 Java 참조
 
 
 
-## **3. 집합**
+### 3.3. Dequeue
+
+
+
+
+
+## **4. Set**
 
 
 
@@ -292,123 +642,6 @@ Java에서 사용되는 자료구조는 Java 참조
   - Intersection : `s1 & s2`
   - Union : `s1 | s2`
   - Difference : `s1 &~s2`
-
-
-
-## **4. 리스트**
-
-> 데이터를 순서대로 나열, **중복을 허용**한 자료구조
-
-
-
-리스트 자료구조의 ADT
-
-- `void ListInit(List * plist);`
-  - 초기화할 리스트의 주소 값을 인자로 전달함
-  - 리스트 생성 후 가장 먼저 호출 됨
-- `void LInsert(List * plist, LDta data);`
-  - 리스트에 데이터를 저장함
-  - 매개변수 data에 전달된 값을 저장함
-- `int LFirst(List * plist, LData * pdata);`
-  - 첫 번째 데이터가 pdata가 가리키는 메모리에 저장됨
-  - 데이터의 참조를 위한 초기화가 진행됨
-  - 참조 성공/실패를 반환
-- `int LNext(List * plist, LData * pdata);`
-  - 참조된 데이터의 다음 데이터가 pdata가 가리키는 메모리에 저장됨
-  - 순차적인 참조를 위해 반복 호출이 가능함
-  - 참조를 새로 시작하려면 먼저 LFirst 함수를 호출해야 함
-  - 참조 성공/실패 반환
-- `LData LRemove(List * plist);`
-  - LFirst 또는 LNext 함수의 마지막 반환 데이터를 삭제함
-  - 삭제된 데이터는 반환됨
-  - 마지막 반환 데이터를 삭제하므로 반복 호출을 허용하지 않음
-- `int LCount(List * plist);`
-  - 리스트에 저장되어 있는 데이터의 수를 반환함
-
-
-
-### 4.1. Array List
-
-
-
-순차 리스트란?
-
-- 배열을 기반으로 구현된 리스트
-  - 쌓이는 데이터의 크기를 미리 알아야 함
-  - 데이터의 삽입, 삭제에 따라 데이터를 모두 옮겨야 하기 때문에 효율이 나쁨
-
-
-
-### 4.2. Linked List
-
-
-
-연결 리스트란?
-
-- 메모리의 동적 할당을 기반으로 구현된 리스트
-- 데이터를 사슬 모양으로 연결한 형태 
-  - 각 노드는 데이터와 다음 노드를 가리키는 포인터를 갖고 있음
-  - 각 노드의 앞 노드를 predecessor node, 뒷 노드를 successor node라고 함
-  - 맨 앞 노드는 head node, 맨 뒷 노드는 tail node라고 함
-
-
-
-장단점
-
-- 삽입과 삭제가 빠름
-  - 삽입하는 곳 전후로 새로운 노드와의 연결만 추가하면 됨
-  - 삭제도 마찬가지로 연결만 끊어내면 됨 : O(1)
-- 조회가 느림
-  - 인덱스를 이용할 수 없고 원하는 데이터를 찾을 때까지 링크를 계속 따라가야 함 : O(n)
-- 추가적인 포인터 변수 사용으로 배열 대비 메모리 공간이 낭비됨
-
-
-
-Singly Linked List 구현
-
-- 하나의 구조체 안에 두 개의 변수 **data**와 **next**가 존재: 포인터를 이용해 다음 노드를 가리킴
-
-- 맨 앞에 시작 노드인 헤드, 맨 뒤 노드에는 next에 NULL을 담음
-
-  - 노드 구현
-
-  - ```c
-    typedef struct __node{
-        Member data;
-        struct __node *next;	// 다음 노드를 가리키는 포인터 next
-    } Node;
-    ```
-
-  - 연결리스트 구현
-
-  - ```c
-    head = (Node*) malloc(sizeof(Node));
-    Node *node1 = (Node*) malloc(sizeof(Node));
-    node1->data = 1;
-    Node *node2 = (Node*) malloc(sizeof(Node));
-    node1->data = 2;
-    
-    head->next = node1;
-    node1->next = node2;
-    node2->next = NULL;
-    ```
-
-  - 삽입: 삽입할 위치 이전 노드가 삽입하는 노드를 가리키고, 삽입하는 노드가 다음 노드를 가리키도록 함
-
-  - 삭제: 삭제할 위치 이전 노드가 다음 노드를 가리키고, 삭제할 노드 **메모리 할당 해제함**
-
-
-
-Doubly Linked List
-
-- 머리(head)와 꼬리(tail)를 가짐
-- 각 노드는 data, **next, prev**를 가짐 : 앞 뒤 노드를 가리킴
-- 삽입
-  - 앞 노드의 next가 삽입노드를, 삽입노드의 prev가 앞 노드를 가리키게 함
-  - 뒷 노드의 prev가 삽입노드를, 삽입노드의 next가 뒷 노드를 가리키게 함
-  - 순서 중요함 : 써진 그대로 할 필요는 없으나 꼬이지 않아야 함
-- 삭제
-  - 삭제할 노드의 앞 노드의 next를 뒷 노드로 하고, 해당 노드의 prev가 앞 노드를 가리키게 함
 
 
 
