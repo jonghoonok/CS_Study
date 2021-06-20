@@ -330,7 +330,7 @@ Node 구현
 
 - ```c
   typedef struct __node{
-      int data;
+      Data data;
       struct __node *next;	// 다음 노드를 가리키는 포인터 next
   } Node;
   ```
@@ -385,24 +385,76 @@ Singly Linked List 구현
     - ```c
       void SInsert(List * plist, LData data){
           Node * newNode = (Node*)malloc(sizeof(Node));
+          Node * pred = plist -> head;				//더미 노드
           newNode -> data = data;
           
-          newNode -> next = plist -> head -> next;	//새 노드가 선두의 노드를 가리킴
-          plist -> head -> next = newNode;			//더미 노드가 새 노드를 가리킴
+          // 새 노드가 들어갈 위치 찾기
+          while(pred->next != NULL && plist->comp(data, pred->next->data)!=0){
+              pred = pred -> next;	// 다음 노드로 이동
+          }
+          
+          newNode -> next = pred -> next;		// 새 노드의 오른쪽 연결
+          pred -> next = newNode;				// 새 노드의 왼쪽 가리킴
           
           (plist -> numOfData)++;
       }
       ```
 
-    - 
+    - comp에 등록된 함수의 호출결과에 기반해서 새 노드가 추가될 위치를 찾음
+
+    - 새 노드의 data와 현재 노드 pred의 다음 노드를 비교 : FALSE가 나오면 pred의 다음에 새 노드 삽입
+
+    - **정렬의 기준이 되는 함수는 연결 리스트가 호출되는 파일에 작성**돼야 함 : 유연성 확보
+
+- 조회
+
+  - 현재 노드를 가리키는 cur 포인터를 이용
+
+  - ```c
+    int LFirst(List * plist, LData * pdata){
+        if(plist->head->next == NULL)
+            return FALSE;
+        
+        plist -> before = plist -> head;		// before은 더미 노드를 가리킴
+        plist -> cur = plist -> head -> next;	// cur은 첫 번째 노드를 가리킴
+        
+        *pdata = plist -> cur -> data;
+        return TRUE;
+    }
+    
+    int LNext(List * plist, LData * pdata){
+        if(plist->cur->next == NULL)
+            return FALSE;
+        
+        plist -> before = plist -> cur;			// cur이 가리키던 것을 before가 가리킴
+        plist -> cur = plist -> cur -> next;	// cur은 그 다음 노드를 가리킴
+        
+        *pdata = plist -> cur -> data;
+        return TRUE;
+    }
+    ```
+
+  - before은 삭제에 이용하기 위해 cur보다 하나 앞선 노드를 가리키게 함
 
 - 삭제
 
   - 삭제할 위치 이전 노드가 다음 노드를 가리키고, 삭제할 노드 **메모리 할당 해제함**
 
-- 참조
+  - 바로 이전에 호출된 LFirst 혹은 LNext가 반환한 데이터를 삭제함
 
-  - 현재 노드를 가리키는 cur 포인터를 이용
+  - ```c
+    LData LRemove(List * plist){
+        Node * rpos = plist -> cur;
+        LData rdata = rpos -> data;
+        
+        plist->before->next = plist->cur->next;	// cur가 가리키는 노드를 리스트에서 제거
+        plist->cur = plist->before;				// cur가 가리키는 위치를 앞으로 당김
+        
+        free(rpos);								// 리스트에서 제거한 노드 소멸
+        (plist->numOfData)--;
+        return rData;
+    }
+    ```
 
 
 
@@ -430,106 +482,209 @@ Singly Linked List 구현
 
 
 
+원형 연결 리스트란?
+
+- 마지막 노드가 첫 번째 노드를 가리키는 연결 리스트
+  - LNext 함수의 무한 반복 호출이 가능함
+- 머리와 꼬리의 구분이 없음
+  - **head, tail중 하나만 있어도 노드를 간단히 추가**할 수 있음
+  - 일반적으로 tail만 두고 새로운 노드를 리스트의 끝에 추가하도록 구현함
+
+
+
+원형 연결 리스트 구현
+
+- 삽입
+
+  - 새로운 노드를 리스트의 앞에 추가하는 경우와 뒤에 추가하는 경우가 있음
+
+  - ```c
+    void LInsert(List * plist, Data data){
+        Node * newNode = (Node*)malloc(sizeOf(Node));
+        newNode->data = data;
+        
+        if(plist->tail == NULL){
+            plist->tail = newNode;
+            newNode->next = newNode;
+        }
+        else{
+            newNode->next = plist->tail->next;
+            plist->tail->next = newNode;
+            plist->tail = newNode;		// 앞에 추가하는 경우에는 이 코드가 빠짐
+        }
+    }
+    ```
+
+  - 머리에 추가하는 것과 꼬리에 추가하는 경우는 코드 한 줄만 다름 : 머리-꼬리 구분이 없음!
+
+- 조회
+
+  - 현재 노드를 가리키는 cur 포인터를 이용
+  - Singly Linked List와 거의 동일하고 tail이 NULL인지만 체크하므로 구현은 생략
+    - 리스트의 끝을 검사하지 않기 때문에 무한으로 반복해서 호출 가능
+
+- 삭제
+
+  - **더미 노드가 존재하지 않기 때문에 예외 상황을 고려**해야 함
+
+    - 예외1 : 삭제할 노드를 tail이 가리키는 경우
+    - 예외2 : 삭제할 노드가 리스트에 혼자 남은 경우
+
+  - ```c
+    LData LRemove(List * plist){
+        Node * rpos = plist -> cur;
+        LData rdata = rpos -> data;
+        
+        if(plist->tail == rpos){					// 예외1
+            if(plist->tail == plist->tail->next)	// 예외2
+                plist->tail = NULL;
+            else
+                plist->tail = plist->before
+        }
+        
+        plist->before->next = plist->cur->next;	
+        plist->cur = plist->before;				
+        
+        free(rpos);								
+        (plist->numOfData)--;
+        return rData;
+    }
+    ```
+
+  - 더미 노드를 추가하면 삭제 코드는 간결해지지만 대신 삽입 시 예외 상황을 고려해야 함
+
 
 
 #### 2.2.3. Doubly Linked List
 
 
 
-Doubly Linked List
+Doubly Linked List란?
 
-- 머리(head)와 꼬리(tail)를 가짐
+- 각 노드가 양쪽 방향으로 연결됨
+
+  - 왼쪽 노드가 오른쪽 노드를 가리키는 동시에 오른쪽 노드도 왼쪽 노드를 가리킴
+  - before 변수가 불필요하며 
+
 - 각 노드는 data, **next, prev**를 가짐 : 앞 뒤 노드를 가리킴
+
+  - Node 구현
+
+  - ```c
+    typedef struct __node{
+        Data data;
+        struct __node *prev;	// 이전 노드를 가리키는 포인터 prev
+        struct __node *next;	// 다음 노드를 가리키는 포인터 next
+    } Node;
+    ```
+
+
+
+Doubly Linked List 구현
+
 - 삽입
-  - 앞 노드의 next가 삽입노드를, 삽입노드의 prev가 앞 노드를 가리키게 함
-  - 뒷 노드의 prev가 삽입노드를, 삽입노드의 next가 뒷 노드를 가리키게 함
-  - 순서 중요함 : 써진 그대로 할 필요는 없으나 꼬이지 않아야 함
+
+  - 앞 노드의 next가 삽입할 노드를, 삽입할 노드의 prev가 앞 노드를 가리키게 함
+
+  - 뒷 노드의 prev가 삽입할 노드를, 삽입할 노드의 next가 뒷 노드를 가리키게 함
+
+  - ```c
+    void LInsert(List * plist, Data data){
+        Node * newNode = (Node*)malloc(sizeOf(Node));
+        newNode->data = data;
+        
+        newNode->next = plist->head;
+        if(plist->head != NULL)
+            plist->head->prev = newNode;		// 두 번째 이후의 노드를 추가할 때 실행
+        
+        newNode->prev = NULL;
+        plist->head = newNode;
+        
+        (plist->numOfData)++;
+    }
+    ```
+
+- 조회
+
+  - LFirst, LNext는 Singly Linked List와 차이가 없음
+
+  - 역방향으로 조회하는 LPrevious만 구현
+
+  - ```c
+    int LPrevious(List * plist, Data * pdata){
+        if(plist->cur->prev == NULL)
+            return FALSE;
+        
+        plist->cur = plist->cur->prev;
+        *pdata = plist->cur->data;
+        return TRUE;
+    }
+    ```
+
 - 삭제
-  - 삭제할 노드의 앞 노드의 next를 뒷 노드로 하고, 해당 노드의 prev가 앞 노드를 가리키게 함
+
+  - **더미 노드를 도입하는 경우가 간단**하므로 해당 경우에 대해 구현
+
+    - 더미 노드가 없으면 삭제할 노드가 맨 앞인 경우, 맨 뒤인 경우에 대해 예외처리 필요
+
+  - 삭제할 노드의 앞 노드의 next를 뒷 노드로 하고, 뒷 노드의 prev가 앞 노드를 가리키게 함
+
+  - ```c
+    Data LRemove(List * plist){
+        Node * rpos = plist->cur;
+        Data * rdata = plist->cur->data;
+        
+        plist->cur->prev->next = plist->cur->next;
+        plist->cur->next->prev = plist->cur->prev;
+        
+        plist->cur = plist->cur->prev;
+        
+        free(rpos);
+        (plist->numOfData)--;
+        return rdata;
+    } 
+    ```
+
+  - 
 
 
 
 ## **3. 스택**
 
-
-
-### 2.1. 배열로 구현
+> 후입선출 방식의 자료구조
 
 
 
 스택이란?
 
 - 데이터를 일시적으로 저장하기 위한 자료구조로, **후입선출**이라는 특징을 가짐
+  - 한 쪽이 막혀있는 통에 비유할 수 있음
+  - **단일한 입구**를 통해 데이터가 출입함(push, pop)
 - 스택을 사용하는 곳
   - 프로그램에서 함수를 호출하고 실행할 때(Call Stack)
   - 문자열 역순 출력
-  - 연산자 후위 표기법
-- 보통 배열 또는 링크드리스트로 구현됨
-- 데이터를 넣는 작업을 **push**, 꺼내는 작업을 **pop**이라 함
-  - push, pop은 스택의 top에서 수행됨
-  - 스택의 가장 밑바닥을 bottom이라 하고, 스택을 배열로 구현하면 `stk[0]`이 bottom이 됨
-  - **스택 포인터** ptr을 움직이며 pop과 push를 수행
-    - ptr은 포인터 변수가 아니라 스택의 인덱스로, 스택에 저장된 원소의 갯수를 나타냄
-    - top은 `stk[ptr]`임
+  - **연산자 후위 표기법**
+- 배열 또는 링크드리스트로 구현될 수 있음
 
 
 
-스택 구현하기
+스택의 ADT
 
-- 초기화
-  - 스택의 메모리 공간을 할당
-  - 스택 구조체의 멤버인 최대 크기(max), 스택 포인터, 스택을 가리키는 포인터를 초기화
-- Push
-  - 스택이 가득 찼는지 확인(ptr의 값이 max 이상인지 체크)
-  - 가득 차지 않았다면 데이터를 stk[ptr]에 저장하고 ptr을 증가시킴
-- Pop
-  - 스택이 비었는지 확인(ptr의 값이 0 이하인지 체크)
-  - 비지 않았다면 stk[ptr-1]의 데이터를 리턴하고 ptr을 감소시킴
-- Peek
-  - 스택이 비었는지 확인하고 비지 않았다면 top의 데이터를 리턴
-- Clear
-  - ptr을 bottom으로 되돌림(`s -> ptr = 0;`)
-  - 배열 요소는 변경할 필요 없음: **모든 데이터 출입은 top에서 이루어지므로** ptr만 변경하면 됨
-- Capacity
-  - 스택의 용량을 반환(`return s -> max;`)
-- Size
-  - 현재 스택에 쌓여 있는 데이터의 갯수를 반환(`return s -> ptr`;)
-- Search
-  - 스택의 top에서부터 인덱스를 감소시키며 원하는 데이터가 있는지 선형적으로 탐색
-- Print
-  - 스택의 top에서부터 인덱스를 감소시키며 모든 데이터를 출력
-- Terminate
-  - 스택에 할당된 메모리를 해제하고(`free()`) 멤버의 값을 0으로 초기화
-
-
-
-
-
-### 2.2. 연결리스트로 구현
-
-
-
-
-
-### 2.3. Postfix
-
-
-
-
-
-## **3. Queue**
-
-
-
-큐란?
-
-- 데이터를 일시적으로 저장하기 위한 자료구조로, **선입선출**이라는 특징을 가짐
-- 큐가 사용되는 곳
-  - Process Ready Queue, Task Queue 등 이름 그대로 대기열에 사용됨
-  - Buffer
-- 보통 배열이나 링크드리스트로 구현됨
-- 데이터를 넣는 작업을 **enqueue**, 꺼내는 작업을 **dequeue**라고 함
-  - 데이터를 꺼내는 쪽을 front, 넣는 쪽을 rear라고 함
+- `void StackInit(Stack * pstack);`
+  - 스택의 초기화를 진행
+  - 스택 생성 후 제일 먼저 호출되어야 하는 함수
+- `bool SIsEmpty(Stack * pstack);`
+  - 스택이 빈 경우 TRUE, 아닌 경우 FALSE를 반환
+- `void SPush(Stack * pstack, Data data);`
+  - 스택에 데이터를 저장함
+  - 매개변수 data로 전달된 값을 저장
+- `Data SPop(Stack * pstack);`
+  - 마지막에 저장된 요소를 삭제함
+  - 삭제된 데이터는 반환함
+  - 삭제하기 전 데이터가 있는지 validation을 거쳐야 함
+- `Data SPeek(Stack * pstack);`
+  - 마지막에 저장된 요소를 반환하되 삭제하지는 않음
+  - 실행하기 전에 데이터가 있는지 validation을 거쳐야 함
 
 
 
@@ -537,13 +692,96 @@ Doubly Linked List
 
 
 
-원형 큐의 필요성
+구현의 논리
 
-- 스택과 달리 **큐에서 데이터를 꺼내는 작업은 O(n)**으로 개선이 필요함
-  - 맨 앞의 데이터를 꺼내고 나면 2번째 이후의 데이터를 한 칸씩 밀어줘야 함
-- 데이터를 꺼내도 앞쪽으로 밀어주지 않기 위해 **링 버퍼** 사용
-  - **front, rear**를 도입하여 논리적으로 첫 번째, 마지막 요소를 식별하고 이 변수들만 변경해줌
-  - 링 버퍼는 **오래된 데이터를 버리는 데 사용**될 수 있음: 가장 최근에 들어온 데이터 n개만 저장함
+- 스택의 가장 밑바닥을 bottom이라 하고, `stackArr[0]`을 bottom으로 설정함
+  - 인덱스 0을 바닥으로 지정하면 **배열의 길이에 상관 없이** 언제나 인덱스 0의 요소가 바닥이 됨
+- **스택 포인터** ptr을 움직이며 pop과 push를 수행
+  - ptr은 포인터 변수가 아니라 스택의 인덱스로, top의 위치를 나타냄
+    - top은 `stackArr[ptr]`임
+  - push : top을 한 칸 올리고, top이 가리키는 위치에 데이터를 저장함
+  - pop : top이 가리키는 데이터를 반환하고, top을 아래로 한 칸 내림
+
+
+
+스택 구현하기
+
+- 스택 구조체와 초기화
+  
+  - ```c
+    typedef struct __arrayStack{
+        Data stackArr[STACK_LEN];
+        int ptr;
+    } ArrayStack;
+    ```
+    
+  - 스택 포인터만 초기화해 주면 됨(스택 길이는 헤더 파일에서 초기화한다 가정)
+    
+  - ```c
+    void StackInit(Stack * pstack){
+        pstack->ptr = -1;		// -1은 빈 상태를 의미함
+    }
+    ```
+  
+  - ptr이 0이면 0번 인덱스에 데이터가 있어야 하므로 -1이 빈 상태를 의미함
+  
+- IsEmpty
+
+  - 비어있는지 확인하기 위해서는 ptr의 값만 체크하면 됨
+
+  - ```c
+    bool SIsEmpty(Stack * pstack){
+        return pstack->ptr == -1;
+    }
+    ```
+
+- Push
+
+  - 배열은 **길이 제한이 있기 때문에 스택이 가득 찼는지 확인**해야 함
+
+  - 가득 차지 않았다면 top을 한 칸 올리고, `stackArr[ptr]`에 데이터를 저장함
+
+  - ```c
+    void SPush(Stack * pstack, Data data){
+        if(plist->ptr == STACK_LEN - 1){...}	// 에러 메세지 출력
+        
+        (pstack->ptr)++;
+        pstack->stackArr[ptr] = data;
+    }
+    ```
+
+- Pop
+
+  - 스택이 비었는지 확인
+
+  - 비지 않았다면 `stackArr[ptr]`의 데이터를 리턴하고 ptr을 감소시킴
+
+  - ```c
+    Data SPop(Stack * pstack){
+        int rIdx;
+        
+        if(SIsEmpty(pstack)){...}	// 에러 메세지 출력
+        
+        rIdx = pstack->ptr;		
+        (pstack->ptr)--;
+        
+        return pstack->stackArr[rIdx];
+    }
+    ```
+
+  - 리턴할 데이터를 받기 위한 변수를 선언하면 메모리를 많이 차지하므로 인덱스를 가리키는 변수를 선언함
+
+- Peek
+
+  - ```c
+    Data SPeek(Stack * pstack){
+        if(SIsEmpty(pstack)){...}	// 에러 메세지 출력
+        
+        return pstack->stackArr[plist->ptr];
+    }
+    ```
+
+  - 반환한 데이터를 소멸시키지 않으므로 간단함
 
 
 
@@ -551,48 +789,406 @@ Doubly Linked List
 
 
 
-큐 구현하기
+구현의 논리
+
+- 연결리스트를 저장된 순서의 역순으로 조회(삭제) 가능하도록 만들면 스택이 됨
+  - head에서 노드를 추가하고 삭제하면 됨
+
+
+
+스택 구현하기
 
 - 초기화
-  - 큐의 메모리 공간을 할당
-  - 큐 구조체의 멤버인 최대 크기(max), 데이터의 수(num), front, rear, 큐를 가리키는 포인터를 초기화
-    - front == rear일 때 큐가 가득 찼는지 판단하기 위해 num이 필요
-- Enqueue
-  - 큐가 가득 찼는지 확인(num의 값이 max 이상인지 체크)
-  - 가득 차지 않았다면 데이터를 queue[rear]에 저장하고 rear을 증가시킴
-    - rear이 배열의 크기를 넘어갈 수 있음
-      1. 나머지 연산을 하거나 
-      2. `rear == max`인 경우에 0으로 만들어줌
-- Dequeue
-  - 큐가 비었는지 확인(num의 값이 0 이하인지 체크)
-  - 비지 않았다면 queue[front]의 데이터를 리턴하고 front를 감소시킴
-    - 마찬가지로 front가 0보다 작아지는 경우에 대해 처리해줌
+
+  - ```c
+    void StackInit(Stack * pstack){
+        pstack->head = NULL;
+    }
+    ```
+
+  - 포인터 변수 head를 NULL로 초기화
+
+- IsEmpty
+
+  - ```c
+    bool SIsEmpty(Stack * pstack){
+        return pstack->head == NULL;
+    }
+    ```
+
+  - head가 NULL인지 체크하여 비어있는지 판단
+
+- Push
+
+  - ```c
+    void SPush(Stack * pstack, Data data){
+        Node * newNode = (Node*)malloc(sizeOf(Node));
+        
+        newNode->data = data;
+        newNode->next = pstack->head;
+    
+        pstack->head = newNode;
+    }
+    ```
+
+  - 리스트의 머리 쪽에 노드를 추가함
+
+- Pop
+
+  - ```c
+    Data SPop(Stack * pstack){
+    	Data rdata;
+        Node * rnode;
+        
+        if(SIsEmpty(pstack)){...}	// 에러 메세지 출력
+    
+        rdata = pstack->head->data;
+        rnode = pstack->head
+        
+        pstack->head = pstack->head->next;
+        free(rnode);
+            
+        return rdata;
+    }
+    ```
+
+  - 삭제할 노드의 다음 노드를 head가 가리키도록 함
+
 - Peek
-  - 큐가 비었는지 확인하고 비지 않았다면 front의 데이터를 리턴
-- Clear
-  - num, front, rear를 모두 0으로 만들어줌
-  - 스택과 마찬가지로 배열 요소의 변경은 불필요
-- Capacity
-  - 큐의 용량을 반환(`return q -> max;`)
-- Size
-  - 현재 큐에 쌓여 있는 데이터의 갯수를 반환(`return q -> num`;)
-- Search
-  - 큐의 front에서부터 인덱스를 증가시키며 원하는 데이터가 있는지 선형적으로 탐색
-  - front에서부터 출발하기 위해 나머지 연산을 사용: `(i + q -> front) % q -> max`
-- Print
-  - 큐의 front에서부터 인덱스를 증가시키며 모든 데이터를 출력
-- Terminate
-  - 큐에 할당된 메모리를 해제하고(`free()`) 멤버의 값을 0으로 초기화
 
+  - ```c
+    Data SPeek(Stack * pstack){
+        if(SIsEmpty(pstack)){...}	// 에러 메세지 출력
+        
+        return pstack->head->data;
+    }
+    ```
 
-
-### 3.3. Dequeue
+  - 반환한 데이터를 소멸시키지 않으므로 간단함
 
 
 
 
 
-## **4. Set**
+### 3.3. Postfix
+
+> 연산자 후위 표기법
+
+
+
+중위 표기법과 후위 표기법
+
+
+
+## **4. Queue**
+
+> 선입선출 방식의 자료구조
+
+
+
+큐란?
+
+- 데이터를 일시적으로 저장하기 위한 자료구조로, **선입선출**이라는 특징을 가짐
+  - 데이터를 넣는 작업(enqueue)과 꺼내는 작업이(dequeue) 다른 곳에서 일어남
+  - 데이터를 꺼내는 쪽을 front, 넣는 쪽을 rear라고 함
+- 큐가 사용되는 곳
+  - Process Ready Queue, Task Queue 등 이름 그대로 대기열에 사용됨
+  - Buffer
+- 배열이나 링크드리스트로 구현될 수 있음
+
+
+
+큐의 ADT
+
+- `void QueueInit(Queue * pq);`
+  - 큐의 초기화를 진행
+  - 큐 생성 후 제일 먼저 호출되어야 함
+- `int QIsEmpty(Queue * pq);`
+  - 큐가 빈 경우 TRUE를, 아닌 경우 FALSE를 반환함
+- `void Enqueue(Queue * pq, Data data);`
+  - 큐에 데이터를 저장함
+  - 매개변수 data로 전달된 값을 저장함
+- `Data Dequeue(Queue * pq);`
+  - 가장 먼저 저장된 데이터를 삭제함
+  - 삭제한 데이터는 반환됨
+  - 실행에 앞서 큐 안에 데이터가 있는지 validation을 거쳐야 함
+- `Data QPeek(Queue * pq);`
+  - 가장 먼저 저장된 데이터를 반환하되 삭제하지 않음
+  - 실행에 앞서 큐 안에 데이터가 있는지 validation을 거쳐야 함
+
+
+
+### 4.1. 배열로 구현
+
+
+
+구현의 논리
+
+- 스택과 마찬가지로 인덱스를 이동시키면서 데이터를 삽입-삭제함
+- 삭제할 경우 **데이터를 한 칸씩 밀어줘야 함** : 비효율 발생
+  - 큐의 입구와(rear) 출구에(front) 각각 포인터를 두어 데이터를 밀지 않고도 삭제 가능하도록 함
+  - 단, 삭제가 계속 일어나면 **데이터가 뒤에만 쌓임**
+    - 입구를 배열의 앞으로 이동시켜서 해결 : **원형 큐**의 도입
+
+
+
+원형 큐란?
+
+- **front, rear**를 도입하여 논리적으로 첫 번째, 마지막 요소를 식별하고 이 변수들만 변경해주는 방식
+  - 이 때 큐가 꽉 찬 상태와 비어있는 상태를 식별할 수 없다는 문제가 발생함
+    - 삽입 후 r을, 삭제 후 f를 오른쪽으로 이동시키면 full과 empty인 경우 r-f위치 관계가 동일함
+  - 해결방안1) 큐의 원소 갯수를 나타내는 변수를 도입
+  - 해결방안2) 큐를 꽉 채우지 않고 한 칸을 남김
+    - 삽입 시 데이터를 넣은 후 r을 이동시키는 것이 아니라 이동시킨 후에 삽입함
+    - empty일 때는 r,f가 동일한 위치, full일 때는 r의 바로 오른쪽에 f가 오게 됨
+- 링 버퍼는 **오래된 데이터를 버리는 데 사용**될 수 있음: 가장 최근에 들어온 데이터 n개만 저장함
+
+
+
+원형 큐 구현하기
+
+- 큐 구조체
+
+  - 실제로 데이터가 저장되는 배열과 입/출구를 나타내는 인덱스 rear/front를 선언
+
+  - ```c
+    typedef struct __cQueue{
+        int front;
+        int rear;
+        Data queArr[QUE_LEN];
+    } cQueue;
+    ```
+
+- 초기화
+
+  - 텅 빈 경우 front와 rear는 동일한 위치를 가리킴
+
+  - ```c
+    void QueueInit(Queue * pq){
+        pq->front = 0;
+        pq->rear = 0;
+    }
+    ```
+
+- IsEmpty
+
+  - 여기에서는 해결방안2를 선택하여 front와 rear가 동일한 위치일 때 비었다고 함
+
+  - ```c
+    int QIsEmpty(Queue * pq){
+        return pq->front == pq->rear;
+    }
+    ```
+
+- NextPosIdx
+
+  - 큐의 다음 위치에 해당하는 배열의 인덱스 값을 반환함
+
+  - F와 R이 회전할 수 있도록 하는 함수
+
+  - ```c
+    int NextPosIdx(int pos){
+        if(pos == QUE_LEN-1)	// 인덱스가 배열의 마지막에 도달하면
+            return 0;			// 처음으로 돌림
+        else
+            return pos+1;
+    }
+    ```
+
+  - 나머지 연산을 활용할 수도 있으나 여기서는 그냥 맨 앞으로 돌리는 것으로 함
+
+- Enqueue
+
+  - 배열은 **길이 제한이 있기 때문에 큐가 가득 찼는지 확인**해야 함
+
+  - rear를 오른쪽으로 한 칸 이동시킨 후 데이터를 삽입
+
+  - ```c
+    void Enqueue(Queue * pq, Data data){
+        if(NextPosIdx(pq->rear) == pq->front){		// r의 바로 오른쪽에 f가 온다면
+            ...										// 에러 메세지 반환
+        }
+        
+        pq->rear = NextPosIdx(pq->rear);
+        pq->queArr[pq->rear] = data;
+    }
+    ```
+
+- Dequeue
+
+  - 큐가 비었는지 확인
+
+  - 비어있지 않다면 front를 오른쪽으로 이동시킨 후 front에서 데이터를 꺼냄
+
+  - ```c
+    Data Dequeue(Queue * pq){
+        if(QIsEmpty(pq)){...}		// 에러 메세지 반환
+        
+        pq->front = NextPosIdx(pq->front);
+        return pq->queArr[pq->front];
+    }
+    ```
+
+- Peek
+
+  - ```c
+    Data QPeek(Queue * pq){
+        if(QIsEmpty(pq)){...}		// 에러 메세지 반환
+        
+        return pq->queArr[NextPosIdx(pq->front)];
+    }
+    ```
+
+
+
+### 4.2. 연결리스트로 구현
+
+
+
+구현의 논리
+
+- 연결리스트에서도 마찬가지로 데이터가 나오는 곳(front)과 들어가는 곳(rear)을 분리해야 함
+  - 단 연결리스트이므로 각각은 노드를 가리키게 됨
+
+
+
+큐 구현하기
+
+- 큐 구조체와 노드 구조체
+  - 실제로 데이터가 저장되는 노드(생략)와 입/출구를 나타내는 노드 rear/front를 선언
+
+  - ```c
+    typedef struct __lQueue{
+        Node * front;
+        Node * rear;
+    } LQueue;
+    ```
+
+- 초기화
+
+  - 텅 빈 경우 front와 rear는 아무 것도 가리키지 않음
+
+  - ```c
+    void QueueInit(Queue * pq){
+        pq->front = NULL;
+        pq->rear = NULL;
+    }
+    ```
+
+- IsEmpty
+
+  - **front에 NULL이 저장된 경우 비었다**고 판단함
+
+    - 빼낼 수 있는 node가 없다는 뜻이기 때문 : rear는 신경쓰지 않아도 됨
+
+  - ```c
+    int QIsEmpty(Queue * pq){
+        return pq->front == NULL;
+    }
+    ```
+
+- Enqueue
+
+  - 노드를 추가한 이후 rear가 새로 추가한 노드를 가리키도록 함
+
+  - ```c
+    void Enqueue(Queue * pq, Data data){
+    	Node * newNode = (Node*)malloc(sizeOf(Node));
+        newNode->data = data;
+        
+        if(QIsEmpty(pq)){				// 첫 번째로 추가하는 노드라면
+            pq->front = newNode;		// head도 새로 추가하는 노드를 가리켜야 함
+            pq->rear = newNode;
+        }
+        else{							// 두 번째 이후라면
+            pq->rear->next = newNode;	// 마지막 노드가 새로 추가하는 노드를 가리킴
+            pq->rear = newNode;
+        }
+    }
+    ```
+
+- Dequeue
+
+  - 큐가 비었는지 확인
+
+  - 비어있지 않다면 front는 선두 노드의 다음 노드를 가리키도록 함
+
+    - 노드가 하나만 남은 상황에서 삭제하면 rear는 쓰레기 값을 가리키게 됨
+    - 그러나 비었는지 확인할 때 front만을 체크하기 때문에 rear는 신경 쓰지 않아도 됨
+
+  - ```c
+    Data Dequeue(Queue * pq){
+        Node * delNode;
+        Data retData;
+        
+        if(QIsEmpty(pq)){...}		// 에러 메세지 반환
+        
+        delNode = pq->front;
+        retData = delNode->data;
+        pq->front = pq->front->next;
+    	
+        free(delNode);
+        return retData;
+    }
+    ```
+
+- Peek
+
+  - ```c
+    Data QPeek(Queue * pq){
+        if(QIsEmpty(pq)){...}		// 에러 메세지 반환
+        
+        return pq->front->data;
+    }
+    ```
+
+
+
+### 4.3. Dequeue
+
+> 앞뒤로 모두 삽입과 삭제가 가능한 큐
+
+
+
+덱의 ADT
+
+- `void DequeInit(Queue * pq);`
+  - 덱의 초기화를 진행
+  - 큐 생성 후 제일 먼저 호출되어야 함
+- `int DQIsEmpty(Queue * pq);`
+  - 덱이 빈 경우 TRUE를, 아닌 경우 FALSE를 반환함
+  - 큐와 마찬가지로 head가 NULL이면 비었다고 판단함
+- `void DQAddFirst(Queue * pq, Data data);`
+  - 덱의 머리에 데이터를 저장함
+  - 매개변수 data로 전달된 값을 저장함
+- `void DQAddLast(Queue * pq, Data data);`
+  - 덱의 꼬리에 데이터를 저장함
+  - 매개변수 data로 전달된 값을 저장함
+- `Data DQRemoveFirst(Queue * pq);`
+  - 덱의 머리에 위치한 데이터를 반환하고 소멸시킴
+  - 실행에 앞서 덱 안에 데이터가 있는지 validation을 거쳐야 함
+- `Data DQRemoveLast(Queue * pq);`
+  - 덱의 꼬리에 위치한 데이터를 반환하고 소멸시킴
+  - 실행에 앞서 덱 안에 데이터가 있는지 validation을 거쳐야 함
+- `Data DQGetFirst(Queue * pq);`
+  - 덱의 머리에 위치한 데이터를 반환하되 삭제하지 않음
+  - 실행에 앞서 큐 안에 데이터가 있는지 validation을 거쳐야 함
+- `Data DQGetLast(Queue * pq);`
+  - 덱의 꼬리에 위치한 데이터를 반환하되 삭제하지 않음
+  - 실행에 앞서 큐 안에 데이터가 있는지 validation을 거쳐야 함
+
+
+
+덱의 구현
+
+- Doubly Linked List를 이용하여 구현할 수 있음
+- 실제 구현은 생략
+- 주의할 점
+  - Queue와는 다르게 노드를 **삭제할 때 rear에도 NULL처리를 해줘야 함** : 뒤로 출입이 가능하기 때문
+
+
+
+## **5. Set**
 
 
 
@@ -645,7 +1241,7 @@ Doubly Linked List
 
 
 
-## **5. Tree**
+## **6. Tree**
 
 > 사이클을 갖지 않는 그래프
 >
@@ -689,7 +1285,7 @@ Doubly Linked List
 
 
 
-### 5.1. Binary Tree
+### 6.1. Binary Tree
 
 > 모든 노드가 **최대 2개의 자식 노드**를 갖는 트리
 
@@ -718,7 +1314,7 @@ Doubly Linked List
 
 
 
-### 5.2. Binary Search Tree
+### 6.2. Binary Search Tree
 
 > 정렬된 이진 트리
 
@@ -755,7 +1351,7 @@ BST 노드의 삭제
 
 
 
-#### 5.2.1. AVL 트리
+#### 6.2.1. AVL 트리
 
 > 삽입/삭제를 할 때마다 균형이 안맞는 것을 맞추기 위해 트리의 일부를 왼쪽 혹은 오른쪽으로 회전시키는 BST
 
@@ -826,7 +1422,7 @@ RL회전
 
 
 
-#### 5.2.2. Red-Black Tree
+#### 6.2.2. Red-Black Tree
 
 > Java에서 내부적으로 BST를 구현하기 위해 사용되는 자료구조
 >
@@ -905,7 +1501,7 @@ RL회전
 
 
 
-### 5.3. Heap
+### 6.3. Heap
 
 > **힙의 특성**을 만족하는 거의 완전한 트리(Almost Complete Tree)
 >
@@ -940,7 +1536,7 @@ RL회전
 
 
 
-### 5.4. Trie
+### 6.4. Trie
 
 > 문자열 탐색을 위한 자료구조로 m-ary Tree의 형태를 띔
 
@@ -956,7 +1552,7 @@ RL회전
 
 
 
-### 5.5. B-Tree
+### 6.5. B-Tree
 
 > 자식 노드의 개수가 **2개 이상**인 트리
 >
@@ -974,7 +1570,7 @@ RL회전
 
 
 
-#### 5.5.1. B+Tree
+#### 6.5.1. B+Tree
 
 데이터의 빠른 접근을 위한 인덱스 역할만 하는 비단말 노드(not Leaf)가 추가로 있음
 
@@ -1013,7 +1609,7 @@ B+Tree의 특징
 
 
 
-## **6. 해시**
+## **7. 해시**
 
 > 해싱을 이용하여 데이터를 저장하는 자료구조
 
