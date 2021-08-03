@@ -109,27 +109,77 @@ Data Independence
 
 Instances and Schemas
 
+![schema_instance](./img/schema_instance.png)
+
 - 프로그래밍 언어에서 변수와 type의 관계와 비슷함
-- 스키마 : 데이터베이스의 논리적 구조
+- 스키마 : 데이터베이스의 **논리적 구조**
+  - 예) 고객과 계약과 그들 사이의 **관계**
+  - 프로그래밍 언어에서의 type과 비슷하다고 할 수 있음
+  - 논리적 스키마 : logical level에서의 데이터베이스 디자인
+  - 물리적 스키마 : physical level에서의 데이터베이스 디자인
 - 인스턴스 : 특정 시점에서 실제 DB에 저장되어 있는 컨텐츠
+  - 프로그래밍 언어에서의 변수와 비슷하다고 할 수 있음
 
 
 
 
 
+Data Model
+
+- 데이터를 **표현하는 방식**
+- 모델의 종류
+  - **Entity-Relationship model**
+    - 각 개체간의 관계로 데이터를 표현
+    - 예) 객체(고객, 계좌, 은행 지점), 관계(고객 Johnson이 갖고 있는 계좌 1011102)
+    - 데이터 베이스 디자인에 일반적으로 많이 사용됨
+  - **Relational model**
+    - 데이터를 표의 형식(tabular form)으로 표현
+    - 기업에서 관리하는 데이터는 대부분 relational model로 표현
+  - Object-oriented model
+  - semi-structured data models
 
 
-
-
-Data Models
 
 
 
 Data Languages
 
+- 데이터를 조작할 수 있도록 script 형태로 제공되는 언어
+- 대표적으로 **SQL**이 있음
+  - DML(Data Manipulation Language)
+    - DB 상에서 **데이터를 조회, 저장, 수정, 삭제**하는 명령어
+  - DDL(Data Definition Language)
+    - DB의 **스키마를 정의**하는 언어
+- Query(질의)
+  - DB에서 데이터를 retrieve하는 명령어
+  - query language라고 하면 DML을 뜻하거나 특히 조회하는 것을 일컬음
+
+
+
+
+
+Database Users
+
+- Database Administrator
+  - 데이터베이스의 모든 활동을 총괄함
+  - 스키마를 정의하고, 저장소의 구조, 액세스 방법 등을 설계
+  - 유저의 권한을 부여/조정하고 모니터링함
+- Application programmers
+  - DML 요청을 이용하여 시스템과 직접적으로 interact 함
+- Sophisticated users
+  - query language를 이용하여 request를 생성함
+- Specialized users
+  - DB가 제공하는 기능 중 일반적으로 사용되지 않는 기능을 이용함
+- Naive users
+  - DB의 존재는 의식하지 않고 응용 프로그램이 제공하는 인터페이스를 이용만 함
+
+
+
 
 
 Transaction Management
+
+
 
 
 
