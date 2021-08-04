@@ -31,6 +31,9 @@ Data란?
 
 - 실세계에 존재하는 개념, 생각, 수치 등을 **컴퓨터에 형식적으로 표현한 것**
   - 기록할 가치가 있는 자료들
+- 데이터와 정보
+  - 데이터: 어떤 필요에 의해 수집했지만 아직 특정 목적을 위해 평가하거나 **정제하지 않은 자료**
+  - 정보: 수집한 데이터를 어떤 목적을 위해 **분석하거나 가공한 것**
 
 
 
@@ -39,6 +42,7 @@ Data란?
 Database란?
 
 - An **Integrated collection** of **persistent** data representing the information of interest
+  - 효율적 관리와 검색을 위해 **구조화한 데이터 집합**
   - 프로그램들이 데이터를 사용할 수 있게끔 데이터를 저장함
   - 데이터를 사용하는 프로그램과 데이터 자체를 분리함
 
@@ -65,7 +69,7 @@ File Systems
   - OS의 일부로 프로그램, 데이터, 문서 등을 저장함
   - DB 기능들이 파일시스템 위에 built on 되었었음
 - 파일 시스템의 단점
-  - 데이터의 중복과 일관성이 깨지는 문제 : 데이터들이 여러 파일에 중복되어 저장됨
+  - 데이터의 **중복과 일관성이 깨지는 문제** : 데이터들이 여러 파일에 중복되어 저장됨
   - 데이터 접근이 어려움 : 파일을 조작하는 새로운 작업을 위해서는 새로운 프로그램을 짜야 함
   - 데이터 통합 문제
     - 프로그램을 짤 때마다 매번 데이터의 제약 조건을 확인해야 함
@@ -76,8 +80,6 @@ File Systems
 - DBMS는 위의 문제들에 대한 솔루션을 제공해 응용 프로그래머의 수고를 줄여줌
 
 
-
-#### View of Data
 
 
 
@@ -126,17 +128,27 @@ Instances and Schemas
 
 Data Model
 
-- 데이터를 **표현하는 방식**
-- 모델의 종류
-  - **Entity-Relationship model**
-    - 각 개체간의 관계로 데이터를 표현
-    - 예) 객체(고객, 계좌, 은행 지점), 관계(고객 Johnson이 갖고 있는 계좌 1011102)
-    - 데이터 베이스 디자인에 일반적으로 많이 사용됨
-  - **Relational model**
-    - 데이터를 표의 형식(tabular form)으로 표현
-    - 기업에서 관리하는 데이터는 대부분 relational model로 표현
-  - Object-oriented model
-  - semi-structured data models
+- 데이터를 **표현하는 방식** : 저장하는 방식을 정의해 놓은 개념 모형
+- 계층형 데이터 모델
+
+  - 트리 구조를 활용
+  - 부모 자식 관계 - 1:N
+- 네트워크형 데이터 모델
+
+  - 그래프 구조를 기반으로 함
+  - 자식 개체가 여러 부모 개체를 가질 수 있음 - M:N
+- **Entity-Relationship model**
+  - 각 **개체간의 관계**로 데이터를 표현
+  - 예) 객체(고객, 계좌, 은행 지점), 관계(고객 Johnson이 갖고 있는 계좌 1011102)
+  - 데이터 베이스 디자인에 일반적으로 많이 사용됨
+- **Relational model**
+  - 데이터를 표의 형식(tabular form)으로 표현
+  - 각 데이터의 **독립 특성**만을 규정하여 데이터 묶음을 나눔
+  - 중복이 발생할 수 있는 데이터는 별개의 **relation**으로 정의하여 연결
+  - 기업에서 관리하는 데이터는 대부분 relational model로 표현
+- Object-oriented model
+  - 데이터를 독립된 개체로 구성하여 관리
+- semi-structured data models
 
 
 
@@ -177,90 +189,9 @@ Database Users
 
 
 
-Transaction Management
-
-
-
-
-
-Storage Management
-
-
-
-Data Mining & Analysis
-
-
-
-Overall System Structure
-
-
-
-
-
-데이터베이스란?
-
-- 데이터와 정보
-  - 데이터: 어떤 필요에 의해 수집했지만 아직 특정 목적을 위해 평가하거나 **정제하지 않은 자료**
-  - 정보: 수집한 데이터를 어떤 목적을 위해 **분석하거나 가공한 것**
-- 효율적인 데이터 관리: **데이터베이스의 필요성** 대두
-  - 데이터를 통합하여 관리
-  - 일관된 방법을 관리
-  - 데이터의 누락, 중복 제거
-  - 여러 사용자가 공동으로 실시간 사용 가능
-- 데이터베이스
-  - 특정 목적을 위해 여러 사람이 공유하여 사용할 수 있으며 효율적 관리와 검색을 위해 **구조화한 데이터 집합**
-- 파일 시스템
-  - DB등장 이전에 데이터를 관리하던 방식
-  - 각각의 응용 프로그램에 필요한 데이터를 각각 저장: 중복 및 누락 발생 가능
-    - 데이터의 통합 관리 필요성 대두: **DBMS**의 등장
-
-
-
-데이터 모델
-
-- 데이터를 저장하는 방식을 정의해 놓은 개념 모형
-
-- 계층형 데이터 모델
-
-  - 트리 구조를 활용
-  - 부모 자식 관계 - 1:N
-
-- 네트워크형 데이터 모델
-
-  - 그래프 구조를 기반으로 함
-  - 자식 개체가 여러 부모 개체를 가질 수 있음 - M:N
-
-- 객체 지향형 데이터 모델
-
-  - 데이터를 독립된 개체로 구성하여 관리
-
-- **관계형 데이터 모델**
-
-  - 데이터 간 관계에 초점
-
-    - 각 데이터의 **독립 특성**만을 규정하여 데이터 묶음을 나눔
-    - 중복이 발생할 수 있는 데이터는 별개의 **relation**으로 정의하여 연결
-
-  - 구성 요소
-
-    - | 이름                   | 설명                                   | 대응(구현)되는 개념  |
-      | ---------------------- | -------------------------------------- | -------------------- |
-      | 개체(entity)           | 데이터화하려는 사물/개념의 정보 단위   | 테이블(**relation**) |
-      | 속성(attribute)        | 데이터의 종류, 특성, 상태              | 열(column)           |
-      | **관계(relationship)** | 개체 간 또는 속성 간의 연관성을 나타냄 | 외래키               |
-
-- 릴레이션(relation)과 관계(relationship)의 차이 [링크](https://m.blog.naver.com/PostView.nhn?blogId=ej5811&logNo=80191263951&proxyReferer=https:%2F%2Fwww.google.com%2F)
-
-  - 릴레이션: 집합x와 집합y 사이에 관계 R을 만족하는 **모든 순서쌍**
-    - 테이블이 집합 간의 cartesian product를 생성한다는 것을 생각해보자
-    - 집합이론에서는 relation, 논리 데이터 모델링에서는 entity, 관계형 데이터베이스에서는 table
-  - 관계: 하나 또는 두 개의 entity type으로부터 업무적인 이유에 의해 entity가 연결되어 있는 **페어링의 집합**
-    - 예) entity type "주문"의 entity인 "주문번호"가 entity type "주문상품"의 entity인 "상품코드"와 연결되어 페어링을 이루고 있음
-    - 페어링은 관계의 멤버이고, 관계는 페어링의 집합체
-
-
-
 ## **2. Relational Theory**
+
+
 
 
 
@@ -268,65 +199,122 @@ Overall System Structure
 
 
 
-Structure/Definition of Relational Model, Attributes
+
+
+Structure/Definition of Relational Model
+
+- 구성 요소
+
+  - | 이름                   | 설명                                   | 대응(구현)되는 개념  |
+    | ---------------------- | -------------------------------------- | -------------------- |
+    | 개체(entity)           | 데이터화하려는 사물/개념의 정보 단위   | 테이블(**relation**) |
+    | 속성(attribute)        | 데이터의 종류, 특성, 상태              | 열(column)           |
+    | **관계(relationship)** | 개체 간 또는 속성 간의 연관성을 나타냄 | 외래키               |
 
 
 
-Relationa Schema/Instance, Keys, Schema Diagram
+
+
+Relation과 Relationship의 차이
+
+- Relation
+  - **원소들 간의 관계**
+  - 어떤 집합으로 만들 수 있는 모든 순서쌍(cartesian product)의 부분집합
+- Relationship
+  - 하나 또는 두 개의 entity type으로부터 업무적인 이유에 의해 entity가 연결되어 있는 **페어링의 집합**
+    - 페어링은 관계의 멤버이고, 관계는 페어링의 집합체
+  - 예) entity type "주문"의 entity인 "주문번호"가 entity type "주문상품"의 entity인 "상품코드"와 연결되어 페어링을 이루고 있음
+
+
+
+
+
+Attribute
+
+- 이름, ID등 어떤 개체를 나타내는 속성
+  - 일반적으로 atomic해야 함
+  - 예) 학번
+  - 반례) 이름 : last name - first name으로 쪼갤 수 있기 때문
+- Domain : attribute의 집합
+  - relation은 Domain의 cartesian product의 subset임
+
+
+
+
+
+Relational Schema/Instance, 
+
+- 어떤 attribute들로 구성되는지 그 순서쌍들의 구조를 relation schema라고 함
+- relation instace는 데이터를 담는 그릇이고, relation schema는 그릇의 구조를 나타냄
+  - relation instance는 table로 표현됨
+  - 이 relation의 원소를 tuple이라 함
+  - tuple들의 순서는 중요하지 않음 : **relation은 set이다**
+    - 그럼 특정 record를 어떻게 identify할 것인가? : key
+
+
+
+
+
+Keys
+
+- superkey
+  - 튜플을 **유일하게 식별**하기 위해서 사용되는 **속성들의 집합**
+  - 예) 학생들의 정보를 나열한 테이블에서 학생 식별에 학번과 주민번호가 사용될 수 있음
+    - 각각은 학생을 유일하게 식별할 수 있고 또 이 둘의 조합 역시 학생을 유일하게 식별할 수 있음
+    - 학번, 주민번호, 학번 + 주민번호 세 가지가 슈퍼키로 사용될 수 있음
+- candidate key
+  - 슈퍼키이면서 **최소성을 만족시키는** 키
+    - 모든 레코드를 유일하게 식별하는 데 꼭 필요한 속성만으로 되어있을 것
+  - 예) 학번과 주민번호는 굳이 조합하지 않아도 모든 튜플을 유일하게 식별할 수 있음
+    - 학번, 주민번호 두 가지가 후보키로 사용될 수 있음
+- primary key
+  - DBA가 해당 domain에서 대표가 될 만한 attributeㄹㄹ 지정
+    - 후보키 중에 **개인 정보 노출이 가장 적은 데이터를 선정**하는 것이 일반적임
+  - 예) 학번과 주민번호 중 학번을 기본키로 채택
+  - 값이 중복되지 않아야 하고 NULL값을 가질 수 없음
+- foreign key
+  - 특정 테이블에 포함되어 있으면서 **다른 테이블의 기본키**로 지정된 키
+    - 다른 테이블(or 같은 테이블)의 record와의 관계를 표현
+  - 예) 학생 정보 테이블에 있는 학과 코드: 학과 정보 테이블과 학생 정보 테이블을 이어줌
+
+
+
+
+
+Query Languages
+
+- (좁은의미로) 데이터베이스에서 정보를 retrieve하기 위해 사용되는 언어
+- procedural
+  - 정보를 가져오는 **절차**를 명시함
+  - 예) Relational Algebra
+- nonprocedural
+  - 정보를 가져올 때 조건만을 명시함
+  - 예) SQL
+- Pure languages
+  - DB를 조작하고 정보를 추출하는 데 필요한 기능을 **이론적으로 정의**
+  - Relational Algebra, Tuple Relational Calculus 등
+
+
 
 
 
 Relational Algebra
 
+- Relational을 조작하는 operator들을 가진 System
+  - Algebra : operators and operands
+  - 둘 혹은 그 이상의 relation을 input으로 받아 새로운 relation을 output으로 출력
+- Operators
+  - Select : 어떤 조건을 만족하는 record들을 filter
+  - Project : 어떤 조건을 만족하는 column들을 filter
+  - Union : 합집합
+  - Set Difference : 차집합
+  - Set Intersection : 교집합
+  - Cartesian Product : 모든 record들의 조합
+  - Natural Join
+    - 일종의 composition of operations라고 볼 수 있음
+    - cartesian product → 공유하는 attribute를 같게 하는 조건으로 selection → 나머지를 projection
 
 
-
-
-관계형 데이터베이스
-
-- 관계형 데이터 모델을 바탕으로 만들어진 데이터베이스
-  - 테이블(table)로 이루어져 있으며, 이 테이블은 키(key)와 값(value)의 **관계**를 나타냄
-- 관계형 데이터베이스를 관리하는 시스템은 **RDBMS**(Relational Database Management System)이라 함
-  - MS-SQL, MySQL, MariaDB, PostgreSQL, DB2 등
-
-
-
-관계형 데이터베이스의 구성 요소
-
-- 테이블
-  - 2차원 표 형태의 데이터 저장 공간
-  - 행: 저장하려는 **하나의 개체를 구성하는 여러 값**을 가로로 늘어뜨린 것
-  - 열: 저장하려는 데이터를 **대표하는 이름과 공동 특성**
-- 키
-  - 수많은 데이터를 구별할 수 있는 유일한 값
-  - 슈퍼키, 후보키, 기본키, 보조키(대체키), 외래키로 분류할 수 있음 
-
-
-
-키의 종류
-
-- 슈퍼키
-  - 튜플을 **유일하게 식별**하기 위해서 사용되는 **속성들의 집합**
-  - 예) 학생들의 정보를 나열한 테이블에서 학생 식별에 학번과 주민번호가 사용될 수 있음
-    - 각각은 학생을 유일하게 식별할 수 있고 또 이 둘의 조합 역시 학생을 유일하게 식별할 수 있음
-    - 학번, 주민번호, 학번 + 주민번호 세 가지가 슈퍼키로 사용될 수 있음
-- 후보키
-  - 슈퍼키이면서 **최소성을 만족시키는** 키
-    - 모든 레코드를 유일하게 식별하는 데 꼭 필요한 속성만으로 되어있을 것
-  - 예) 학번과 주민번호는 굳이 조합하지 않아도 모든 튜플을 유일하게 식별할 수 있음
-    - 학번, 주민번호 두 가지가 후보키로 사용될 수 있음
-- **기본키**
-  - 후보키 중에 **개인 정보 노출이 가장 적은 데이터를 선정**하는 것이 일반적임
-  - 예) 학번과 주민번호 중 학번을 기본키로 채택
-  - 값이 중복되지 않아야 하고 NULL값을 가질 수 없음
-- 보조키
-  - 후보키 중에 기본키로 지정되지 않은 값: 속성은 기본키와 같음
-- 외래키
-  - 특정 테이블에 포함되어 있으면서 **다른 테이블의 기본키**로 지정된 키
-  - 예) 학생 정보 테이블에 있는 학과 코드: 학과 정보 테이블과 학생 정보 테이블을 이어줌
-- 복합키
-  - 여러 열을 조합하여 기본키 역할을 할 수 있게 만든 키
-  - 예) 과목 정보 테이블에서 (과목코드+교수+강의시간) 조합으로 수업을 유일하게 식별함
 
 
 
