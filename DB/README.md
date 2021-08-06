@@ -197,7 +197,7 @@ Database Users
 
 ### 2.1. Relational Model
 
-
+[수업 필기](./2-Relational-Theory/21-Relational-Model.pdf)
 
 
 
@@ -357,6 +357,8 @@ Relational Algebra
 
 
 ### 2.2. Formal Relational Theory Languages
+
+[수업 필기](./2-Relational-Theory/22-Formal-Relational-Theory-Languages.pdf)
 
 
 
